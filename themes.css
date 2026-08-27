@@ -1083,3 +1083,353 @@ html[data-skin="marble"] .path-card, html[data-skin="obsidian"] .path-card,
 html[data-skin="marble"] .spec-card, html[data-skin="obsidian"] .spec-card { border-color: var(--line); }
 html[data-skin="marble"] .faq-list, html[data-skin="marble"] .faq-list details,
 html[data-skin="obsidian"] .faq-list, html[data-skin="obsidian"] .faq-list details { border-color: var(--line); }
+
+/* ==================================================================
+   V2 REFINEMENT PASS — richer backgrounds, full theme coverage,
+   logo-matched wordmark, contrast hardening
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   A. Brand wordmark follows the official logo lettering (gold serif)
+   ------------------------------------------------------------------ */
+.brand-name {
+  background: linear-gradient(102deg, #f6dd9a 0%, #e6b954 30%, #c08e22 58%, #f0cd76 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #d9ab41;
+  letter-spacing: -.02em;
+  filter: drop-shadow(0 1px 10px rgba(212, 160, 52, .22));
+}
+html[data-theme="day"] .brand-name {
+  background: linear-gradient(102deg, #8a620c 0%, #a97a17 32%, #6e4e09 60%, #9c7318 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #8a620c;
+  filter: none;
+}
+.brand-sub { letter-spacing: .16em; }
+.footer .brand-name, .crm-header .brand-name { filter: drop-shadow(0 1px 8px rgba(212, 160, 52, .18)); }
+
+/* ------------------------------------------------------------------
+   B. Living section backgrounds — no more flat, empty canvases
+   ------------------------------------------------------------------ */
+.section { position: relative; z-index: 0; }
+
+/* Topographic contour motif — soft gold curves drifting at the edges */
+.section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='680' height='480' viewBox='0 0 680 480'%3E%3Cg fill='none' stroke='%23d8c489' stroke-width='1.1'%3E%3Cpath d='M-30 96 C 110 30 210 150 350 96 S 560 16 720 86' stroke-opacity='.5'/%3E%3Cpath d='M-30 152 C 130 84 250 208 390 142 S 600 76 720 146' stroke-opacity='.36'/%3E%3Cpath d='M-30 210 C 150 130 270 258 410 190 S 610 122 720 196' stroke-opacity='.24'/%3E%3Cpath d='M-30 268 C 160 178 290 305 430 236 S 620 168 720 244' stroke-opacity='.16'/%3E%3Cpath d='M-30 326 C 170 226 310 352 450 282 S 630 214 720 292' stroke-opacity='.1'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left -110px bottom -70px;
+  background-size: 720px auto;
+  mix-blend-mode: soft-light;
+  animation: contourDrift 90s ease-in-out infinite alternate;
+}
+.section-soft::before { background-position: left -110px top -60px; transform: scaleX(-1); animation: none; }
+.section-earth::before { background-position: left -120px top -70px; }
+@keyframes contourDrift { from { background-position-x: -110px; } to { background-position-x: -70px; } }
+@media (prefers-reduced-motion: reduce) { .section::before { animation: none; } }
+
+/* Official emblem watermark — the house mark floats behind key sections */
+.section-dark::after, .section-earth::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("media/logo-mark.webp");
+  background-repeat: no-repeat;
+  background-position: right -70px center;
+  background-size: min(42vw, 500px) auto;
+  opacity: .06;
+  mix-blend-mode: screen;
+  animation: watermarkDrift 16s ease-in-out infinite alternate;
+}
+.section-earth::after { background-position: left -70px center; }
+@keyframes watermarkDrift { to { transform: translateY(-14px); } }
+@media (prefers-reduced-motion: reduce) { .section-dark::after, .section-earth::after { animation: none; } }
+html[data-theme="day"] .section-dark::after, html[data-theme="day"] .section-earth::after {
+  mix-blend-mode: multiply;
+  opacity: .05;
+}
+
+/* Layered ambient washes per skin — night only */
+html[data-skin="signature"]:not([data-theme="day"]) .section-dark, html:not([data-skin]):not([data-theme="day"]) .section-dark {
+  background: radial-gradient(circle at 8% -10%, rgba(239, 209, 116, .05), transparent 38%),
+              radial-gradient(circle at 98% 112%, rgba(141, 175, 118, .055), transparent 34%), var(--coal);
+}
+html[data-skin="signature"]:not([data-theme="day"]) .section-soft, html:not([data-skin]):not([data-theme="day"]) .section-soft {
+  background: radial-gradient(circle at 92% -8%, rgba(239, 209, 116, .04), transparent 40%),
+              radial-gradient(circle at 4% 112%, rgba(128, 163, 116, .05), transparent 36%), #101513;
+}
+html[data-skin="signature"]:not([data-theme="day"]) .section-earth, html:not([data-skin]):not([data-theme="day"]) .section-earth {
+  background: radial-gradient(circle at 10% -10%, rgba(214, 193, 154, .05), transparent 38%),
+              radial-gradient(circle at 96% 110%, rgba(239, 107, 61, .035), transparent 32%), #1b1a14;
+}
+html[data-skin="marble"] .section-dark {
+  background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .07), transparent 38%),
+              radial-gradient(circle at 97% 110%, rgba(246, 242, 232, .035), transparent 34%), #121218;
+}
+html[data-skin="marble"] .section-soft {
+  background: radial-gradient(circle at 90% -10%, rgba(212, 160, 52, .06), transparent 42%),
+              radial-gradient(circle at 5% 112%, rgba(246, 242, 232, .03), transparent 36%),
+              linear-gradient(160deg, #17171f 0%, #131319 55%, #191922 100%);
+}
+html[data-skin="marble"] .section-earth {
+  background: radial-gradient(circle at 88% -8%, rgba(212, 160, 52, .07), transparent 40%),
+              radial-gradient(circle at 6% 112%, rgba(239, 225, 189, .04), transparent 34%),
+              linear-gradient(160deg, #1a1a14 0%, #15150f 58%, #1c1c15 100%);
+}
+html[data-skin="obsidian"] .section-dark {
+  background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .06), transparent 38%),
+              linear-gradient(160deg, #0d0d11 0%, #0a0a0d 55%, #0e0e13 100%);
+}
+html[data-skin="obsidian"] .section-soft {
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, .02) 50%, transparent 60%),
+              radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .055), transparent 42%),
+              linear-gradient(160deg, #131318 0%, #0e0e12 60%, #121218 100%);
+}
+html[data-skin="obsidian"] .section-earth {
+  background: linear-gradient(115deg, transparent 42%, rgba(212, 160, 52, .028) 50%, transparent 58%),
+              radial-gradient(circle at 8% -10%, rgba(212, 160, 52, .06), transparent 40%),
+              linear-gradient(160deg, #14130d 0%, #0e0e10 58%, #13130e 100%);
+}
+/* Day washes */
+html[data-skin="marble"][data-theme="day"] .section-dark {
+  background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .13), transparent 38%), #f7f4ec;
+}
+html[data-skin="marble"][data-theme="day"] .section-soft {
+  background: radial-gradient(circle at 90% -10%, rgba(212, 160, 52, .11), transparent 42%),
+              radial-gradient(circle at 5% 112%, rgba(184, 168, 128, .14), transparent 36%),
+              linear-gradient(160deg, #f3efe4 0%, #f8f5ec 55%, #efe9da 100%);
+}
+html[data-skin="marble"][data-theme="day"] .section-earth {
+  background: radial-gradient(circle at 88% -8%, rgba(212, 160, 52, .12), transparent 40%),
+              radial-gradient(circle at 6% 112%, rgba(184, 168, 128, .12), transparent 34%),
+              linear-gradient(160deg, #f1ecdd 0%, #f5f0e3 58%, #ece4d1 100%);
+}
+html[data-skin="obsidian"][data-theme="day"] .section-dark {
+  background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .11), transparent 38%), #f2f1ef;
+}
+html[data-skin="obsidian"][data-theme="day"] .section-soft {
+  background: radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .1), transparent 42%),
+              radial-gradient(circle at 5% 112%, rgba(160, 160, 160, .13), transparent 36%),
+              linear-gradient(160deg, #efeeec 0%, #f5f4f2 55%, #e9e7e3 100%);
+}
+html[data-skin="obsidian"][data-theme="day"] .section-earth {
+  background: radial-gradient(circle at 8% -10%, rgba(212, 160, 52, .1), transparent 40%),
+              radial-gradient(circle at 6% 112%, rgba(160, 160, 160, .12), transparent 34%),
+              linear-gradient(160deg, #e9e7e2 0%, #f1f0ee 58%, #e2e0db 100%);
+}
+/* FAQ section follows the soft washes */
+html[data-skin="marble"]:not([data-theme="day"]) .faq-section { background: radial-gradient(circle at 90% -10%, rgba(212, 160, 52, .06), transparent 42%), linear-gradient(160deg, #17171f, #131319); }
+html[data-skin="obsidian"]:not([data-theme="day"]) .faq-section { background: radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .055), transparent 42%), linear-gradient(160deg, #131318, #0e0e12); }
+html[data-skin="marble"][data-theme="day"] .faq-section { background: radial-gradient(circle at 90% -10%, rgba(212, 160, 52, .11), transparent 42%), linear-gradient(160deg, #f3efe4, #f8f5ec); }
+html[data-skin="obsidian"][data-theme="day"] .faq-section { background: radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .1), transparent 42%), linear-gradient(160deg, #efeeec, #f5f4f2); }
+
+/* Business snapshot section: quiet graph-paper motif behind the numbers */
+.business-snapshot::before {
+  background-image:
+    linear-gradient(rgba(212, 160, 52, .07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 160, 52, .07) 1px, transparent 1px);
+  background-size: 46px 46px, 46px 46px;
+  background-repeat: repeat, repeat;
+  background-position: 0 0;
+  -webkit-mask-image: radial-gradient(130% 100% at 18% 0%, black, transparent 68%);
+  mask-image: radial-gradient(130% 100% at 18% 0%, black, transparent 68%);
+  transform: none;
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Callout panels: gold inner ring + soft glow */
+.callout { position: relative; }
+.callout::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 1px solid rgba(212, 160, 52, .26);
+  box-shadow: inset 0 0 70px rgba(212, 160, 52, .045);
+}
+
+/* ------------------------------------------------------------------
+   C. Full marble / obsidian coverage — every remaining surface
+   ------------------------------------------------------------------ */
+/* Border lines that were locked to the green palette */
+html[data-skin="marble"] .rule, html[data-skin="marble"] .feature-card, html[data-skin="marble"] .numbered-item,
+html[data-skin="marble"] .mini-stats, html[data-skin="marble"] .mini-stat, html[data-skin="marble"] .faq-list, html[data-skin="marble"] .faq-list details,
+html[data-skin="obsidian"] .rule, html[data-skin="obsidian"] .feature-card, html[data-skin="obsidian"] .numbered-item,
+html[data-skin="obsidian"] .mini-stats, html[data-skin="obsidian"] .mini-stat, html[data-skin="obsidian"] .faq-list, html[data-skin="obsidian"] .faq-list details { border-color: var(--line); }
+
+/* Export panel — gold & charcoal instead of forest green */
+html[data-skin="marble"] .export-panel, html[data-skin="obsidian"] .export-panel {
+  background: radial-gradient(circle at 77% 45%, rgba(212, 160, 52, .16), transparent 27%), linear-gradient(130deg, #1c1a12, #2c2410 53%, #191712);
+  border-color: rgba(212, 160, 52, .3);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, .45), 0 0 70px rgba(212, 160, 52, .05) inset;
+}
+html[data-skin="marble"] .export-node, html[data-skin="obsidian"] .export-node { color: rgba(239, 225, 189, .62); }
+html[data-skin="marble"] .export-node span, html[data-skin="obsidian"] .export-node span { border-color: rgba(239, 225, 189, .33); background: rgba(14, 14, 19, .3); }
+html[data-skin="marble"] .export-node.active span, html[data-skin="obsidian"] .export-node.active span { color: #241d08; border-color: #e3bd63; background: linear-gradient(140deg, #f2c65e, #c08e22); }
+html[data-skin="marble"] .export-line, html[data-skin="obsidian"] .export-line { background: rgba(239, 225, 189, .24); }
+html[data-skin="marble"] .export-copy p, html[data-skin="obsidian"] .export-copy p { color: #d3ccc0; }
+html[data-skin="marble"][data-theme="day"] .export-copy p, html[data-skin="obsidian"][data-theme="day"] .export-copy p { color: #e6ddc8; }
+
+/* Distribution & transport photo cards */
+html[data-skin="marble"] .distribution-card, html[data-skin="marble"] .transport-card { background: #101017; border-color: rgba(246, 242, 232, .14); }
+html[data-skin="obsidian"] .distribution-card, html[data-skin="obsidian"] .transport-card { background: #0e0e13; border-color: rgba(212, 160, 52, .16); }
+
+/* Home reel controls */
+html[data-skin="marble"] .reel-footer, html[data-skin="obsidian"] .reel-footer { background: rgba(12, 12, 17, .92); border-top-color: rgba(212, 160, 52, .22); }
+html[data-skin="marble"] .reel-live, html[data-skin="obsidian"] .reel-live { color: #d5c089; }
+html[data-skin="marble"] .reel-skip, html[data-skin="obsidian"] .reel-skip { color: #cdc6b2; }
+html[data-skin="marble"] .reel-live i, html[data-skin="obsidian"] .reel-live i { background: #e3bd63; box-shadow: 0 0 0 5px rgba(212, 160, 52, .14); }
+
+/* Journey card icon ring */
+html[data-skin="marble"] .journey-card .path-icon { border-color: #101016; }
+html[data-skin="obsidian"] .journey-card .path-icon { border-color: #0b0b0f; }
+html[data-skin="marble"][data-theme="day"] .journey-card .path-icon { border-color: #f6f1e3; color: #241d08; }
+html[data-skin="obsidian"][data-theme="day"] .journey-card .path-icon { border-color: #f2f1ef; color: #20180a; }
+
+/* Gallery hero (gallery page top) */
+html[data-skin="marble"] .gallery-hero { background: radial-gradient(circle at 78% 20%, rgba(212, 160, 52, .16), transparent 27%), linear-gradient(118deg, #101016, #1c1c18 65%, #26241c); }
+html[data-skin="obsidian"] .gallery-hero { background: radial-gradient(circle at 78% 20%, rgba(212, 160, 52, .14), transparent 27%), linear-gradient(118deg, #0c0c10, #16161c 65%, #1c1a12); }
+
+/* Footer night tones */
+html[data-skin="marble"]:not([data-theme="day"]) .footer { background: #0e0e14; }
+html[data-skin="obsidian"]:not([data-theme="day"]) .footer { background: #09090d; }
+html[data-skin="marble"]:not([data-theme="day"]) .footer-bottom, html[data-skin="obsidian"]:not([data-theme="day"]) .footer-bottom { color: #8d8878; }
+html[data-skin="marble"][data-theme="day"] .footer-bottom { color: #5d5237; }
+html[data-skin="obsidian"][data-theme="day"] .footer-bottom { color: #53504a; }
+
+/* Supply board internals */
+html[data-skin="marble"] .supply-board-top i, html[data-skin="obsidian"] .supply-board-top i { background: #e3bd63; box-shadow: 0 0 0 5px rgba(212, 160, 52, .13); }
+html[data-skin="marble"] .board-terrain, html[data-skin="obsidian"] .board-terrain { background: linear-gradient(155deg, #4a4430, #14131a 70%); }
+html[data-skin="marble"] .mine-depth, html[data-skin="obsidian"] .mine-depth { background: linear-gradient(160deg, #2e2a1d, #0d0d10 64%); border-color: rgba(206, 193, 145, .22); }
+/* Supply board stays a dark signal island in day — keep its text light */
+html[data-skin="marble"][data-theme="day"] .supply-board, html[data-skin="obsidian"][data-theme="day"] .supply-board {
+  background: radial-gradient(circle at 74% 38%, rgba(212, 160, 52, .17), transparent 25%), linear-gradient(150deg, #292417, #13120d 65%);
+  border-color: rgba(140, 116, 43, .42);
+}
+html[data-skin="marble"][data-theme="day"] .supply-board-top, html[data-skin="obsidian"][data-theme="day"] .supply-board-top { color: #efe1bd; }
+html[data-skin="marble"][data-theme="day"] .supply-board-top strong, html[data-skin="obsidian"][data-theme="day"] .supply-board-top strong { color: #d5c089; }
+html[data-skin="marble"][data-theme="day"] .route-node, html[data-skin="obsidian"][data-theme="day"] .route-node { color: #b3ab97; }
+html[data-skin="marble"][data-theme="day"] .route-node b, html[data-skin="obsidian"][data-theme="day"] .route-node b { color: #d8cfb4; background: #2a251c; border-color: #5c5137; }
+html[data-skin="marble"][data-theme="day"] .route-node.active, html[data-skin="obsidian"][data-theme="day"] .route-node.active { color: #efe1bd; }
+html[data-skin="marble"][data-theme="day"] .supply-board-note, html[data-skin="obsidian"][data-theme="day"] .supply-board-note { color: #b3ab97; }
+html[data-skin="marble"][data-theme="day"] .supply-board-note strong, html[data-skin="obsidian"][data-theme="day"] .supply-board-note strong { color: #efe1bd; }
+
+/* Field art (valley / beacon / mine scenes) gets a brand-gold grade per skin */
+html[data-skin="marble"] .valley-scene, html[data-skin="marble"] .beacon-horizon, html[data-skin="marble"] .mine-animation,
+html[data-skin="marble"] .story-3d-scene, html[data-skin="marble"] .surface-mine-animation { filter: sepia(.3) saturate(.88); }
+html[data-skin="obsidian"] .valley-scene, html[data-skin="obsidian"] .beacon-horizon, html[data-skin="obsidian"] .mine-animation,
+html[data-skin="obsidian"] .story-3d-scene, html[data-skin="obsidian"] .surface-mine-animation { filter: grayscale(.24) sepia(.16) brightness(.94); }
+
+/* Director portrait illustration follows the skin mood */
+html[data-skin="marble"] .portrait::before { filter: saturate(.72) sepia(.16); }
+html[data-skin="obsidian"] .portrait::before { filter: saturate(.5) sepia(.1) contrast(1.05); }
+
+/* Form fields */
+html[data-skin="marble"] .field input, html[data-skin="marble"] .field select, html[data-skin="marble"] .field textarea { background: #0e0e14; }
+html[data-skin="obsidian"] .field input, html[data-skin="obsidian"] .field select, html[data-skin="obsidian"] .field textarea { background: #0b0b0f; }
+html[data-skin="marble"][data-theme="day"] .field input, html[data-skin="marble"][data-theme="day"] .field select, html[data-skin="marble"][data-theme="day"] .field textarea,
+html[data-skin="obsidian"][data-theme="day"] .field input, html[data-skin="obsidian"][data-theme="day"] .field select, html[data-skin="obsidian"][data-theme="day"] .field textarea { background: rgba(255, 253, 248, .85); color: #241d10; }
+
+/* ------------------------------------------------------------------
+   D. Contrast hardening — day modes, all skins
+   ------------------------------------------------------------------ */
+/* Gallery illustrated frames are always dark: lock their text light */
+.visual-copy h3 { color: #f2ede0; }
+.visual-copy p { color: #b6b1a3; }
+.visual-copy > span { color: #e8b06a; }
+/* Director role line: readable gold in day */
+html[data-theme="day"] .person-info .role { color: #8a620c; }
+html[data-skin="marble"][data-theme="day"] .person-info .role, html[data-skin="obsidian"][data-theme="day"] .person-info .role { color: #8a620c; }
+/* Small gold numerals in day need the deeper tone */
+html[data-skin="marble"][data-theme="day"] .feature-number, html[data-skin="obsidian"][data-theme="day"] .feature-number { color: #8a620c; }
+/* Big numbers & kickers keep brand gold but stay legible */
+html[data-skin="marble"][data-theme="day"] .mini-stat strong, html[data-skin="obsidian"][data-theme="day"] .mini-stat strong,
+html[data-skin="marble"][data-theme="day"] .big-num, html[data-skin="obsidian"][data-theme="day"] .big-num { color: #8f6410; }
+/* FAQ gold marker in day */
+html[data-skin="marble"][data-theme="day"] .faq-list summary::after, html[data-skin="obsidian"][data-theme="day"] .faq-list summary::after { color: #8a620c; }
+/* Signature day: leftover weak accents */
+html[data-skin="signature"][data-theme="day"] .person-info .role, html:not([data-skin])[data-theme="day"] .person-info .role { color: #8f620b; }
+html[data-skin="signature"][data-theme="day"] .mini-stat strong, html:not([data-skin])[data-theme="day"] .mini-stat strong { color: #7d560a; }
+/* Night: soften the giant watermark quote on quote cards for marble/obsidian */
+html[data-skin="marble"] .quote-card::before, html[data-skin="obsidian"] .quote-card::before { color: rgba(212, 160, 52, .22); }
+
+/* ------------------------------------------------------------------
+   F. CRM — full marble / obsidian coverage
+   ------------------------------------------------------------------ */
+html[data-skin="marble"] .crm-live-badge, html[data-skin="obsidian"] .crm-live-badge {
+  color: #d5c089; border-color: rgba(212, 160, 52, .32); background: rgba(212, 160, 52, .08);
+}
+html[data-skin="marble"] .crm-live-badge i, html[data-skin="obsidian"] .crm-live-badge i { background: #e3bd63; box-shadow: 0 0 0 5px rgba(212, 160, 52, .13); }
+html[data-skin="marble"] .crm-metrics span, html[data-skin="obsidian"] .crm-metrics span { color: #a8a294; }
+html[data-skin="marble"] .crm-metrics small, html[data-skin="obsidian"] .crm-metrics small { color: #8d8878; }
+html[data-skin="marble"] .crm-sidebar-label, html[data-skin="obsidian"] .crm-sidebar-label { color: #8d8878; }
+html[data-skin="marble"] .crm-tab span, html[data-skin="obsidian"] .crm-tab span { color: #b99d5e; }
+html[data-skin="marble"] .crm-tab:hover, html[data-skin="marble"] .crm-tab.active,
+html[data-skin="obsidian"] .crm-tab:hover, html[data-skin="obsidian"] .crm-tab.active { color: #f0ead9; background: rgba(212, 160, 52, .1); }
+html[data-skin="marble"] .crm-card-status, html[data-skin="obsidian"] .crm-card-status { color: #c9b487; border-color: rgba(212, 160, 52, .26); }
+html[data-skin="marble"] .crm-save-status, html[data-skin="obsidian"] .crm-save-status { color: #c9b487; }
+html[data-skin="marble"] .crm-table th, html[data-skin="obsidian"] .crm-table th { color: #8d8878; }
+html[data-skin="marble"] .crm-table td, html[data-skin="obsidian"] .crm-table td { color: #c7c2b4; }
+html[data-skin="marble"] .crm-table td small, html[data-skin="obsidian"] .crm-table td small { color: #8b8677; }
+html[data-skin="marble"] .crm-sidebar-note p, html[data-skin="obsidian"] .crm-sidebar-note p { color: #8b8677; }
+html[data-skin="marble"] .crm-cloud-card.cloud-connected, html[data-skin="obsidian"] .crm-cloud-card.cloud-connected {
+  border-color: rgba(212, 160, 52, .42); background: linear-gradient(120deg, rgba(52, 42, 16, .88), rgba(12, 12, 17, .93));
+}
+/* CRM day — gold-tinted status furniture */
+html[data-skin="marble"][data-theme="day"] .crm-live-badge, html[data-skin="obsidian"][data-theme="day"] .crm-live-badge {
+  color: #6e581c; border-color: rgba(140, 116, 43, .4); background: rgba(212, 160, 52, .12);
+}
+html[data-skin="marble"][data-theme="day"] .crm-live-badge i, html[data-skin="obsidian"][data-theme="day"] .crm-live-badge i { background: #b8891f; box-shadow: 0 0 0 5px rgba(212, 160, 52, .16); }
+html[data-skin="marble"][data-theme="day"] .crm-metrics small, html[data-skin="obsidian"][data-theme="day"] .crm-metrics small { color: #6b6555; }
+html[data-skin="marble"][data-theme="day"] .crm-sidebar-label, html[data-skin="obsidian"][data-theme="day"] .crm-sidebar-label { color: #6b6555; }
+html[data-skin="marble"][data-theme="day"] .crm-card-status, html[data-skin="obsidian"][data-theme="day"] .crm-card-status { color: #6e581c; }
+html[data-skin="marble"][data-theme="day"] .crm-save-status, html[data-skin="obsidian"][data-theme="day"] .crm-save-status { color: #6e581c; }
+html[data-skin="marble"][data-theme="day"] .crm-danger:hover, html[data-skin="obsidian"][data-theme="day"] .crm-danger:hover { color: #a3401a; }
+
+/* ------------------------------------------------------------------
+   G. Final polish
+   ------------------------------------------------------------------ */
+/* Section headlines get a quiet gold keyline for structure */
+.section-head > div:first-child::after {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 2px;
+  margin-top: 18px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--yellow), transparent);
+  opacity: .55;
+}
+/* Cards: unified hover lift + gold edge for every skin */
+.path-card, .spec-card, .community-card, .process-panel, .person-card, .quote-card, .crm-card, .image-note {
+  transition: transform .45s cubic-bezier(.2, .8, .2, 1), border-color .45s ease, box-shadow .45s ease, background .45s ease;
+}
+.path-card:hover, .spec-card:hover, .community-card:hover, .process-panel:hover, .image-note:hover {
+  transform: translateY(-4px);
+  border-color: rgba(212, 160, 52, .38);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, .28), 0 0 44px rgba(212, 160, 52, .05);
+}
+html[data-theme="day"] .path-card:hover, html[data-theme="day"] .spec-card:hover, html[data-theme="day"] .community-card:hover,
+html[data-theme="day"] .process-panel:hover, html[data-theme="day"] .image-note:hover {
+  box-shadow: 0 22px 55px rgba(70, 60, 30, .12), 0 0 44px rgba(212, 160, 52, .06);
+}
+/* Media tiles: slow zoom shimmer on hover */
+.media-tile, .media-card, .media-wall figure, .darra-wall figure, .darra-strip figure { isolation: isolate; }
+
+/* Sub-line of the lockup: warm gold letterspacing, matching the emblem's edge text */
+.brand-sub { color: #b99d5e; }
+html[data-theme="day"] .brand-sub { color: #7c651f; }
+html[data-skin="marble"] .brand-sub, html[data-skin="obsidian"] .brand-sub { color: #b99d5e; }
+html[data-skin="marble"][data-theme="day"] .brand-sub, html[data-skin="obsidian"][data-theme="day"] .brand-sub { color: #6e581c; }
