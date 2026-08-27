@@ -2430,3 +2430,128 @@ html[data-skin="obsidian"] body.page-home .qom-card-featured { background: radia
 html[data-theme="day"] body.page-home .qom-card-featured {
   background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .16), transparent 44%), rgba(255, 255, 255, .7);
 }
+
+/* ==================================================================
+   V7 — visible living coal backdrop, cinematic hero, focused reel
+   ================================================================== */
+
+/* --- The coal must be SEEN: brighter layer, lighter veils --- */
+.coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 6, .2), rgba(4, 7, 6, .4)),
+    url('media/coal-texture-bg.jpg');
+  filter: brightness(1.14) contrast(1.05);
+}
+.coal-page-bg video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(.6) saturate(.85) contrast(1.06) blur(1.5px);
+  opacity: .55;
+}
+html[data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(240, 236, 226, .3), rgba(240, 236, 226, .5)),
+    url('media/coal-texture-bg.jpg');
+}
+html[data-theme="day"] .coal-page-bg video { filter: brightness(1.02) saturate(.9) blur(1.5px); opacity: .38; }
+html[data-skin="obsidian"][data-theme="day"] .coal-page-bg video { opacity: .32; }
+
+/* Night veils let the coal texture read through clearly */
+html[data-skin="signature"] body.page-home .section-dark, html:not([data-skin]) body.page-home .section-dark { background: rgba(7, 16, 13, .78); }
+html[data-skin="signature"] body.page-home .section-soft, html:not([data-skin]) body.page-home .section-soft { background: rgba(16, 21, 19, .74); }
+html[data-skin="signature"] body.page-home .section-earth, html:not([data-skin]) body.page-home .section-earth { background: rgba(27, 26, 20, .75); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-dark, html:not([data-skin])[data-theme="day"] body.page-home .section-dark { background: rgba(244, 247, 242, .85); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-soft, html:not([data-skin])[data-theme="day"] body.page-home .section-soft { background: rgba(232, 241, 229, .83); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-earth, html:not([data-skin])[data-theme="day"] body.page-home .section-earth { background: rgba(237, 241, 223, .84); }
+html[data-skin="marble"] body.page-home .section-dark { background: rgba(19, 24, 36, .78); }
+html[data-skin="marble"] body.page-home .section-soft { background: rgba(23, 28, 43, .74); }
+html[data-skin="marble"] body.page-home .section-earth { background: rgba(25, 28, 44, .75); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-dark { background: rgba(247, 243, 232, .85); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-soft { background: rgba(243, 239, 228, .83); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-earth { background: rgba(241, 236, 221, .84); }
+html[data-skin="obsidian"] body.page-home .section-dark { background: rgba(10, 11, 14, .8); }
+html[data-skin="obsidian"] body.page-home .section-soft { background: rgba(14, 16, 19, .76); }
+html[data-skin="obsidian"] body.page-home .section-earth { background: rgba(13, 14, 12, .76); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-dark { background: rgba(242, 244, 247, .85); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-soft { background: rgba(236, 239, 243, .83); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-earth { background: rgba(233, 236, 241, .84); }
+
+/* --- Cinematic hero: stronger drift, breathing light, rising embers --- */
+.page-home .hero-photo { animation: heroKenBurns 26s ease-in-out infinite alternate; }
+@keyframes heroKenBurns {
+  from { transform: scale(1.04); }
+  to { transform: scale(1.19) translateX(-2.4%); }
+}
+html:not([data-theme="day"]) .page-home .hero-photo {
+  animation: heroKenBurns 26s ease-in-out infinite alternate, heroBreathe 9s ease-in-out infinite;
+}
+@keyframes heroBreathe {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.12) saturate(1.06); }
+}
+.hero-embers {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255, 202, 92, .9) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(255, 170, 60, .7) 0 1.6px, transparent 2.6px),
+    radial-gradient(circle, rgba(255, 222, 132, .8) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle, rgba(255, 188, 78, .55) 0 1.2px, transparent 2.2px);
+  background-size: 95px 140px, 140px 180px, 75px 115px, 170px 200px;
+  background-position: 8% 105%, 34% 112%, 62% 108%, 88% 114%;
+  background-repeat: repeat;
+  opacity: .5;
+  -webkit-mask-image: linear-gradient(to top, black 15%, transparent 72%);
+  mask-image: linear-gradient(to top, black 15%, transparent 72%);
+  animation: emberRise 13s linear infinite;
+}
+@keyframes emberRise {
+  from { background-position: 8% 105%, 34% 112%, 62% 108%, 88% 114%; }
+  to { background-position: 8% -30%, 34% -22%, 62% -34%, 88% -26%; }
+}
+html[data-theme="day"] .hero-embers { opacity: .2; }
+.hero-embers::after {
+  content: "";
+  position: absolute;
+  inset: -25% -45%;
+  background: linear-gradient(100deg, transparent 42%, rgba(255, 216, 124, .12) 50%, transparent 58%);
+  mix-blend-mode: screen;
+  animation: heroGlint 9s ease-in-out infinite;
+}
+@keyframes heroGlint {
+  0%, 100% { transform: translateX(-45%); }
+  50% { transform: translateX(45%); }
+}
+@media (prefers-reduced-motion: reduce) { .hero-embers { display: none; } }
+
+/* Compact hero copy — heading + intro small and confident */
+.page-home .hero .display { font-size: clamp(2.8rem, 4.5vw, 4.9rem); margin: 20px 0 20px; }
+.page-home .hero .lede { max-width: 470px; font-size: 1rem; line-height: 1.65; }
+.page-home .hero-actions { margin-top: 28px; }
+.page-home .hero-note { margin-top: 30px; }
+
+/* --- Focused reel: photo slides + glass-gold frame synced to design --- */
+.reel-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.reel-slide-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(4, 10, 7, .12) 30%, rgba(4, 10, 7, .38) 62%, rgba(4, 10, 7, .92));
+  pointer-events: none;
+}
+.page-home .home-reel { border-radius: 16px; }
+html[data-skin="obsidian"] .page-home .home-reel { border-radius: 8px; }
+.page-home .home-reel::before { border-color: rgba(212, 160, 52, .38); }
+.reel-footer {
+  background: rgba(7, 9, 11, .55);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(212, 160, 52, .28);
+}
+.reel-slide figcaption { border-left: 2px solid var(--yellow); }
+.reel-slide figcaption span { color: var(--ember-2); }
+.reel-slide figcaption strong { font-family: "Playfair Display", Georgia, serif; letter-spacing: .01em; }
