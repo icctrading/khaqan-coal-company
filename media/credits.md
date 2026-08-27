@@ -45,3 +45,5 @@ Please review each license and attribution requirement before deploying the site
 - `media/logo-official-black.jpg` — presentation lockup used for social sharing (og:image).
 - `favicon.png` — favicon derived from the official emblem.
 - `media/darra-photo-1.jpg` … `media/darra-photo-4.jpg` — photographs of Darra Adam Khel supplied by the company; used on the Gallery, Community, and About pages.
+
+- `media/mine-3d-terraces.jpg`, `media/mine-3d-tunnel.jpg`, `media/mine-3d-trucks.jpg`, `media/mine-3d-underground.jpg`, `media/mine-3d-stockpile.jpg` — original AI-generated 3D-style mountain coal mining visualizations created for this site (2026); no third-party licensing required. They replace the former open-pit reference photos that did not match mountain coal mining.

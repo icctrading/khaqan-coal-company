@@ -368,6 +368,7 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   const dotsWrap = reel.querySelector('[data-reel-dots]');
   const count = reel.querySelector('[data-reel-count]');
   const nextButton = reel.querySelector('[data-reel-skip]');
+  const progress = reel.querySelector('.reel-progress');
   const interval = Number(reel.dataset.reelInterval) || 7200;
   let index = 0;
   let timer = null;
@@ -403,14 +404,21 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
     });
     if (count) count.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
     dotsWrap?.querySelectorAll('.reel-dot').forEach((dot, i) => dot.classList.toggle('active', i === index));
+    if (progress) {
+      progress.classList.remove('run');
+      void progress.offsetWidth; /* restart the timeline */
+      progress.classList.add('run');
+    }
   }
 
   function stop() {
     if (timer) window.clearInterval(timer);
     timer = null;
+    if (progress) progress.classList.add('paused');
   }
   function restart() {
     stop();
+    if (progress) progress.classList.remove('paused');
     timer = window.setInterval(() => activate(index + 1), interval);
   }
 

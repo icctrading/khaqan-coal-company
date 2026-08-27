@@ -2555,3 +2555,50 @@ html[data-skin="obsidian"] .page-home .home-reel { border-radius: 8px; }
 .reel-slide figcaption { border-left: 2px solid var(--yellow); }
 .reel-slide figcaption span { color: var(--ember-2); }
 .reel-slide figcaption strong { font-family: "Playfair Display", Georgia, serif; letter-spacing: .01em; }
+
+/* ==================================================================
+   V8 — clean separated reel with bottom progress, 3D mining visuals
+   ================================================================== */
+
+/* Compact reel, clearly separated from the coal backdrop */
+.page-home .home-reel {
+  width: 322px;
+  height: 214px;
+  border: 1px solid rgba(212, 160, 52, .45);
+  background: #0a0c0b;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .65), 0 0 0 6px rgba(5, 8, 7, .35);
+}
+.page-home .home-reel::before { border: 0; }
+@media (max-width: 920px) { .page-home .home-reel { width: 288px; height: 192px; } }
+@media (max-width: 680px) { .page-home .home-reel { width: 248px; height: 168px; } }
+
+/* Bottom progress line — synced to the reel interval */
+.reel-progress {
+  position: absolute;
+  z-index: 9;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, .1);
+  overflow: hidden;
+}
+.reel-progress i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #c08e22, #f2c65e);
+  box-shadow: 0 0 8px rgba(242, 198, 94, .55);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.reel-progress.run i { animation: reelProgress var(--reel-duration, 7600ms) linear forwards; }
+.reel-progress.paused i { animation-play-state: paused; }
+@keyframes reelProgress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Clean footer: badge + dots + count only */
+.reel-footer { gap: 10px; }
+.reel-dot { transition: background .3s ease, transform .3s ease; }
+.reel-dot.active { background: var(--yellow); box-shadow: 0 0 8px rgba(242, 198, 94, .6); }
