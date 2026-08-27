@@ -47,3 +47,14 @@ Please review each license and attribution requirement before deploying the site
 - `media/darra-photo-1.jpg` … `media/darra-photo-4.jpg` — photographs of Darra Adam Khel supplied by the company; used on the Gallery, Community, and About pages.
 
 - `media/mine-3d-terraces.jpg`, `media/mine-3d-tunnel.jpg`, `media/mine-3d-trucks.jpg`, `media/mine-3d-underground.jpg`, `media/mine-3d-stockpile.jpg` — original AI-generated 3D-style mountain coal mining visualizations created for this site (2026); no third-party licensing required. They replace the former open-pit reference photos that did not match mountain coal mining.
+
+## Cinematic 3D media (added 2026-08)
+
+- `media/cine/hero-01.jpg … hero-05.jpg` (+ `.webp`) — original cinematic 3D render sequence of a terraced open-pit mountain coal mine at golden hour, generated for this site (2026). Drives the landing-page cinematic backdrop (crossfading frame engine in `script.js`); no third-party licensing required.
+- `media/cine/coal-rock.jpg` (+ `.webp`) — original photorealistic 3D close-up of coal.
+- `media/cine/valley-dawn.jpg` (+ `.webp`) — original cinematic 3D render of a hillside coal mine in a KPK valley at dawn; used on the About page legacy section.
+- `media/cine/gallery-conveyor.jpg`, `media/cine/gallery-stockpile.jpg` (+ `.webp`) — original 3D renders for the Gallery.
+
+## WebP optimisation (added 2026-08)
+
+All page imagery now ships as WebP through `<picture>` (with the original JPG as fallback) or as a WebP CSS background. Originals are retained on disk. The landing-page background video (`coal-mining-360.webm` as a fixed full-page loop) was removed; it remains available for the home reel and CRM library.

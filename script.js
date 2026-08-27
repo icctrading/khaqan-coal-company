@@ -432,3 +432,105 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   activate(0);
   restart();
 });
+
+/* =====================================================================
+   Cinematic 3D backdrop — the landing page background is a live
+   crossfading sequence of high-quality 3D renders with a slow camera
+   drift (a "video" that needs no video download).
+   ===================================================================== */
+(function () {
+  const host = document.querySelector('.coal-page-bg');
+  if (!host) return;
+  const canvas = host.querySelector('canvas.cine-canvas');
+  const imgs = Array.from(host.querySelectorAll('img.cine-src'));
+  if (!canvas || !imgs.length) return;
+  const ctx = canvas.getContext('2d');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const SEG = 8200;    // ms a frame stays in view
+  const FADE = 2800;   // crossfade window inside the segment
+  // per-frame camera drift: [scaleFrom, scaleTo, xFrom, xTo, yFrom, yTo]
+  const drift = [
+    [1.04, 1.13, -0.012, 0.016, 0.000, -0.006],
+    [1.13, 1.04, 0.016, -0.010, -0.004, 0.002],
+    [1.05, 1.15, -0.020, 0.006, 0.004, -0.006],
+    [1.15, 1.05, 0.008, -0.018, -0.004, 0.003],
+    [1.05, 1.12, 0.000, 0.014, 0.003, 0.006]
+  ];
+
+  let W = 0, H = 0, dpr = 1, raf = 0, segStart = 0, idx = 0, settled = 0;
+
+  function size() {
+    dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+    W = host.clientWidth; H = host.clientHeight;
+    canvas.width = Math.max(1, Math.round(W * dpr));
+    canvas.height = Math.max(1, Math.round(H * dpr));
+  }
+
+  function draw(img, d, p) {
+    if (!img || !img.naturalWidth) return false;
+    const s = d[0] + (d[1] - d[0]) * p;
+    const x = d[2] + (d[3] - d[2]) * p;
+    const y = d[4] + (d[5] - d[4]) * p;
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    const scale = Math.max(W / iw, H / ih) * s;
+    const dw = iw * scale, dh = ih * scale;
+    const dx = (W - dw) / 2 + x * W;
+    const dy = (H - dh) / 2 + y * H;
+    ctx.drawImage(img, dx * dpr, dy * dpr, dw * dpr, dh * dpr);
+    return true;
+  }
+
+  function frame(now) {
+    const el = now - segStart;
+    const p = Math.min(1, el / SEG);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const d = drift[idx % drift.length];
+    if (!draw(imgs[idx], d, p)) draw(imgs[0], drift[0], 0.5);
+    const fp = (el - (SEG - FADE)) / FADE;
+    if (fp > 0) {
+      const nextIdx = (idx + 1) % imgs.length;
+      ctx.globalAlpha = Math.min(1, fp);
+      draw(imgs[nextIdx], drift[nextIdx % drift.length], 0);
+      ctx.globalAlpha = 1;
+    }
+    if (p >= 1) { idx = (idx + 1) % imgs.length; segStart = now; }
+    raf = window.requestAnimationFrame(frame);
+  }
+
+  function still() {
+    size();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    draw(imgs[0], drift[0], 0.5);
+  }
+
+  function ready() {
+    if (settled < imgs.length) return;
+    size();
+    if (reduced) { still(); return; }
+    segStart = window.performance.now();
+    window.cancelAnimationFrame(raf);
+    raf = window.requestAnimationFrame(frame);
+  }
+
+  imgs.forEach((im, i) => {
+    const done = () => { settled++; ready(); };
+    if (im.complete && im.naturalWidth) done();
+    else { im.addEventListener('load', done, { once: true }); im.addEventListener('error', done, { once: true }); }
+  });
+
+  let rt = 0;
+  window.addEventListener('resize', () => {
+    window.clearTimeout(rt);
+    rt = window.setTimeout(() => {
+      size();
+      if (reduced) { ctx.clearRect(0, 0, canvas.width, canvas.height); draw(imgs[0], drift[0], 0.5); }
+    }, 160);
+  }, { passive: true });
+
+  document.addEventListener('visibilitychange', () => {
+    if (reduced) return;
+    if (document.hidden) window.cancelAnimationFrame(raf);
+    else { segStart = window.performance.now(); window.cancelAnimationFrame(raf); raf = window.requestAnimationFrame(frame); }
+  });
+})();
