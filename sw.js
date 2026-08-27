@@ -64,7 +64,11 @@ async function remember(url) {
   if (keys.length <= MAX_ENTRIES) return;
   const assets = await caches.open(ASSETS);
   const pages = await caches.open(PAGES);
-  await Promise.all(keys.slice(0, Math.ceil(keys.length / 2)).map(async (req) => {
+  const shell = new Set(SHELL.map((href) => new URL(href, self.location.href).href));
+  // The shell is never evicted: it is what makes an offline *first* paint work,
+  // and dropping it to save a few hundred KB is a bad trade.
+  const doomed = keys.slice(0, Math.ceil(keys.length / 2)).filter((req) => !shell.has(req.url));
+  await Promise.all(doomed.map(async (req) => {
     await Promise.all([assets.delete(req), pages.delete(req), list.delete(req)]);
   }));
 }
