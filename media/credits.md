@@ -104,3 +104,8 @@ retina display takes the master — nobody gets upscaled, and nobody downloads a
   `<link rel="preload" as="image">` target deliberately have **no** small rendition —
   the canvas reads the raw `src` attribute and paints full-bleed, and the preload has to
   stay the same file the hero paints (see `deploy.md` §5).
+
+The nine home-page reel chapter thumbnails also carry a `…-120.webp` candidate
+(`srcset="X-120.webp 120w, X.webp 220w" sizes="(min-width: 700px) 56px, 104px"`) because
+that strip paints 54px on the desktop and 102px on a phone: 71KB of thumbs becomes 25KB on
+a 1x display, while a 2x phone still takes the 220px master.

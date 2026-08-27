@@ -72,17 +72,14 @@ Three layers, all of them safe to deploy without any build step:
    without bound. Bump `VERSION` (`khaqan-coal-vN`) whenever the HTML set changes; the
    activate step deletes every older cache.
 
-The rule covers **both** themes: the day hero and the night hero each paint a photograph
-that the page otherwise never needs, so both must name a file the page already loads - the
-preload for day, one of the backdrop frames for night (V24). If you give a theme its own
-exclusive hero file, that file lands on the LCP critical path in exactly one theme and
-nothing shares its download.
-
 Each page also carries one `<link rel="preload" as="image">` for the first frame of its
-coal backdrop, and the day-mode hero photograph deliberately uses **that same file** —
-one download feeds both the hero and the canvas (measured on this repo: home LCP
-573ms → 425ms, About 628ms → 354ms on a 4×-throttled phone). If you give a page a new
-hero image, change its preload to match.
+coal backdrop, and the hero photograph deliberately reuses a file the page already loads:
+**day** names the preloaded frame, **night** names one of the backdrop frames (V24) -
+one download feeds the hero, the canvas and the preload together (measured on this repo:
+home LCP 573ms → 425ms, About 628ms → 354ms on a 4×-throttled phone, and 1.06MB of
+exclusive night-mode hero bytes removed across five inner pages). A theme-specific hero
+file that nothing else needs lands on the LCP critical path for that theme alone, so if
+you introduce one, add it to the preload list instead of leaving it to CSS discovery.
 
 Diagnostics, from the browser console:
 
