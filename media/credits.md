@@ -109,3 +109,15 @@ The nine home-page reel chapter thumbnails also carry a `…-120.webp` candidate
 (`srcset="X-120.webp 120w, X.webp 220w" sizes="(min-width: 700px) 56px, 104px"`) because
 that strip paints 54px on the desktop and 102px on a phone: 71KB of thumbs becomes 25KB on
 a 1x display, while a 2x phone still takes the 220px master.
+
+The brand mark ships in three renditions - `logo-mark-128.webp` (128 px),
+`logo-mark-260.webp` (260 px) and the `logo-mark.webp` master (286 px), with the
+`-light` variants alongside for day mode - because it is painted into fixed boxes:
+58 px in the site header, 119 px in the footer, and 78 px in the CRM's own top bar
+(which therefore lists only the 260 px tier - see `deploy.md` §5). The originals are the PNGs
+(`logo-mark.png`, kept as the `<picture>` fallback for browsers without WebP); both tiers
+are cut from the master at `quality=90, method=6, exact=True` on an RGBA image, so the
+transparent surround survives. The `-128` pair is what the service worker precaches.
+
+Video posters are `.webp` only. The three `*-poster.jpg` masters are kept because the CRM
+media library lists them as source files, but no page markup references them.

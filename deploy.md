@@ -120,6 +120,30 @@ generated and which files are deliberately single-rendition (`.cine-src` backdro
 and each page's preload target - the canvas reads the raw `src` attribute, and the preload
 must name the file the hero paints).
 
+### Logos, posters and the shell image budget
+
+The brand mark is CSS-sized (58px in the header, 119px in the footer and the CRM media
+cell), so it carries `logo-mark-128.webp 128w, logo-mark-260.webp 260w, logo-mark.webp
+286w` with `sizes` matching *that slot* - `(min-width: 1024px) 58px, 46px` in the header,
+`(min-width: 1024px) 120px, 88px` below the fold. The PNG stays as the `<img>` fallback
+only; no browser that understands `<picture>` pays for it. Only the two `-128` files are
+in the service worker's precached shell: the header mark is above the fold on every page,
+the larger tiers are runtime-cached (`/media/` is cache-first), so a first-time visitor
+installs 25KB of logo instead of 81KB.
+
+Two rules to keep:
+
+- Adding or re-sizing a logo slot means re-measuring the box and re-checking the pick at
+  **both** densities (`currentSrc`, never `naturalWidth`, which reports the `sizes`
+  declaration). Both slots must resolve to a tier at least as wide as `box × DPR`, or the
+  mark goes soft on a retina screen. Where the maths is not enough — the CRM page paints
+  the mark at 78px, whose 2x box (156px) sits between two tiers — narrow that slot's
+  `srcset` to the tiers that satisfy it instead of widening `sizes`, so a 1x visitor is
+  not made to pay for a retina file either.
+- `<video poster>` always points at a `.webp`. The JPEG posters cost 2-5x the same
+  picture (142KB vs 89KB on `excavator-poster`) and are painted on every load, poster or
+  no poster.
+
 ## 6. Scrolling performance conventions
 
 Things that are deliberately true about this codebase, and worth keeping:
