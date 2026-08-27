@@ -106,8 +106,6 @@ Things that are deliberately true about this codebase, and worth keeping:
   reveal handling; the menu bar and hero do not use it, on purpose.
 - Scroll reveals start ~200px before a block enters the viewport, so text is already in
   place when the reader arrives instead of animating in under the scrollbar.
-- Reveals lead the viewport (the observer root margin is positive) so a block is already
-  in place when the reader arrives rather than animating in under the scrollbar.
 - Measured on the last pass: cumulative layout shift across a whole-page scroll is
   0.0001 or zero on all seven content pages, so the fixed bar, the drawer and
   `content-visibility` together stay geometrically still. If a change makes that number
