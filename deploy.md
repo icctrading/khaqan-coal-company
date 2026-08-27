@@ -106,3 +106,22 @@ Things that are deliberately true about this codebase, and worth keeping:
   reveal handling; the menu bar and hero do not use it, on purpose.
 - Scroll reveals start ~200px before a block enters the viewport, so text is already in
   place when the reader arrives instead of animating in under the scrollbar.
+- Reveals lead the viewport (the observer root margin is positive) so a block is already
+  in place when the reader arrives rather than animating in under the scrollbar.
+- Measured on the last pass: cumulative layout shift across a whole-page scroll is
+  0.0001 or zero on all seven content pages, so the fixed bar, the drawer and
+  `content-visibility` together stay geometrically still. If a change makes that number
+  move, it is a scroll regression, not a cosmetic one.
+- Header tuck hides the bar on a *deliberate* downward gesture (>= 120px past the hero,
+  >= 80px net) and reveals it on upward scroll, on keyboard focus entering the header,
+  and at `y < 240`. It must never tuck while the drawer is open, while the theme popup
+  is open, while a field in it has focus, or while a scroll animation is running - a bar
+  sliding out from under an open control is the classic way a header feels broken.
+- Anchored targets get `scroll-padding-top: var(--bar-total)`, so a deep link lands below
+  the bar instead of under it (checked with `#ticker`, which lands ~30px clear).
+- Keyboard behaviour in the bar: a skip link jumps past the header; opening the drawer
+  focuses the active link, traps Tab inside the bar (the rest of the page is `inert`,
+  with a focus-ring fallback where `inert` is unsupported) and restores focus to the
+  toggle on `Esc`; the theme popup is a `role="menu"` with `aria-activedescendant`, so
+  ArrowUp/Down/Home/End move the selection and Enter/`Esc` return focus to the toggle.
+  Keep exactly one `#skin-menu` per page - the toggle references it by id.
