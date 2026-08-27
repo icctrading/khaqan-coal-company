@@ -21,6 +21,13 @@ const DEFAULT_CMS_DATA = {
 const CMS_KEY = 'khaqanSiteData';
 const LEADS_KEY = 'khaqanLeads';
 const THEME_KEY = 'khaqanTheme';
+const SKIN_KEY = 'khaqanSkin';
+const SKINS = ['signature', 'marble', 'obsidian'];
+const THEME_COLORS = {
+  signature: { day: '#f4f7f2', night: '#07100d' },
+  marble: { day: '#f7f4ec', night: '#121218' },
+  obsidian: { day: '#f2f1ef', night: '#0b0b0e' }
+};
 
 function readJSON(key, fallback) {
   try {
@@ -69,6 +76,11 @@ function currentTheme() {
   return window.localStorage.getItem(THEME_KEY) || 'night';
 }
 
+function currentSkin() {
+  const skin = window.localStorage.getItem(SKIN_KEY);
+  return SKINS.indexOf(skin) > -1 ? skin : 'signature';
+}
+
 function updateThemeButtons() {
   const day = document.documentElement.dataset.theme === 'day';
   document.querySelectorAll('.theme-toggle').forEach((button) => {
@@ -81,14 +93,82 @@ function updateThemeButtons() {
   });
 }
 
+function updateSkinButtons() {
+  const skin = currentSkin();
+  document.querySelectorAll('.skin-option').forEach((button) => {
+    const active = button.dataset.skin === skin;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-checked', String(active));
+  });
+}
+
+function updateThemeColorMeta() {
+  const skin = currentSkin();
+  const mode = document.documentElement.dataset.theme === 'day' ? 'day' : 'night';
+  const color = (THEME_COLORS[skin] || THEME_COLORS.signature)[mode];
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta && color) meta.setAttribute('content', color);
+}
+
+/* Brief global transition class so skin / day-night changes cross-fade smoothly. */
+function withThemeTransition(apply) {
+  const root = document.documentElement;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) { apply(); return; }
+  root.classList.add('theming');
+  apply();
+  window.setTimeout(() => root.classList.remove('theming'), 700);
+}
+
 function setTheme(theme) {
   const nextTheme = theme === 'day' ? 'day' : 'night';
-  document.documentElement.dataset.theme = nextTheme;
-  try { window.localStorage.setItem(THEME_KEY, nextTheme); } catch (error) { /* no-op */ }
+  withThemeTransition(() => {
+    document.documentElement.dataset.theme = nextTheme;
+    try { window.localStorage.setItem(THEME_KEY, nextTheme); } catch (error) { /* no-op */ }
+  });
   updateThemeButtons();
+  updateThemeColorMeta();
+}
+
+function setSkin(skin) {
+  const nextSkin = SKINS.indexOf(skin) > -1 ? skin : 'signature';
+  withThemeTransition(() => {
+    document.documentElement.dataset.skin = nextSkin;
+    try { window.localStorage.setItem(SKIN_KEY, nextSkin); } catch (error) { /* no-op */ }
+  });
+  updateSkinButtons();
+  updateThemeColorMeta();
+  closeSkinMenus();
+}
+
+/* Skin picker menu behaviour. */
+function closeSkinMenus() {
+  document.querySelectorAll('.skin-menu').forEach((menu) => {
+    menu.removeAttribute('data-open');
+    menu.hidden = true;
+  });
+  document.querySelectorAll('.skin-toggle').forEach((button) => {
+    button.setAttribute('aria-expanded', 'false');
+  });
+}
+
+function toggleSkinMenu(switchEl) {
+  const menu = switchEl.querySelector('.skin-menu');
+  if (!menu) return;
+  const willOpen = menu.hidden;
+  closeSkinMenus();
+  if (willOpen) {
+    menu.hidden = false;
+    menu.setAttribute('data-open', '');
+    const button = switchEl.querySelector('.skin-toggle');
+    if (button) button.setAttribute('aria-expanded', 'true');
+    const first = menu.querySelector('.skin-option');
+    if (first) first.focus({ preventScroll: true });
+  }
 }
 
 document.documentElement.dataset.theme = currentTheme();
+document.documentElement.dataset.skin = currentSkin();
 
 const path = window.location.pathname.split('/').pop() || 'index.html';
 
@@ -111,7 +191,23 @@ const themeButtons = document.querySelectorAll('.theme-toggle');
 themeButtons.forEach((button) => {
   button.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'day' ? 'night' : 'day'));
 });
+
+document.querySelectorAll('.skin-switch').forEach((switchEl) => {
+  const toggle = switchEl.querySelector('.skin-toggle');
+  if (toggle) toggle.addEventListener('click', (event) => { event.stopPropagation(); toggleSkinMenu(switchEl); });
+  switchEl.querySelectorAll('.skin-option').forEach((option) => {
+    option.addEventListener('click', () => setSkin(option.dataset.skin));
+  });
+});
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('.skin-switch')) closeSkinMenus();
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeSkinMenus();
+});
 updateThemeButtons();
+updateSkinButtons();
+updateThemeColorMeta();
 applyCmsData();
 
 async function hydrateCloudContent() {
@@ -208,6 +304,12 @@ window.addEventListener('storage', (event) => {
   if (event.key === THEME_KEY) {
     document.documentElement.dataset.theme = event.newValue === 'day' ? 'day' : 'night';
     updateThemeButtons();
+    updateThemeColorMeta();
+  }
+  if (event.key === SKIN_KEY && SKINS.indexOf(event.newValue) > -1) {
+    document.documentElement.dataset.skin = event.newValue;
+    updateSkinButtons();
+    updateThemeColorMeta();
   }
 });
 
