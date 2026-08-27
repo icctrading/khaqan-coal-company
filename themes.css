@@ -3594,3 +3594,20 @@ html[data-theme="day"] .page-hero::after {
 html[data-theme="day"] .skin-menu-note b { color: #6a4407; }
 html[data-skin="marble"][data-theme="day"] .skin-menu-note b,
 html[data-skin="obsidian"][data-theme="day"] .skin-menu-note b { color: #7a5a12; }
+
+/* V24 — night is the default theme, and on five inner pages its hero photograph was
+   the one image nothing else on the page needed: mine-3d-underground (97KB),
+   coal-rail-transport (367KB), coal-haul-truck (225KB), darra-coal-mines-max (252KB)
+   and mine-3d-trucks (220KB) were fetched only to paint the top of the viewport,
+   competing with the backdrop frame the page already preloads for the same LCP window.
+   Night now paints that already-loaded frame and the dark veil - not a second file -
+   is what makes it night. Same subject per page (rail for supply, coal faces for the
+   gallery, the valley for community, the stockpile for contact), one download instead
+   of two, and the pair of themes stays legible because the veils differ, not the photo.
+   Kept verbatim from the computed cascade so the gradient overlay does not move:
+   background-image only, so center / cover / no-repeat from the base shorthand stand. */
+html[data-theme="night"] .page-operations .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .8) 46%, rgba(7, 19, 12, .25) 100%), url('media/cine/reel-underground.webp'); }
+html[data-theme="night"] .page-supply .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .82) 48%, rgba(7, 19, 12, .25) 100%), url('media/cine/reel-rail.webp'); }
+html[data-theme="night"] .page-gallery .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .82) 48%, rgba(7, 19, 12, .22) 100%), url('media/cine/reel-coalfaces.webp'); }
+html[data-theme="night"] .page-community .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .84) 48%, rgba(7, 19, 12, .22) 100%), url('media/darra-photo-1.webp'); }
+html[data-theme="night"] .page-contact .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .84) 48%, rgba(7, 19, 12, .24) 100%), url('media/cine/reel-stockpile.webp'); }

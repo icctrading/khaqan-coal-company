@@ -12,7 +12,7 @@
  * the oldest half once the entry count passes MAX_ENTRIES, so a long visit can't
  * grow the origin's quota without bound.
  */
-const VERSION = 'khaqan-coal-v2';
+const VERSION = 'khaqan-coal-v3';
 const ASSETS = VERSION + ':assets';
 const PAGES = VERSION + ':pages';
 const LIST = VERSION + ':list';
@@ -23,7 +23,7 @@ const SHELL = [
   './index.html',
   './about.html', './operations.html', './supply.html', './gallery.html',
   './community.html', './contact.html', './crm.html',
-  './styles.css?v=3', './themes.css?v=14', './script.js?v=8',
+  './styles.css?v=3', './themes.css?v=15', './script.js?v=8',
   './supabase-config.js?v=1', './cloud.js?v=1',
   './crm.css?v=2', './crm.js?v=1', './crm-cloud.js?v=1',
   './media/logo-mark.webp', './media/logo-mark-light.webp',
