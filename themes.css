@@ -3067,3 +3067,502 @@ html[data-theme="day"] .coal-page-bg canvas { filter: brightness(1.04) saturate(
   background: radial-gradient(120% 90% at 50% 45%, transparent 42%, rgba(8, 18, 12, .1) 100%);
 }
 html[data-theme="day"] .coal-page-bg::after { background: radial-gradient(120% 90% at 50% 45%, transparent 45%, rgba(243, 246, 239, .22) 100%); }
+
+/* ==================================================================
+   V12 — HEADER 2.0, cache & scroll performance
+   1. Header: fixed bar, measured grid, pill nav with a gliding
+      indicator, condense + hide-on-scroll-down, hairline progress.
+   2. Perf: no full-screen CSS filters on the animated canvas, no
+      backdrop blur on large panels, content-visibility on sections.
+   3. Cache: preconnect + offline/prefetch hooks (see sw.js).
+   ================================================================== */
+
+:root { --header-h: 74px; --header-h-tight: 60px; --header-pad: clamp(16px, 3vw, 34px); }
+html { scroll-padding-top: calc(var(--header-h) + 18px); }
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  padding: 0;
+  background: linear-gradient(180deg, rgba(5, 13, 10, .6) 0%, rgba(5, 13, 10, .18) 58%, transparent 100%);
+  border-bottom: 1px solid transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: transform .5s cubic-bezier(.22, .8, .22, 1), background-color .4s ease, border-color .4s ease, box-shadow .4s ease, backdrop-filter .4s ease;
+  /* no `will-change: transform` here on purpose: a transform hint on the bar
+     would make it the containing block for the fixed drawer inside it */
+}
+html[data-theme="day"] .site-header { background: linear-gradient(180deg, rgba(243, 246, 239, .82) 0%, rgba(243, 246, 239, .34) 62%, transparent 100%); }
+.site-header.is-scrolled {
+  background: rgba(7, 16, 12, .8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.35);
+  backdrop-filter: blur(16px) saturate(1.35);
+  border-bottom-color: rgba(164, 196, 166, .16);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .22);
+}
+html[data-theme="day"] .site-header.is-scrolled { background: rgba(246, 248, 241, .84); border-bottom-color: rgba(16, 74, 38, .16); box-shadow: 0 12px 30px rgba(28, 77, 41, .1); }
+.site-header.is-hidden { transform: translateY(-104%); }
+
+/* One measured grid: brand · nav · tools. Everything shares one centre line. */
+.header-bar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: clamp(10px, 2vw, 34px);
+  width: min(100% - clamp(24px, 5vw, 72px), 1340px);
+  height: var(--header-h);
+  margin-inline: auto;
+  transition: height .4s cubic-bezier(.22, .8, .22, 1);
+}
+.site-header.is-scrolled .header-bar { height: var(--header-h-tight); }
+.header-bar > * { min-width: 0; }
+
+.brand { display: inline-flex; align-items: center; gap: clamp(8px, .9vw, 13px); flex: 0 0 auto; }
+.site-header .brand-logo { height: clamp(34px, 3vw, 44px); }
+.brand-logo img { display: block; height: 100%; width: auto; }
+.brand-name { display: grid; gap: 2px; font-size: clamp(1.02rem, 1.15vw, 1.24rem); line-height: .96; letter-spacing: -.04em; color: var(--ink); }
+.brand-sub { margin-top: 1px; font-size: clamp(.44rem, .5vw, .51rem); letter-spacing: .2em; font-weight: 850; text-transform: uppercase; color: var(--ink-soft); }
+.site-header.is-scrolled .brand-sub { opacity: 0; transition: opacity .3s ease; }
+.brand-sub { transition: opacity .3s ease; }
+
+/* Nav: a segmented pill. The dot that used to sit under the active item
+   grew that item by 20px and pulled the whole row off-centre — removed. */
+.main-nav {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-self: center;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;
+  transition: background-color .35s ease, border-color .35s ease;
+}
+.site-header.is-scrolled .main-nav, .main-nav:hover { background: rgba(255, 255, 255, .05); border-color: rgba(195, 218, 198, .14); }
+html[data-theme="day"] .site-header.is-scrolled .main-nav, html[data-theme="day"] .main-nav:hover { background: rgba(255, 255, 255, .62); border-color: rgba(16, 74, 38, .14); }
+.main-nav a {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  color: #b7c6ba;
+  font-size: .79rem;
+  font-weight: 700;
+  letter-spacing: .005em;
+  line-height: 1;
+  transition: color .22s ease;
+}
+.main-nav a:hover, .main-nav a:focus-visible { color: #f4f7ee; }
+.main-nav a.active { color: #f7f9f2; }
+html[data-theme="day"] .main-nav a { color: #4d6a53; }
+html[data-theme="day"] .main-nav a:hover, html[data-theme="day"] .main-nav a.active { color: #0a2413; }
+.main-nav a.active::after { display: none; }
+
+/* Gliding highlight — JS parks it over the active link and slides it on hover */
+.nav-glide {
+  position: absolute;
+  z-index: 0;
+  top: 5px;
+  left: 0;
+  width: 0;
+  height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(246, 242, 232, .16), rgba(212, 160, 52, .22));
+  border: 1px solid rgba(246, 242, 232, .16);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .1);
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  transition: transform .42s cubic-bezier(.22, .8, .22, 1), width .42s cubic-bezier(.22, .8, .22, 1), opacity .25s ease;
+  pointer-events: none;
+}
+.main-nav.has-glide .nav-glide { opacity: 1; }
+html[data-theme="day"] .nav-glide { background: linear-gradient(120deg, rgba(23, 99, 47, .12), rgba(242, 197, 107, .5)); border-color: rgba(23, 72, 39, .2); box-shadow: 0 6px 16px rgba(31, 78, 44, .12), inset 0 1px 0 rgba(255, 255, 255, .7); }
+@media (prefers-reduced-motion: reduce) { .nav-glide { transition: opacity .2s ease; } .site-header, .header-bar { transition: none; } }
+
+/* Right-hand tools */
+.header-tools { display: inline-flex; align-items: center; gap: 8px; justify-self: end; }
+.nav-actions { display: inline-flex; align-items: center; gap: 7px; }
+.theme-toggle, .skin-toggle { height: 38px; padding: 0 13px; align-items: center; border-radius: 999px; }
+.theme-toggle { gap: 7px; }
+.nav-cta { height: 38px; padding: 0 15px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.nav-cta, .nav-cta::after { line-height: 1; }
+.theme-toggle-label, .skin-toggle-label { line-height: 1; }
+
+/* Scroll progress hairline, glued to the bottom edge of the bar */
+.nav-progress { position: absolute; inset: auto 0 -1px 0; height: 2px; pointer-events: none; opacity: 0; transition: opacity .4s ease; }
+.site-header.is-scrolled .nav-progress { opacity: 1; }
+.nav-progress span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(var(--progress, 0));
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--ember-2), var(--yellow) 62%, var(--sand-2));
+  box-shadow: 0 0 12px rgba(212, 160, 52, .35);
+}
+
+/* The menu button, only in drawer mode */
+.menu-toggle { display: none; }
+.nav-burger { position: relative; display: block; width: 20px; height: 12px; }
+.nav-burger i { position: absolute; left: 0; width: 100%; height: 2px; border-radius: 2px; background: currentColor; transition: transform .32s cubic-bezier(.2, .8, .2, 1), opacity .2s ease; }
+.nav-burger i:nth-child(1) { top: 0; }
+.nav-burger i:nth-child(2) { top: 5px; }
+.nav-burger i:nth-child(3) { top: 10px; }
+.menu-toggle[aria-expanded="true"] .nav-burger i:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+.menu-toggle[aria-expanded="true"] .nav-burger i:nth-child(2) { opacity: 0; }
+.menu-toggle[aria-expanded="true"] .nav-burger i:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+.menu-toggle-text { display: none; }
+.skip-link {
+  position: fixed; z-index: 90; top: 12px; left: 12px;
+  padding: 11px 16px; border-radius: 999px;
+  color: #08150f; background: var(--yellow); font-size: .78rem; font-weight: 800;
+  transform: translateY(-160%);
+  transition: transform .3s cubic-bezier(.2, .8, .2, 1);
+}
+.skip-link:focus { transform: none; }
+.main-nav a:focus-visible, .nav-cta:focus-visible, .menu-toggle:focus-visible, .theme-toggle:focus-visible, .skin-toggle:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+
+/* Tablet: the tools stay, the CTA moves into the drawer */
+@media (max-width: 1180px) { .nav-cta { display: none; } }
+@media (max-width: 1340px) { .main-nav a { padding: 0 10px; font-size: .76rem; } }
+
+/* Drawer mode */
+@media (max-width: 1023px) {
+  .header-bar { grid-template-columns: minmax(0, 1fr) auto; }
+  .menu-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 14px; border: 1px solid var(--line-strong); border-radius: 999px; background: rgba(255, 255, 255, .05); color: var(--ink); font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  html[data-theme="day"] .menu-toggle { background: rgba(255, 255, 255, .6); border-color: rgba(16, 74, 38, .22); }
+  .nav-actions { display: none; }
+  .main-nav {
+    position: fixed;
+    inset: var(--header-h) 0 0 auto;
+    z-index: 55;
+    width: min(420px, 100vw);
+    height: calc(100vh - var(--header-h));
+    height: calc(100dvh - var(--header-h));
+    justify-self: stretch;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: 18px 18px calc(28px + env(safe-area-inset-bottom));
+    border: 1px solid var(--line);
+    border-right: 0;
+    border-radius: 22px 0 0 0;
+    background: rgba(8, 18, 13, .97);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    box-shadow: -30px 30px 70px rgba(0, 0, 0, .35);
+    transform: translateX(102%);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform .46s cubic-bezier(.22, .85, .2, 1), opacity .3s ease, visibility .46s;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  html[data-theme="day"] .main-nav { background: rgba(248, 250, 244, .97); border-color: rgba(16, 74, 38, .16); box-shadow: -24px 24px 60px rgba(28, 77, 41, .14); }
+  .main-nav.is-open { transform: none; opacity: 1; visibility: visible; }
+  .main-nav a { height: auto; padding: 14px 14px; font-size: .95rem; border-radius: 12px; }
+  .main-nav a + a { border-top: 1px solid rgba(195, 218, 198, .1); }
+  html[data-theme="day"] .main-nav a + a { border-top-color: rgba(16, 74, 38, .1); }
+  .main-nav a.active { background: rgba(212, 160, 52, .12); }
+  .nav-glide { display: none; }
+  .nav-cta { display: none !important; }
+  .nav-drawer-cta { display: inline-flex; margin-top: 14px; width: 100%; justify-content: center; height: 46px; }
+  .nav-scrim { position: fixed; inset: 0; z-index: 54; background: rgba(3, 9, 6, .5); opacity: 0; pointer-events: none; transition: opacity .4s ease; -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+  .nav-scrim.is-open { opacity: 1; pointer-events: auto; }
+  body.nav-locked { overflow: hidden; }
+  @keyframes navItemIn { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+  .main-nav.is-open a { animation: navItemIn .42s cubic-bezier(.2, .8, .2, 1) both; }
+  .main-nav.is-open a:nth-child(2) { animation-delay: .02s; }
+  .main-nav.is-open a:nth-child(3) { animation-delay: .06s; }
+  .main-nav.is-open a:nth-child(4) { animation-delay: .1s; }
+  .main-nav.is-open a:nth-child(5) { animation-delay: .14s; }
+  .main-nav.is-open a:nth-child(6) { animation-delay: .18s; }
+  .main-nav.is-open a:nth-child(7) { animation-delay: .22s; }
+  .main-nav.is-open a:nth-child(8) { animation-delay: .26s; }
+  .main-nav.is-open a:nth-child(9) { animation-delay: .3s; }
+  .main-nav.is-open a:nth-child(10) { animation-delay: .34s; }
+}
+@media (min-width: 1024px) { .nav-scrim { display: none; } .nav-drawer-cta { display: none; } }
+@media (max-width: 1023px) { .nav-drawer-cta { display: inline-flex; } }
+@media (max-width: 420px) {
+  :root { --header-h: 66px; --header-h-tight: 56px; }
+  .brand-sub { display: none; }
+  .site-header .brand-logo { height: 32px; }
+  .menu-toggle { padding: 0 11px; }
+  .menu-toggle .menu-toggle-text { display: none; }
+}
+
+/* CRM header shares the new bar geometry but keeps its own two-column shape */
+.crm-header .header-bar { display: flex; align-items: center; justify-content: space-between; height: var(--header-h); width: min(100% - clamp(24px, 5vw, 72px), 1340px); }
+.crm-header .brand-name { font-size: clamp(1rem, 1.1vw, 1.16rem); }
+
+/* ------------------------------------------------------------------
+   2. SCROLL PERFORMANCE
+   The fixed backdrop is a live canvas: every full-screen CSS filter on
+   it is re-run for every painted frame, and every backdrop-filter on a
+   large panel costs the same while the page moves. Those are removed and
+   replaced by static veils, and the purely decorative loops are paused
+   while the reader is actually scrolling (html.is-scrolling).
+   ------------------------------------------------------------------ */
+html.is-scrolling .page-home .hero-photo,
+html.is-scrolling .hero-photo::before,
+html.is-scrolling .section::before,
+html.is-scrolling .hero-embers i,
+html.is-scrolling .qom-rank i,
+html.is-scrolling .supply-board-top i,
+html.is-scrolling .brand-logo,
+html.is-scrolling .brand-logo img,
+html.is-scrolling .emblem-card .emblem-picture,
+html.is-scrolling .emblem-ring,
+html.is-scrolling .scroll-cue i,
+html.is-scrolling body::after,
+html.is-scrolling .coal-page-bg::after { animation-play-state: paused; }
+html.is-scrolling .reel-glass, html.is-scrolling .reel-stage::after { filter: none; }
+
+/* No per-frame filters on the animated layer any more — the grade lives in
+   the veil, which is painted once. */
+.coal-page-bg, .coal-page-bg canvas, .coal-page-bg::after { filter: none !important; }
+html[data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(243, 242, 232, .04), rgba(243, 242, 232, .2)),
+    var(--page-bg-img, url('media/coal-texture-bg.webp'));
+}
+html:not([data-theme="day"]) .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 6, .04), rgba(4, 7, 6, .22)),
+    var(--page-bg-img, url('media/coal-texture-bg.webp'));
+}
+/* Extra presence for the frames themselves, paid for once at draw time */
+.coal-page-bg canvas { opacity: .96; }
+
+/* Big translucent panels used to blur the moving canvas behind them. */
+html[data-theme="day"] .spec-card, html[data-theme="day"] .path-card, html[data-theme="day"] .qom-card,
+html[data-theme="day"] .community-card, html[data-theme="day"] .feature-card, html[data-theme="day"] .image-note,
+html[data-theme="day"] .proof-strip article, html[data-theme="day"] .mini-stats { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+/* Only paint what the viewport can actually see. Sections are far down the
+   page, so skipping their layout/paint is the single biggest scroll win. */
+@supports (content-visibility: auto) {
+  main > .section:not(.hero):not(.page-hero) { content-visibility: auto; contain-intrinsic-size: auto 720px; }
+  .reel-band, .cine-wall, .media-wall { content-visibility: auto; contain-intrinsic-size: auto 560px; }
+}
+
+/* The backdrop no longer needs its own composited layer when it is static */
+.coal-page-bg { will-change: auto; transform: none; }
+
+/* Scrolling should feel immediate: keep the reveals short and cheap */
+.reveal { transition: opacity .5s cubic-bezier(.2, .8, .2, 1), transform .5s cubic-bezier(.2, .8, .2, 1); will-change: opacity, transform; }
+.reveal.visible { will-change: auto; }
+.delay-1 { transition-delay: .05s; } .delay-2 { transition-delay: .1s; } .delay-3 { transition-delay: .15s; }
+
+/* Corrections after the first header screenshots: the drawer CTA must not
+   win against `.main-nav a`, and the nav is centred on the page axis, not on
+   whatever is left over between brand and tools. */
+@media (min-width: 1024px) { .main-nav .nav-drawer-cta { display: none !important; } }
+.header-bar { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+.header-bar > .brand { justify-self: start; }
+.header-bar > .header-tools { justify-self: end; }
+/* At mid widths the wordmark steps back before the nav can feel crowded */
+@media (max-width: 1339px) and (min-width: 1024px) {
+  .brand-sub { display: none; }
+  .site-header .brand-logo { height: 34px; }
+  .main-nav { gap: 0; }
+  .main-nav a { padding: 0 11px; }
+}
+
+/* The legacy collapse rules (680 / 920 / 1020 / 1180 breakpoints) are all
+   superseded by the drawer above; pin the desktop row back on in one place so
+   no old block can flip it to a stacked menu between 1024 and 1180. */
+@media (min-width: 1024px) {
+  .main-nav { display: flex !important; flex-direction: row !important; position: relative !important; top: auto !important; left: auto !important; right: auto !important; width: auto !important; background: transparent; box-shadow: none; padding: 5px; border-radius: 999px; }
+  .site-header.is-scrolled .main-nav, .main-nav:hover { background: rgba(255, 255, 255, .05); }
+  .main-nav.open { display: flex !important; }
+  .header-bar .nav-cta { display: inline-flex; }
+  .menu-toggle { display: none !important; }
+}
+@media (min-width: 1024px) and (max-width: 1180px) { .header-bar .nav-cta { display: none !important; } }
+
+/* Drawer mode keeps the essentials reachable: the day/night switch stays in
+   the bar as an icon, the theme picker joins it above 560px. */
+@media (max-width: 1023px) {
+  .header-tools { gap: 6px; }
+  .nav-actions { display: inline-flex; align-items: center; }
+  .theme-toggle { width: 38px; padding: 0; justify-content: center; }
+  .theme-toggle-label { display: none; }
+  .skin-toggle { width: 38px; padding: 0; justify-content: center; }
+  .header-bar .nav-cta { display: none; }
+}
+@media (max-width: 560px) {
+  .skin-switch { display: none; }
+  .nav-burger { width: 18px; }
+}
+
+/* 1180–1440 the side tracks were narrower than their content, so the tools
+   slid under the last nav item. Tracks may now shrink and the nav centres in
+   the space that is left, which cannot overlap by construction. */
+.header-bar { grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto); }
+.header-bar > .brand { flex: 0 1 auto; min-width: 0; }
+.header-bar > .header-tools { flex: 0 0 auto; }
+.main-nav { justify-self: center; }
+.main-nav a.active { font-weight: 800; }
+.main-nav a.active::before {
+  content: ""; position: absolute; left: 13px; right: 13px; bottom: 5px; height: 2px;
+  border-radius: 2px; background: var(--yellow); opacity: .85;
+}
+html[data-theme="day"] .main-nav a.active::before { background: #17632f; opacity: .7; }
+@media (min-width: 1024px) and (max-width: 1259px) { .header-bar .nav-cta { display: none; } }
+@media (min-width: 1260px) and (max-width: 1339px) { .main-nav a { padding: 0 9px; font-size: .74rem; } .theme-toggle-label, .skin-toggle-label { display: none; } .theme-toggle, .skin-toggle { width: 38px; padding: 0; justify-content: center; } }
+
+/* ---------------------------------------------------------------------------
+   V14 — narrow phones: nothing may stick out past the viewport. At 320px the
+   featured QOM card and the footer wordmark were 11px too wide because their
+   intrinsic min-width fought the grid tracks. `overflow: clip` (not `hidden`)
+   also stops the old body scroller from trapping `position: sticky` children.
+--------------------------------------------------------------------------- */
+@supports (overflow: clip) { html { overflow-x: clip; } }
+@media (max-width: 379px) {
+  :root { --container-pad: 14px; }
+  .container { padding-inline: 14px; }
+  .grid, .grid-2, .grid-3, .grid-4, .split-2, .section, .hero, .hero-inner { min-width: 0; }
+  .grid > *, [class*="grid"] > *, .split-2 > * { min-width: 0; }
+  .brand-mark, .brand-logo { flex: 0 1 auto; min-width: 0; }
+  .brand-name { min-width: 0; overflow: hidden; }
+  .brand-name strong { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+@media (max-width: 359px) {
+  .hero h1 { font-size: clamp(1.75rem, 7.6vw, 2.4rem); }
+  .btn { padding-inline: 16px; }
+}
+@media (max-width: 379px) {
+  .footer .brand { min-width: 0; max-width: 100%; }
+  .footer .brand-name { min-width: 0; }
+  .footer .brand-name > span:first-child { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .footer .brand-sub { display: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   V15 — data grids on tiny phones. Every multi-`fr` grid sized itself from the
+   min-content of its cells (a `535,121.35` figure is 128px wide), so at 320px
+   the track pushed past the viewport and `overflow-x: clip` silently ate the
+   copy. Below 480px these grids stack in one shrinkable column and their
+   `grid-column: span 2` mosaic children are released, which cannot overflow.
+--------------------------------------------------------------------------- */
+@media (max-width: 479px) {
+  .about-legacy, .about-legacy-facts, .client-grid, .contact-grid, .distribution-grid, .editorial-grid, .export-panel, .faq-grid, .footer-top, .form-grid, .intro-grid, .machinery-layout, .mini-stats, .performance-layout, .person-card, .process-grid, .profile-meta, .profile-overview, .qom-facts, .qom-grid, .spec-grid, .story-grid, .transport-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .about-legacy, .about-legacy-facts, .client-grid, .contact-grid, .distribution-grid, .editorial-grid, .export-panel, .faq-grid, .footer-top, .form-grid, .intro-grid, .machinery-layout, .mini-stats, .performance-layout, .person-card, .process-grid, .profile-meta, .profile-overview, .qom-facts, .qom-grid, .spec-grid, .story-grid, .transport-grid > * { grid-column: auto !important; }
+}
+
+/* ---------------------------------------------------------------------------
+   V16 — the bar is the one element that re-blurs its backdrop on every scroll
+   frame, so it is the one place worth spending a solid fill on. Day mode never
+   asked for a blur at all (it only inherited one through the cascade).
+--------------------------------------------------------------------------- */
+html[data-theme="day"] .site-header.is-scrolled { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(246, 248, 241, .93); }
+@media (max-width: 767px) {
+  .site-header.is-scrolled { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(7, 16, 12, .95); }
+  html[data-theme="day"] .site-header.is-scrolled { background: rgba(246, 248, 241, .96); }
+}
+
+/* ---------------------------------------------------------------------------
+   V17 — phone header weight. The logo mark already carries the wordmark, so
+   the repeated "Khaqan" was stealing width the drawer button needs, and two
+   full-opacity pills read heavier than the mark itself.
+--------------------------------------------------------------------------- */
+@media (max-width: 420px) {
+  .header-bar .brand-name { display: none; }
+  .header-bar .brand { gap: 0; }
+}
+@media (max-width: 1023px) {
+  .theme-toggle, .skin-toggle { width: 40px; height: 40px; background: rgba(255, 255, 255, .55); border-color: rgba(16, 74, 38, .16); }
+  .menu-toggle { min-width: 44px; height: 44px; padding: 0 12px; background: rgba(255, 255, 255, .72); border-color: rgba(16, 74, 38, .18); }
+  html:not([data-theme="day"]) .theme-toggle, html:not([data-theme="day"]) .skin-toggle { background: rgba(255, 255, 255, .07); border-color: rgba(195, 218, 198, .2); }
+  html:not([data-theme="day"]) .menu-toggle { background: rgba(255, 255, 255, .1); }
+}
+
+/* V18 — the phone rail scrolls sideways, and only ~3 of the 9 cuts fit at
+   390px, so it gets an explicit affordance: a slim gold scrollbar, a little
+   breathing room on both ends, and thumbs that are never half-cut at the left
+   edge. Cheap on purpose — a mask or an overlay here would cost more paint
+   than it saves. */
+@media (max-width: 900px) {
+  .reel-rail {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(212, 160, 52, .6) transparent;
+    scroll-padding-inline: 8px;
+    padding-inline: 8px 22px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .reel-rail::-webkit-scrollbar { height: 4px; }
+  .reel-rail::-webkit-scrollbar-thumb { border-radius: 4px; background: rgba(212, 160, 52, .6); }
+  .reel-rail::-webkit-scrollbar-track { background: transparent; }
+  .reel-cut { min-width: 104px; }
+}
+
+/* ---------------------------------------------------------------------------
+   V19 — phones only, day mode. The hero veils fade left-to-right so the coal
+   stays visible beside the headline on a laptop, but at 390px the copy runs the
+   full width and its right-hand words were landing on bare imagery. Below
+   560px the same veil runs top-to-bottom: legible headline block, imagery still
+   visible under the buttons.
+--------------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  html[data-theme="day"] .page-hero::after,
+  html[data-theme="day"] body.page-home .hero::after,
+  html[data-skin="marble"][data-theme="day"] .page-hero::after,
+  html[data-skin="marble"][data-theme="day"] body.page-home .hero::after,
+  html[data-skin="obsidian"][data-theme="day"] .page-hero::after,
+  html[data-skin="obsidian"][data-theme="day"] body.page-home .hero::after {
+    background: linear-gradient(180deg,
+      rgba(243, 246, 239, .97) 0%,
+      rgba(243, 246, 239, .93) 42%,
+      rgba(243, 246, 239, .8) 64%,
+      rgba(243, 246, 239, .52) 84%,
+      rgba(243, 246, 239, .26) 100%);
+  }
+  html[data-skin="marble"][data-theme="day"] .page-hero::after,
+  html[data-skin="marble"][data-theme="day"] body.page-home .hero::after {
+    background: linear-gradient(180deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .93) 42%, rgba(247, 244, 236, .8) 64%, rgba(247, 244, 236, .52) 84%, rgba(247, 244, 236, .26) 100%);
+  }
+  html[data-skin="obsidian"][data-theme="day"] .page-hero::after,
+  html[data-skin="obsidian"][data-theme="day"] body.page-home .hero::after {
+    background: linear-gradient(180deg, rgba(242, 241, 239, .97) 0%, rgba(242, 241, 239, .93) 42%, rgba(242, 241, 239, .8) 64%, rgba(242, 241, 239, .52) 84%, rgba(242, 241, 239, .26) 100%);
+  }
+  html:not([data-theme="day"]) .page-hero::after {
+    background: linear-gradient(180deg, rgba(4, 10, 7, .84) 0%, rgba(4, 10, 7, .6) 46%, rgba(4, 10, 7, .28) 100%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   V20 — the home hero's day scrim lives on `.hero::before` (it has to, the
+   coal photo paints at z-index 0 and the veil at 1), so the phone fix belongs
+   there too, not on ::after which only covers the bottom strip. Same three
+   skins, same grid texture, veil turned from left-right to top-bottom.
+--------------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  html[data-theme="day"] .page-home .hero::before {
+    background-image:
+      linear-gradient(180deg, rgba(244, 249, 241, .97) 0%, rgba(244, 249, 241, .94) 44%, rgba(244, 249, 241, .78) 66%, rgba(244, 249, 241, .46) 86%, rgba(244, 249, 241, .2) 100%),
+      linear-gradient(rgba(30, 81, 52, .05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 81, 52, .05) 1px, transparent 1px);
+  }
+  html[data-skin="marble"][data-theme="day"] .page-home .hero::before {
+    background-image:
+      linear-gradient(180deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .94) 44%, rgba(247, 244, 236, .78) 66%, rgba(247, 244, 236, .46) 86%, rgba(247, 244, 236, .2) 100%),
+      linear-gradient(rgba(90, 74, 35, .05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(90, 74, 35, .05) 1px, transparent 1px);
+  }
+  html[data-skin="obsidian"][data-theme="day"] .page-home .hero::before {
+    background-image:
+      linear-gradient(180deg, rgba(242, 241, 239, .97) 0%, rgba(242, 241, 239, .94) 44%, rgba(242, 241, 239, .78) 66%, rgba(242, 241, 239, .46) 86%, rgba(242, 241, 239, .2) 100%),
+      linear-gradient(rgba(45, 42, 35, .05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45, 42, 35, .05) 1px, transparent 1px);
+  }
+}

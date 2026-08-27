@@ -181,11 +181,6 @@ document.querySelectorAll('[data-nav]').forEach((link) => {
 });
 
 const header = document.querySelector('.site-header');
-const onScroll = () => {
-  if (header) header.classList.toggle('scrolled', window.scrollY > 22);
-};
-onScroll();
-window.addEventListener('scroll', onScroll, { passive: true });
 
 const themeButtons = document.querySelectorAll('.theme-toggle');
 themeButtons.forEach((button) => {
@@ -221,20 +216,7 @@ async function hydrateCloudContent() {
 }
 hydrateCloudContent();
 
-const toggle = document.querySelector('.menu-toggle');
-const nav = document.querySelector('.main-nav');
-if (toggle && nav) {
-  toggle.addEventListener('click', () => {
-    const open = nav.classList.toggle('open');
-    toggle.setAttribute('aria-expanded', String(open));
-    toggle.textContent = open ? '×' : '☰';
-  });
-  nav.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
-    nav.classList.remove('open');
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.textContent = '☰';
-  }));
-}
+/* Drawer control lives in the Header 2.0 module below (`.is-open`). */
 
 const revealItems = document.querySelectorAll('.reveal');
 if ('IntersectionObserver' in window && revealItems.length) {
@@ -245,7 +227,10 @@ if ('IntersectionObserver' in window && revealItems.length) {
         obs.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.13 });
+    /* Fire ~200px before a block enters instead of 13% into it: the fade has
+       usually finished by the time the reader arrives, so the page reads as
+       already-there rather than catching up with the scrollbar. */
+  }, { threshold: 0.02, rootMargin: '0px 0px 200px 0px' });
   revealItems.forEach((item) => observer.observe(item));
 } else {
   revealItems.forEach((item) => item.classList.add('visible'));
@@ -375,6 +360,7 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   const interval = Number(reel.dataset.reelInterval) || 7200;
   let index = 0;
   let timer = null;
+  let onScreen = true;
 
   if (!slides.length) return;
   reel.style.setProperty('--reel-duration', `${interval}ms`);
@@ -415,11 +401,13 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
       slide.setAttribute('aria-hidden', String(!active));
       const video = slide.querySelector('video');
       if (video) {
-        if (active) {
+        if (active && onScreen) {
           video.currentTime = 0;
+          delete video.dataset.reelResume;
           video.play().catch(() => {});
         } else {
           video.pause();
+          if (active) video.dataset.reelResume = '1';
         }
       }
     });
@@ -438,15 +426,24 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
     }
   }
 
+  const activeVideo = () => (slides[index] ? slides[index].querySelector('video') : null);
   function stop() {
     if (timer) window.clearInterval(timer);
     timer = null;
     if (progress) progress.classList.add('paused');
+    const video = activeVideo();
+    if (video && !video.paused) { video.pause(); video.dataset.reelResume = '1'; }
   }
   function restart() {
+    if (!onScreen) return;
     stop();
     if (progress) progress.classList.remove('paused');
     timer = window.setInterval(() => activate(index + 1), interval);
+    const video = activeVideo();
+    if (video && video.dataset.reelResume === '1') {
+      delete video.dataset.reelResume;
+      video.play().catch(() => {});
+    }
   }
 
   nextButton?.addEventListener('click', () => { activate(index + 1); restart(); });
@@ -457,6 +454,17 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   pauseZone.addEventListener('focusin', stop);
   pauseZone.addEventListener('focusout', (event) => { if (!pauseZone.contains(event.relatedTarget)) restart(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else restart(); });
+
+  /* Decode budget: a 30fps clip should not keep decoding while the reader is
+     three sections away, or while the tab is in the background. */
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        onScreen = entry.isIntersecting;
+        if (onScreen) restart(); else stop();
+      });
+    }, { rootMargin: '160px 0px' }).observe(reel);
+  }
 
   activate(0);
   restart();
@@ -488,7 +496,7 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
     [1.05, 1.12, 0.000, 0.014, 0.003, 0.006]
   ];
 
-  let W = 0, H = 0, dpr = 1, raf = 0, segStart = 0, idx = 0, live = 0, started = false;
+  let W = 0, H = 0, dpr = 1, raf = 0, segStart = 0, idx = 0, live = 0, started = false, lastPaint = 0, paused = 0;
 
   /* The markup keeps the frames as hidden <img> tags so the HTML stays
      declarative — but a `display:none` lazy image is never fetched, so
@@ -522,7 +530,7 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   }
 
   function size() {
-    dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+    dpr = Math.min(window.devicePixelRatio || 1, 1.25);
     W = host.clientWidth; H = host.clientHeight;
     canvas.width = Math.max(1, Math.round(W * dpr));
     canvas.height = Math.max(1, Math.round(H * dpr));
@@ -566,11 +574,29 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   }
 
   function frame(now) {
+    /* The backdrop is fixed, so scrolling never changes what it shows:
+       stop requesting frames entirely while the reader moves and pick the
+       sequence back up when they stop. While idle, ~32fps is plenty for a
+       slow crossfade and halves the paint cost. */
+    if (khaqanScroll.moving) {
+      paused = now - segStart;   /* freeze the sequence, don't skip ahead */
+      raf = 0;
+      return;
+    }
+    if (now - lastPaint < 31) { raf = window.requestAnimationFrame(frame); return; }
+    lastPaint = now;
     const el = now - segStart;
     paint(Math.min(1, el / SEG), fadeOf(el));
     if (el >= SEG) { idx = (idx + 1) % frames.length; segStart = now; }
     raf = window.requestAnimationFrame(frame);
   }
+
+  function resume() {
+    if (!started || reduced || raf || document.hidden) return;
+    segStart = window.performance.now() - paused;
+    raf = window.requestAnimationFrame(frame);
+  }
+  document.addEventListener('khaqan:scroll-end', resume);
 
   function start() {
     if (started || !live) return;
@@ -602,4 +628,221 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
     if (document.hidden) window.cancelAnimationFrame(raf);
     else { segStart = window.performance.now(); window.cancelAnimationFrame(raf); raf = window.requestAnimationFrame(frame); }
   });
+})();
+
+/* =====================================================================
+   Scroll signal — one passive listener publishes "the reader is moving".
+   Decorative loops (the backdrop canvas, the ambient animations) pause on
+   it, so scroll budget goes to scroll.
+   ===================================================================== */
+const khaqanScroll = (function () {
+  const root = document.documentElement;
+  let timer = 0;
+  let moving = false;
+  function stop() {
+    if (!moving) return;
+    moving = false;
+    root.classList.remove('is-scrolling');
+    document.dispatchEvent(new CustomEvent('khaqan:scroll-end'));
+  }
+  window.addEventListener('scroll', () => {
+    if (!moving) {
+      moving = true;
+      root.classList.add('is-scrolling');
+      document.dispatchEvent(new CustomEvent('khaqan:scroll-start'));
+    }
+    window.clearTimeout(timer);
+    timer = window.setTimeout(stop, 180);
+  }, { passive: true });
+  window.addEventListener('wheel', stop, { passive: true });
+  return { get moving() { return moving; } };
+})();
+
+/* =====================================================================
+   Header 2.0 — one rAF-batched listener drives the condensing bar, the
+   hide-on-scroll-down reveal, the scroll-progress hairline, the gliding
+   nav pill and the mobile drawer. Nothing here reads layout during
+   scroll: geometry is measured once per resize/fonts-load and cached.
+   ===================================================================== */
+(function () {
+  const bar = document.querySelector('.site-header');
+  if (!bar) return;
+
+  const nav = bar.querySelector('.main-nav');
+  const links = nav ? Array.from(nav.querySelectorAll('a[data-nav]')) : [];
+  const glide = nav ? nav.querySelector('.nav-glide') : null;
+  const burger = bar.querySelector('.menu-toggle');
+  const scrim = document.querySelector('.nav-scrim');
+  const progress = bar.querySelector('.nav-progress span');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const drawerMode = window.matchMedia('(max-width: 1023px)');
+
+  let navMetrics = [];
+  let open = false;
+  let lastY = Math.max(0, window.scrollY);
+  let ticking = false;
+  let docHeight = 1;
+
+  /* ---------- geometry (measured, never during scroll) ---------- */
+  function measure() {
+    docHeight = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    if (!glide || !nav || drawerMode.matches) { navMetrics = []; return; }
+    const base = nav.getBoundingClientRect();
+    const ox = nav.clientLeft || 0;
+    navMetrics = links.map((link) => {
+      const r = link.getBoundingClientRect();
+      return { x: Math.max(0, Math.round(r.left - base.left - ox)), w: Math.round(r.width) };
+    });
+    const active = links.findIndex((l) => l.classList.contains('active'));
+    moveGlide(active >= 0 ? active : -1);
+  }
+
+  function moveGlide(i) {
+    if (!glide) return;
+    if (i < 0 || !navMetrics[i]) { nav.classList.remove('has-glide'); return; }
+    const m = navMetrics[i];
+    glide.style.transform = `translate3d(${m.x}px, 0, 0)`;
+    glide.style.width = `${m.w}px`;
+    nav.classList.add('has-glide');
+  }
+
+  const activeIndex = () => links.findIndex((l) => l.classList.contains('active'));
+  links.forEach((link, i) => {
+    link.addEventListener('mouseenter', () => { if (!drawerMode.matches) moveGlide(i); });
+    link.addEventListener('focus', () => { if (!drawerMode.matches) moveGlide(i); });
+    link.addEventListener('mouseleave', () => { if (!drawerMode.matches) moveGlide(activeIndex()); });
+    link.addEventListener('blur', () => { if (!drawerMode.matches) moveGlide(activeIndex()); });
+  });
+  if (nav) {
+    nav.addEventListener('mouseleave', () => moveGlide(activeIndex()));
+  }
+
+  let resizeTimer = 0;
+  const remeasure = () => { window.clearTimeout(resizeTimer); resizeTimer = window.setTimeout(measure, 140); };
+  window.addEventListener('resize', remeasure, { passive: true });
+  window.addEventListener('orientationchange', remeasure);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure).catch(() => {});
+
+  /* ---------- the single scroll pass ---------- */
+  function apply() {
+    ticking = false;
+    const y = Math.max(0, window.scrollY);
+    const goingDown = y > lastY + 4;
+    const goingUp = y < lastY - 4;
+
+    bar.classList.toggle('is-scrolled', y > 18);
+    /* Tuck the bar away on the way down, bring it back the moment the
+       reader looks up — but never while the drawer or a menu is open. */
+    const menuOpen = open || bar.querySelector('.skin-menu:not([hidden])');
+    const tuck = !menuOpen && !reduceMotion.matches && goingDown && y > 460 && !drawerMode.matches;
+    bar.classList.toggle('is-hidden', tuck);
+    if (goingUp || y < 240) bar.classList.remove('is-hidden');
+    lastY = y;
+
+    if (progress) progress.style.setProperty('--progress', Math.min(1, y / docHeight).toFixed(4));
+  }
+  function onScroll() {
+    if (!ticking) { ticking = true; window.requestAnimationFrame(apply); }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  /* A tucked bar must never hide the thing the keyboard is on. */
+  bar.addEventListener('focusin', () => bar.classList.remove('is-hidden'));
+
+  /* ---------- drawer ---------- */
+  function setOpen(next) {
+    open = next;
+    if (nav) nav.classList.toggle('is-open', open);
+    if (scrim) scrim.classList.toggle('is-open', open);
+    if (burger) {
+      burger.setAttribute('aria-expanded', String(open));
+      burger.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+    }
+    document.body.classList.toggle('nav-locked', open);
+    if (open) {
+      const first = nav && nav.querySelector('a');
+      if (first) window.setTimeout(() => first.focus({ preventScroll: true }), 260);
+    } else if (burger) {
+      burger.focus({ preventScroll: true });
+    }
+  }
+  if (burger && nav) {
+    burger.addEventListener('click', () => setOpen(!open));
+    if (scrim) scrim.addEventListener('click', () => setOpen(false));
+    nav.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => { if (open) setOpen(false); }));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && open) { event.preventDefault(); setOpen(false); }
+    });
+    drawerMode.addEventListener('change', (event) => { if (!event.matches && open) setOpen(false); measure(); });
+  }
+
+  measure();
+  apply();
+  if (reduceMotion.matches) bar.classList.remove('is-hidden');
+})();
+
+/* --------------------------------------------------------------------------
+   Cache layer — one service worker for the whole origin.
+
+   * Registered on idle so it never competes with the first paint.
+   * `saveData` (or 2g) opts the tab out of speculative work entirely: the
+     prerender rules are removed and the hover prefetch stays switched off.
+   * `KhaqanCache.clear()` is the escape hatch — it drops every entry the
+     worker owns and reloads, which is what you want after a bad deploy.
+   -------------------------------------------------------------------------- */
+(function () {
+  var nav = navigator;
+  var conn = nav.connection || nav.mozConnection || nav.webkitConnection;
+  var lean = !!(conn && (conn.saveData || /(^|\b)2g$/.test(conn.effectiveType || '')));
+
+  if (lean) {
+    document.querySelectorAll('script[type="speculationrules"]').forEach(function (s) { s.remove(); });
+  }
+
+  /* Firefox and older Safari have no speculation rules yet, so those engines
+     get a plain <link rel=prefetch> the moment a pointer settles on a nav
+     link. Browsers that parse the rules are left alone — they already
+     prerender the whole document, subresources included. */
+  var specRules = !!(window.HTMLScriptElement && HTMLScriptElement.supports
+    && HTMLScriptElement.supports('speculationrules'));
+  if (!specRules && !lean) {
+    var warmed = new Set();
+    var warm = function (link) {
+      var href = link && link.getAttribute('href');
+      if (!href || !/^[^:]*\.html$/i.test(href) || warmed.has(href)) return;
+      if (href === location.pathname.replace(/^\//, '')) return;
+      warmed.add(href);
+      var l = document.createElement('link');
+      l.rel = 'prefetch';
+      l.href = href;
+      document.head.appendChild(l);
+    };
+    var bind = function (e) {
+      var link = e.target.closest && e.target.closest('a[data-nav]');
+      if (link) warm(link);
+    };
+    document.addEventListener('pointerenter', bind, true);
+    document.addEventListener('focusin', bind, true);
+  }
+
+  if (!('serviceWorker' in nav) || (!location.protocol.startsWith('http') && location.hostname !== 'localhost')) return;
+  window.addEventListener('load', function () {
+    var go = function () {
+      nav.serviceWorker.register('sw.js', { scope: './' }).then(function (reg) {
+        window.KhaqanCache = {
+          offline: function () { return !!reg.sync; },
+          clear: function () {
+            if (reg.active) reg.active.postMessage({ type: 'khaqan-cache-clear' });
+            return caches.keys().then(function (keys) {
+              return Promise.all(keys.map(function (k) { return caches.delete(k); })).then(function () { location.reload(); });
+            });
+          }
+        };
+        nav.serviceWorker.addEventListener('message', function (e) {
+          if (e.data && e.data.type === 'khaqan-cache-cleared' && e.source) e.source.postMessage({ type: 'khaqan-cache-reload' });
+        });
+      }).catch(function () { /* caching is an upgrade, never a dependency */ });
+    };
+    if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 3000 });
+    else setTimeout(go, 1200);
+  }, { once: true });
 })();

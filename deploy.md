@@ -50,3 +50,53 @@ In Vercel, open **Project → Settings → Domains**, add the company domain, an
 ## Important security note
 
 The browser only needs the public Supabase anon/publishable key. The database policies in `supabase/schema.sql` are the security boundary. Never expose the Supabase service-role key, GitHub token, Vercel token, or an email password in the website code.
+
+## 5. Caching — how the site is stored on a visitor's device
+
+Three layers, all of them safe to deploy without any build step:
+
+1. **HTTP cache (Vercel only).** `vercel.json` sets `max-age=31536000, immutable` on
+   `*.css` / `*.js` and everything under `media/`, `max-age=0, must-revalidate` with a
+   `stale-while-revalidate=3600` window on HTML, and `no-store` on `sw.js`. A deploy
+   on any other host (GitHub Pages, for example) cannot set headers — the next two
+   layers still work there.
+2. **Version tokens.** Every stylesheet and script is linked as `file.css?v=N`.
+   The token *is* the cache key, so an asset may be `immutable` and still update
+   instantly. **When you edit `styles.css`, `themes.css`, `script.js`, `crm.css`,
+   `crm.js`, `cloud.js` or `supabase-config.js`, raise that file's `?v=` number in
+   all nine HTML pages and in the `SHELL` list at the top of `sw.js`.** Forgetting
+   this is the only way to ship a change nobody can see.
+3. **Service worker (`sw.js`).** Precaches the shell, serves pages network-first with
+   an offline fallback, serves assets stale-while-revalidate and media cache-first, and
+   evicts the oldest half of its entries past 180 so the origin's quota cannot grow
+   without bound. Bump `VERSION` (`khaqan-coal-vN`) whenever the HTML set changes; the
+   activate step deletes every older cache.
+
+Diagnostics, from the browser console:
+
+```js
+KhaqanCache.clear()   // drop every cached response and reload — use after a bad deploy
+caches.keys()         // what is on disk right now
+```
+
+Speculative loading is on too: a `<script type="speculationrules">` block in each page
+prerenders the sibling page as soon as a visitor hovers a menu link (whole document,
+images included), so the next page appears instantly. Browsers that cannot parse it get
+a plain `<link rel="prefetch">` from `script.js` instead. Both are skipped when the
+device reports `saveData` or a 2g connection.
+
+## 6. Scrolling performance conventions
+
+Things that are deliberately true about this codebase, and worth keeping:
+
+- The cinematic backdrop (`script.js`) **stops requesting animation frames while the
+  page is being scrolled** and resumes on a `khaqan:scroll-end` event. Do not move that
+  canvas back onto a per-frame CSS `filter:` — a filtered fixed layer repaints on every
+  frame of the scroll.
+- `html.is-scrolling` is set for the duration of a scroll gesture; `themes.css` uses it
+  to pause ~14 decorative animations and to drop the one remaining `backdrop-filter`.
+- Long sections use `content-visibility: auto` with `contain-intrinsic-size: auto 720px`
+  so off-screen work is skipped. Anything *inside* a section therefore needs no special
+  reveal handling; the menu bar and hero do not use it, on purpose.
+- Scroll reveals start ~200px before a block enters the viewport, so text is already in
+  place when the reader arrives instead of animating in under the scrollbar.

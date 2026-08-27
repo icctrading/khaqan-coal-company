@@ -1,0 +1,17 @@
+{
+  "name": "Khaqan Coal Company Pvt. Ltd.",
+  "short_name": "Khaqan Coal",
+  "description": "Best-quality coal at good prices — mined and moved with pride from Darra Adam Khel to customers across Pakistan.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0d0d",
+  "theme_color": "#0b0d0d",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "favicon.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "media/logo-mark.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
