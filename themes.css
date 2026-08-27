@@ -2652,3 +2652,8 @@ html[data-skin] body.page-home .coal-visible, html:not([data-skin]) body.page-ho
 html[data-skin][data-theme="day"] body.page-home .coal-visible, html:not([data-skin])[data-theme="day"] body.page-home .coal-visible {
   background: linear-gradient(90deg, rgba(243, 247, 240, .93) 0%, rgba(243, 247, 240, .6) 55%, rgba(243, 247, 240, .38) 100%);
 }
+
+/* ==================================================================
+   V10 — restore the classic coal close-up as the home hero backdrop.
+   ================================================================== */
+.page-home .hero-photo { display: block; background-image: url('media/coal-hero.webp'); }
