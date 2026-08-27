@@ -2923,12 +2923,12 @@ html[data-skin="obsidian"][data-theme="day"] body:not(.page-home) .section-dark 
 html[data-skin="obsidian"][data-theme="day"] body:not(.page-home) .section-soft { background: rgba(236, 239, 243, .64); }
 html[data-skin="obsidian"][data-theme="day"] body:not(.page-home) .section-earth { background: rgba(233, 236, 241, .66); }
 /* The inner-page hero photos also read stronger now */
-html[data-theme="day"] .page-about .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .9) 0%, rgba(245, 249, 242, .68) 44%, rgba(245, 249, 242, .1) 100%), url('media/mine-3d-terraces.webp') center / cover no-repeat; }
-html[data-theme="day"] .page-operations .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .9) 0%, rgba(245, 249, 242, .68) 44%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-underground.webp') center / cover no-repeat; }
-html[data-theme="day"] .page-supply .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .9) 0%, rgba(245, 249, 242, .68) 44%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-rail.webp') center / cover no-repeat; }
-html[data-theme="day"] .page-gallery .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .9) 0%, rgba(245, 249, 242, .68) 44%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-aerial.webp') center / cover no-repeat; }
-html[data-theme="day"] .page-community .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .9) 0%, rgba(245, 249, 242, .68) 44%, rgba(245, 249, 242, .1) 100%), url('media/cine/valley-dawn.webp') center / cover no-repeat; }
-html[data-theme="day"] .page-contact .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .9) 0%, rgba(245, 249, 242, .68) 44%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-stockpile.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-about .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/mine-3d-terraces.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-operations .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-underground.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-supply .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-rail.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-gallery .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-aerial.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-community .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/valley-dawn.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-contact .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-stockpile.webp') center / cover no-repeat; }
 
 /* Per-page fallback still-frame (used before the canvas engine paints,
    and forever if JS is off) — each page gets its own coal scene. */
@@ -3565,4 +3565,26 @@ html[data-theme="day"] .site-header.is-scrolled { backdrop-filter: none; -webkit
       linear-gradient(rgba(45, 42, 35, .05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(45, 42, 35, .05) 1px, transparent 1px);
   }
+}
+
+/* ---------------------------------------------------------------------------
+   V21 — the hero photograph should be the file the page already preloads.
+   Three day-mode heroes pointed at a second image, so the browser had to
+   discover and fetch it after CSS parsing even though a 1376px frame was
+   already in flight from the <link rel=preload>; the LCP element then waited
+   on a cold request. Same bytes, one fetch, and the canvas reuses them.
+--------------------------------------------------------------------------- */
+html[data-theme="day"] .page-about .page-hero { background-image: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-haulroad.webp'); }
+html[data-theme="day"] .page-gallery .page-hero { background-image: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-coalfaces.webp'); }
+html[data-theme="day"] .page-community .page-hero { background-image: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/darra-photo-1.webp'); }
+
+/* V22 — same plateau for the `.page-hero::after` scrim, so the lede never
+   finishes its last line on bare imagery between 46% and 74% of the width. */
+html[data-theme="day"] .page-hero::after {
+  background: linear-gradient(90deg,
+    rgba(243, 246, 239, .97) 0%,
+    rgba(243, 246, 239, .93) 40%,
+    rgba(243, 246, 239, .76) 62%,
+    rgba(243, 246, 239, .4) 82%,
+    rgba(243, 246, 239, .14) 100%);
 }

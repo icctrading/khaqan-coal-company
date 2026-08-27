@@ -72,6 +72,12 @@ Three layers, all of them safe to deploy without any build step:
    without bound. Bump `VERSION` (`khaqan-coal-vN`) whenever the HTML set changes; the
    activate step deletes every older cache.
 
+Each page also carries one `<link rel="preload" as="image">` for the first frame of its
+coal backdrop, and the day-mode hero photograph deliberately uses **that same file** —
+one download feeds both the hero and the canvas (measured on this repo: home LCP
+573ms → 425ms, About 628ms → 354ms on a 4×-throttled phone). If you give a page a new
+hero image, change its preload to match.
+
 Diagnostics, from the browser console:
 
 ```js
