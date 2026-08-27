@@ -66,8 +66,10 @@ p { margin: 0 0 18px; color: var(--ink-soft); }
 }
 .site-header.scrolled { position: fixed; background: rgba(11,13,13,.84); backdrop-filter: blur(15px); border-bottom: 1px solid var(--line); padding: 14px 0; animation: navIn .3s ease both; }
 @keyframes navIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.nav-wrap { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.brand { display: inline-flex; align-items: center; gap: 12px; min-width: 210px; }
+.nav-wrap { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.main-nav { margin-inline: auto; }
+.nav-actions { display: inline-flex; align-items: center; gap: 8px; }
+.brand { display: inline-flex; align-items: center; gap: 11px; min-width: 0; }
 .brand-mark { width: 38px; height: 38px; color: var(--yellow); flex: 0 0 auto; }
 .brand-name { font-size: 1.28rem; line-height: .9; color: var(--ink); }
 .brand-sub { display: block; margin-top: 4px; color: var(--ink-soft); font-family: Inter, sans-serif; font-size: .52rem; letter-spacing: .19em; font-weight: 800; text-transform: uppercase; }
@@ -1258,7 +1260,7 @@ h1, h2, h3, .display { text-wrap: balance; }
 .main-nav { gap: 24px; }
 .main-nav a { font-size: .78rem; letter-spacing: .02em; }
 .nav-cta, .theme-toggle { font-size: .68rem; letter-spacing: .08em; }
-.hero { min-height: 840px; background: linear-gradient(90deg, rgba(5,14,9,.99) 0%, rgba(7,19,12,.95) 27%, rgba(7,19,12,.66) 53%, rgba(7,19,12,.1) 100%), url('media/coal-haul-truck.jpg') center right / cover no-repeat; }
+.hero { min-height: 840px; background: linear-gradient(90deg, rgba(5,14,9,.94) 0%, rgba(7,19,12,.84) 30%, rgba(7,19,12,.5) 58%, rgba(7,19,12,.14) 100%); }
 .hero::before { opacity: .12; background-size: 92px 92px; mask-image: linear-gradient(to right, black 0%, transparent 100%); }
 .hero::after { height: 25%; background: linear-gradient(transparent, var(--coal)); }
 .hero-content { padding-top: 155px; padding-bottom: 115px; }
@@ -1311,12 +1313,12 @@ h1, h2, h3, .display { text-wrap: balance; }
 .footer-top { padding-bottom: 58px; }
 
 /* Inner pages receive a visual, photographic hero while preserving readable copy. */
-.page-about .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.88) 45%, rgba(7,19,12,.28) 100%), url('media/mine-3d-terraces.jpg') center / cover no-repeat; }
-.page-operations .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.8) 46%, rgba(7,19,12,.25) 100%), url('media/mine-3d-underground.jpg') center / cover no-repeat; }
-.page-supply .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.82) 48%, rgba(7,19,12,.25) 100%), url('media/coal-rail-transport.jpg') center / cover no-repeat; }
-.page-gallery .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.82) 48%, rgba(7,19,12,.22) 100%), url('media/coal-haul-truck.jpg') center / cover no-repeat; }
-.page-community .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.84) 48%, rgba(7,19,12,.22) 100%), url('media/darra-coal-mines-max.jpg') center / cover no-repeat; }
-.page-contact .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.84) 48%, rgba(7,19,12,.24) 100%), url('media/mine-3d-trucks.jpg') center / cover no-repeat; }
+.page-about .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.88) 45%, rgba(7,19,12,.28) 100%), url('media/mine-3d-terraces.webp') center / cover no-repeat; }
+.page-operations .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.8) 46%, rgba(7,19,12,.25) 100%), url('media/mine-3d-underground.webp') center / cover no-repeat; }
+.page-supply .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.82) 48%, rgba(7,19,12,.25) 100%), url('media/coal-rail-transport.webp') center / cover no-repeat; }
+.page-gallery .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.82) 48%, rgba(7,19,12,.22) 100%), url('media/coal-haul-truck.webp') center / cover no-repeat; }
+.page-community .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.84) 48%, rgba(7,19,12,.22) 100%), url('media/darra-coal-mines-max.webp') center / cover no-repeat; }
+.page-contact .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.84) 48%, rgba(7,19,12,.24) 100%), url('media/mine-3d-trucks.webp') center / cover no-repeat; }
 .page-hero::before { background-image: linear-gradient(120deg, transparent 44%, rgba(222,239,217,.12) 44.2%, transparent 44.7%), linear-gradient(160deg, transparent 57%, rgba(222,239,217,.08) 57.2%, transparent 57.7%); mix-blend-mode: screen; }
 .page-hero-orb { opacity: .6; }
 
@@ -1324,17 +1326,17 @@ h1, h2, h3, .display { text-wrap: balance; }
 html[data-theme="day"] body { background: #f4f7f2; }
 html[data-theme="day"] .site-header { background: rgba(255,255,255,.95); border-bottom-color: rgba(15,58,31,.2); box-shadow: 0 4px 24px rgba(34,77,43,.08); }
 html[data-theme="day"] .site-header.scrolled { background: rgba(255,255,255,.98); }
-html[data-theme="day"] .hero { background: linear-gradient(90deg, rgba(242,248,239,.99) 0%, rgba(242,248,239,.94) 27%, rgba(242,248,239,.73) 53%, rgba(242,248,239,.12) 100%), url('media/coal-haul-truck.jpg') center right / cover no-repeat; }
+html[data-theme="day"] .hero { background: linear-gradient(90deg, rgba(243,248,239,.94) 0%, rgba(243,248,239,.82) 32%, rgba(243,248,239,.48) 60%, rgba(243,248,239,.2) 100%); }
 html[data-theme="day"] .hero::after { background: linear-gradient(transparent, #f4f7f2); }
 html[data-theme="day"] .hero h1, html[data-theme="day"] .hero .lede { color: #102819; }
 html[data-theme="day"] .hero h1 span { color: #8f4d21; }
 html[data-theme="day"] .hero-note { color: #2a5637; border-top-color: rgba(15,58,31,.24); }
-html[data-theme="day"] .page-about .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.18) 100%), url('media/mine-3d-terraces.jpg') center / cover no-repeat; }
-html[data-theme="day"] .page-operations .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.15) 100%), url('media/mine-3d-underground.jpg') center / cover no-repeat; }
-html[data-theme="day"] .page-supply .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.15) 100%), url('media/coal-rail-transport.jpg') center / cover no-repeat; }
-html[data-theme="day"] .page-gallery .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.15) 100%), url('media/coal-haul-truck.jpg') center / cover no-repeat; }
-html[data-theme="day"] .page-community .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.16) 100%), url('media/darra-coal-mines-max.jpg') center / cover no-repeat; }
-html[data-theme="day"] .page-contact .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.16) 100%), url('media/mine-3d-trucks.jpg') center / cover no-repeat; }
+html[data-theme="day"] .page-about .page-hero { background: linear-gradient(90deg, rgba(245,249,242,.94) 0%, rgba(245,249,242,.8) 44%, rgba(245,249,242,.34) 100%), url('media/mine-3d-terraces.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-operations .page-hero { background: linear-gradient(90deg, rgba(245,249,242,.94) 0%, rgba(245,249,242,.8) 44%, rgba(245,249,242,.36) 100%), url('media/mine-3d-underground.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-supply .page-hero { background: linear-gradient(90deg, rgba(245,249,242,.94) 0%, rgba(245,249,242,.8) 44%, rgba(245,249,242,.36) 100%), url('media/coal-rail-transport.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-gallery .page-hero { background: linear-gradient(90deg, rgba(245,249,242,.94) 0%, rgba(245,249,242,.8) 44%, rgba(245,249,242,.34) 100%), url('media/coal-haul-truck.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-community .page-hero { background: linear-gradient(90deg, rgba(245,249,242,.94) 0%, rgba(245,249,242,.8) 44%, rgba(245,249,242,.34) 100%), url('media/darra-coal-mines-max.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-contact .page-hero { background: linear-gradient(90deg, rgba(245,249,242,.94) 0%, rgba(245,249,242,.8) 44%, rgba(245,249,242,.36) 100%), url('media/mine-3d-trucks.webp') center / cover no-repeat; }
 html[data-theme="day"] .page-hero h1, html[data-theme="day"] .page-hero .lede { color: #102819; }
 html[data-theme="day"] .page-hero::before { mix-blend-mode: multiply; opacity: .28; }
 html[data-theme="day"] .page-hero-orb { opacity: .36; }
@@ -1453,14 +1455,12 @@ html[data-theme="day"] .export-profile-callout { border-color: rgba(16,74,38,.27
 .brand-sub { margin-top: 5px; font-size: .58rem; letter-spacing: .135em; }
 .footer .brand-name { font-size: 1.4rem; }
 @media (max-width: 1180px) {
-  .main-nav { gap: 13px; }
+  .main-nav { gap: 15px; }
   .nav-cta { display: none; }
-  .brand { min-width: 245px; }
 }
 @media (max-width: 920px) {
-  .brand { min-width: 222px; }
-  .brand-name { font-size: 1.34rem; }
-  .brand-sub { font-size: .53rem; }
+  .brand-name { font-size: 1.28rem; }
+  .brand-sub { font-size: .5rem; }
 }
 @media (max-width: 680px) {
   .brand { min-width: 0; gap: 10px; }
@@ -1472,8 +1472,8 @@ html[data-theme="day"] .export-profile-callout { border-color: rgba(16,74,38,.27
 /* Proof slides inside the hero reel: convert visual attention into buyer confidence. */
 .reel-proof-slide { background: #0c1c12; }
 .reel-proof-bg, .reel-client-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: saturate(.72) contrast(1.08) brightness(.47); transform: scale(1.04); transition: transform 8s ease; }
-.reel-proof-bg { background-image: url('media/coal-haul-truck.jpg'); }
-.reel-client-bg { background-image: url('media/coal-rail-transport.jpg'); background-position: center 43%; }
+.reel-proof-bg { background-image: url('media/coal-haul-truck.webp'); }
+.reel-client-bg { background-image: url('media/coal-rail-transport.webp'); background-position: center 43%; }
 .reel-proof-slide.active .reel-proof-bg, .reel-proof-slide.active .reel-client-bg { transform: scale(1.12); }
 .reel-proof-content { position: absolute; z-index: 3; right: 20px; bottom: 24px; left: 20px; display: grid; gap: 6px; }
 .proof-eyebrow { color: var(--ember-2); font-size: .52rem; font-weight: 850; letter-spacing: .11em; }
@@ -1579,3 +1579,64 @@ html[data-theme="day"] .video-window-copy strong { color: #f6faed; }
   .surface-video-inset { right: 12px; bottom: 14px; width: 165px; height: 102px; transform: translateZ(180px) rotateY(-6deg) rotateX(3deg); }
   .surface-video-inset span { font-size: .44rem; }
 }
+
+/* ================================================================
+   New media systems — field reel band, 3D image wall, film wall,
+   about legacy panel, machinery media grid
+   ================================================================ */
+.reel-band { padding: 84px 0 96px; }
+.reel-band-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 34px; }
+.reel-band-head h2 { font-size: clamp(2rem, 3.3vw, 3.05rem); margin: 10px 0 0; }
+.reel-band-head p { max-width: 430px; color: var(--ink-soft); font-size: .9rem; line-height: 1.7; }
+.reel-wrap { position: relative; }
+.reel-stage {
+  position: relative; width: 100%; max-width: 1080px; margin: 0 auto; aspect-ratio: 21 / 9; min-height: 320px;
+  overflow: hidden; border: 1px solid rgba(239,209,116,.5); border-radius: 20px; background: #07120b;
+  box-shadow: 0 34px 70px rgba(0,0,0,.48), 0 0 0 10px rgba(8,18,12,.12);
+  transform: perspective(1400px) rotateX(calc(var(--tilt-y, 0deg) * .3)) rotateY(calc(var(--tilt-x, 0deg) * .3));
+  transition: transform .6s cubic-bezier(.2,.8,.2,1);
+}
+.reel-stage .reel-slide video, .reel-stage .reel-slide > img { filter: saturate(.9) contrast(1.07) brightness(.9); }
+html[data-theme="day"] .reel-stage { border-color: rgba(103,74,29,.5); box-shadow: 0 34px 70px rgba(38,62,35,.25), 0 0 0 10px rgba(235,244,225,.16); }
+html[data-theme="day"] .reel-stage .reel-slide video, html[data-theme="day"] .reel-stage .reel-slide > img { filter: saturate(.92) contrast(1.05) brightness(.95); }
+@media (max-width: 680px) { .reel-stage { aspect-ratio: 16 / 10; min-height: 250px; border-radius: 14px; } .reel-band { padding: 60px 0 68px; } }
+
+.cine-wall { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.cine-wall figure { position: relative; margin: 0; overflow: hidden; border-radius: 16px; border: 1px solid rgba(195,218,198,.14); background: #0a120d; aspect-ratio: 16 / 9; }
+.cine-wall .cw-wide { grid-column: span 2; }
+.cine-wall img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.85) contrast(1.06); transition: transform .8s cubic-bezier(.2,.8,.2,1), filter .4s ease; }
+.cine-wall figure:hover img { transform: scale(1.045); filter: saturate(.95) contrast(1.08); }
+.cine-wall figcaption { position: absolute; right: 0; bottom: 0; left: 0; padding: 34px 16px 14px; background: linear-gradient(transparent, rgba(4,10,6,.88)); display: grid; gap: 3px; }
+.cine-wall figcaption span { color: var(--ember-2); font-size: .58rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.cine-wall figcaption strong { color: #f2f4e6; font-size: .85rem; font-weight: 700; }
+@media (max-width: 920px) { .cine-wall { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .cine-wall { grid-template-columns: 1fr; } .cine-wall .cw-wide { grid-column: auto; } }
+
+.film-wall { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.film-card { margin: 0; position: relative; border-radius: 16px; overflow: hidden; border: 1px solid rgba(195,218,198,.14); background: #0a120d; aspect-ratio: 16 / 10; }
+.film-card video { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.85) contrast(1.06) brightness(.92); }
+.film-card figcaption { position: absolute; right: 0; bottom: 0; left: 0; padding: 30px 14px 12px; background: linear-gradient(transparent, rgba(4,10,6,.9)); display: grid; gap: 3px; pointer-events: none; }
+.film-card figcaption span { color: var(--ember-2); font-size: .56rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.film-card figcaption strong { color: #f2f4e6; font-size: .8rem; font-weight: 700; }
+@media (max-width: 980px) { .film-wall { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .film-wall { grid-template-columns: 1fr; } }
+
+.about-legacy { display: grid; grid-template-columns: 1.12fr .88fr; gap: 50px; align-items: center; }
+.about-legacy-media { margin: 0; position: relative; border-radius: var(--radius); overflow: hidden; border: 1px solid rgba(195,218,198,.16); box-shadow: 0 30px 60px rgba(0,0,0,.35); }
+.about-legacy-media img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.9) contrast(1.04); }
+.about-legacy-media figcaption { position: absolute; right: 14px; bottom: 12px; left: 14px; padding: 9px 12px; border-left: 2px solid var(--yellow); background: rgba(6,14,8,.6); backdrop-filter: blur(8px); color: rgba(240,244,228,.85); font-size: .64rem; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
+.about-legacy-copy h2 { font-size: clamp(2.2rem, 3.6vw, 3.4rem); margin: 12px 0 20px; }
+.about-legacy-copy p { max-width: 540px; }
+.about-legacy-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 30px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.about-legacy-facts div { padding: 16px 18px; background: rgba(16,21,19,.6); }
+.about-legacy-facts strong { display: block; font-family: Georgia, serif; font-size: 1.28rem; color: var(--sand-2); letter-spacing: -.02em; }
+.about-legacy-facts span { color: var(--ink-soft); font-size: .68rem; letter-spacing: .05em; }
+html[data-theme="day"] .about-legacy-facts div { background: rgba(255,255,255,.6); }
+@media (max-width: 920px) { .about-legacy { grid-template-columns: 1fr; gap: 30px; } .about-legacy-media { order: -1; } }
+
+.machinery-media { display: grid; grid-template-columns: 1.5fr 1fr; grid-template-rows: 1fr 1fr; gap: 14px; min-height: 440px; }
+.machinery-media figure { margin: 0; position: relative; overflow: hidden; border-radius: var(--radius); border: 1px solid rgba(195,218,198,.16); background: #0a120d; min-height: 200px; }
+.machinery-media-main { grid-row: span 2; }
+.machinery-media img, .machinery-media video { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.85) contrast(1.06) brightness(.92); }
+.machinery-media figcaption { position: absolute; right: 12px; bottom: 11px; left: 12px; padding: 8px 11px; border-left: 2px solid var(--yellow); background: rgba(6,14,8,.62); backdrop-filter: blur(8px); color: rgba(240,244,228,.85); font-size: .6rem; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
+@media (max-width: 920px) { .machinery-media { grid-template-columns: 1fr; grid-template-rows: auto auto; min-height: 0; } .machinery-media-main { grid-row: auto; } .machinery-media figure { min-height: 240px; } }

@@ -1136,27 +1136,13 @@ html[data-theme="day"] .brand-name {
 @keyframes contourDrift { from { background-position-x: -110px; } to { background-position-x: -70px; } }
 @media (prefers-reduced-motion: reduce) { .section::before { animation: none; } }
 
-/* Official emblem watermark — the house mark floats behind key sections */
+/* Section glow layer (brand watermark removed 2026-08) */
 .section-dark::after, .section-earth::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: url("media/logo-mark.webp");
-  background-repeat: no-repeat;
-  background-position: right -70px center;
-  background-size: min(42vw, 500px) auto;
-  opacity: .06;
-  mix-blend-mode: screen;
-  animation: watermarkDrift 16s ease-in-out infinite alternate;
-}
-.section-earth::after { background-position: left -70px center; }
-@keyframes watermarkDrift { to { transform: translateY(-14px); } }
-@media (prefers-reduced-motion: reduce) { .section-dark::after, .section-earth::after { animation: none; } }
-html[data-theme="day"] .section-dark::after, html[data-theme="day"] .section-earth::after {
-  mix-blend-mode: multiply;
-  opacity: .05;
 }
 
 /* Layered ambient washes per skin — night only */
@@ -1446,10 +1432,6 @@ html[data-theme="day"] .brand-logo-day { display: block; }
 html[data-theme="day"] .brand-logo-night { display: none; }
 html[data-theme="day"] .emblem-picture-day { display: block; }
 html[data-theme="day"] .emblem-picture-night { display: none; }
-/* Watermarks use the light artwork in day mode */
-html[data-theme="day"] .section-dark::after, html[data-theme="day"] .section-earth::after {
-  background-image: url("media/logo-mark-light.webp");
-}
 
 /* ------------------------------------------------------------------
    B. Bigger brand lockup + logo animation
@@ -2175,23 +2157,18 @@ html[data-skin="obsidian"][data-theme="day"] .footer { background: #e3e7ec; }
 .section-dark::after, .section-earth::after {
   background-image:
     radial-gradient(620px 460px at 88% 16%, rgba(212, 160, 52, .09), transparent 70%),
-    radial-gradient(520px 400px at 10% 88%, rgba(239, 209, 116, .05), transparent 70%),
-    url("media/logo-mark.webp");
+    radial-gradient(520px 400px at 10% 88%, rgba(239, 209, 116, .05), transparent 70%);
   background-repeat: no-repeat;
-  background-position: 88% 16%, 10% 88%, right -70px center;
-  background-size: auto, auto, min(42vw, 500px) auto;
-  opacity: 1;
+  background-position: 88% 16%, 10% 88%;
+  background-size: auto, auto;
 }
 html[data-theme="day"] .section-dark::after, html[data-theme="day"] .section-earth::after {
   background-image:
     radial-gradient(620px 460px at 88% 16%, rgba(212, 160, 52, .1), transparent 70%),
-    radial-gradient(520px 400px at 10% 88%, rgba(212, 160, 52, .06), transparent 70%),
-    url("media/logo-mark-light.webp");
-  background-position: 88% 16%, 10% 88%, right -70px center;
-  background-size: auto, auto, min(42vw, 500px) auto;
+    radial-gradient(520px 400px at 10% 88%, rgba(212, 160, 52, .06), transparent 70%);
+  background-position: 88% 16%, 10% 88%;
+  background-size: auto, auto;
 }
-.section-earth::after { background-position: 88% 16%, 10% 88%, left -70px center; }
-html[data-theme="day"] .section-earth::after { background-position: 88% 16%, 10% 88%, left -70px center; }
 /* Aurora washes also reach the soft sections */
 .section-soft { position: relative; }
 .section-soft::after {
@@ -2602,3 +2579,76 @@ html[data-skin="obsidian"] .page-home .home-reel { border-radius: 8px; }
 .reel-footer { gap: 10px; }
 .reel-dot { transition: background .3s ease, transform .3s ease; }
 .reel-dot.active { background: var(--yellow); box-shadow: 0 0 8px rgba(242, 198, 94, .6); }
+
+/* ==================================================================
+   V8 — cinematic 3D backdrop (canvas frame engine) replaces the old
+   low-quality background video; day mode keeps the imagery visible.
+   ================================================================== */
+
+/* Canvas sits over the fallback texture; the veil keeps copy readable. */
+.coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 6, .3), rgba(4, 7, 6, .52)),
+    url('media/coal-texture-bg.webp');
+  filter: none;
+}
+.coal-page-bg canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.coal-page-bg img.cine-src { display: none; }
+.cine-veil {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(4, 7, 6, .38) 0%, rgba(4, 7, 6, .44) 55%, rgba(4, 7, 6, .62) 100%);
+}
+/* Day mode: the golden-hour renders stay clearly visible (not washed out). */
+html[data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(238, 236, 224, .42), rgba(238, 236, 224, .58)),
+    url('media/coal-texture-bg.webp');
+}
+html[data-theme="day"] .cine-veil {
+  background: linear-gradient(180deg, rgba(240, 239, 228, .16) 0%, rgba(240, 239, 228, .34) 55%, rgba(240, 239, 228, .52) 100%);
+}
+html[data-skin="obsidian"] .cine-veil {
+  background: linear-gradient(180deg, rgba(5, 6, 8, .4) 0%, rgba(5, 6, 8, .46) 55%, rgba(5, 6, 8, .64) 100%);
+}
+html[data-skin="obsidian"][data-theme="day"] .cine-veil {
+  background: linear-gradient(180deg, rgba(236, 238, 242, .18) 0%, rgba(236, 238, 242, .36) 55%, rgba(236, 238, 242, .55) 100%);
+}
+
+/* The separate hero photo layer is retired — the canvas IS the backdrop. */
+.page-home .hero-photo { display: none; }
+
+/* Day-mode section veils on the home page stay light enough for the
+   golden renders to read through, per the request. */
+html[data-theme="day"] body.page-home .section-dark, html[data-skin="marble"][data-theme="day"] body.page-home .section-dark,
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-dark { background: rgba(244, 247, 242, .82); }
+html[data-theme="day"] body.page-home .section-soft, html[data-skin="marble"][data-theme="day"] body.page-home .section-soft,
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-soft { background: rgba(232, 241, 229, .8); }
+html[data-theme="day"] body.page-home .section-earth, html[data-skin="marble"][data-theme="day"] body.page-home .section-earth,
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-earth { background: rgba(237, 241, 223, .8); }
+
+/* New components — mode/skin accents */
+html[data-theme="day"] .reel-band-head p, html[data-theme="day"] .cine-wall figcaption strong, html[data-theme="day"] .film-card figcaption strong { color: #f7f6ea; }
+html[data-theme="day"] .film-card, html[data-theme="day"] .cine-wall figure { border-color: rgba(15, 58, 31, .22); }
+html[data-theme="day"] .about-legacy-media { border-color: rgba(15, 58, 31, .22); }
+html[data-theme="day"] .machinery-media figure { border-color: rgba(15, 58, 31, .22); }
+html[data-skin="marble"] .reel-stage, html[data-skin="obsidian"] .reel-stage { border-color: rgba(212, 160, 52, .45); }
+html[data-skin="marble"] .cine-wall figure, html[data-skin="obsidian"] .cine-wall figure,
+html[data-skin="marble"] .film-card, html[data-skin="obsidian"] .film-card { border-color: rgba(212, 160, 52, .2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reel-stage { transform: none !important; transition: none !important; }
+}
+
+/* The canvas engine supplies its own motion — retire the layer drift. */
+.coal-page-bg { animation: none; will-change: auto; }
+
+/* ==================================================================
+   V9 — coal backdrop reads clearly behind the "More than a supplier"
+   section (left-anchored copy stays readable, right side opens up).
+   ================================================================== */
+html[data-skin] body.page-home .coal-visible, html:not([data-skin]) body.page-home .coal-visible {
+  background: linear-gradient(90deg, rgba(6, 10, 8, .86) 0%, rgba(6, 10, 8, .52) 52%, rgba(6, 10, 8, .26) 100%);
+}
+html[data-skin][data-theme="day"] body.page-home .coal-visible, html:not([data-skin])[data-theme="day"] body.page-home .coal-visible {
+  background: linear-gradient(90deg, rgba(243, 247, 240, .93) 0%, rgba(243, 247, 240, .6) 55%, rgba(243, 247, 240, .38) 100%);
+}
