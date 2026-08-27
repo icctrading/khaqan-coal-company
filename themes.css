@@ -3611,3 +3611,9 @@ html[data-theme="night"] .page-supply .page-hero { background-image: linear-grad
 html[data-theme="night"] .page-gallery .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .82) 48%, rgba(7, 19, 12, .22) 100%), url('media/cine/reel-coalfaces.webp'); }
 html[data-theme="night"] .page-community .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .84) 48%, rgba(7, 19, 12, .22) 100%), url('media/darra-photo-1.webp'); }
 html[data-theme="night"] .page-contact .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .84) 48%, rgba(7, 19, 12, .24) 100%), url('media/cine/reel-stockpile.webp'); }
+
+/* V25 — the skip link is only useful if focus actually lands somewhere. #main now
+   carries tabindex="-1", so activating the link moves focus into the content instead
+   of leaving it on <body> (which restarts the tab order at the header). The container
+   must not paint a ring around the whole page when it takes that focus. */
+#main:focus, #main:focus-visible { outline: none; }

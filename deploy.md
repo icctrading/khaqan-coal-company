@@ -94,6 +94,21 @@ images included), so the next page appears instantly. Browsers that cannot parse
 a plain `<link rel="prefetch">` from `script.js` instead. Both are skipped when the
 device reports `saveData` or a 2g connection.
 
+### Fonts
+
+Both families are requested as **variable ranges**, not as a list of static weights:
+
+```
+family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:ital,wght@0,300..900;1,300..900
+```
+
+The stylesheets set weights the old static request could not serve (`font-weight: 850` on
+69 elements on the home page, plus 750/650, and Inter italics) - those were silently
+rounding to the nearest supplied face and synthesising obliques. One variable file per
+style covers every weight the CSS asks for, and it is fewer requests and fewer service
+worker cache entries than five static ones. Keep `&display=swap` and the
+`preconnect` to `fonts.gstatic.com` together with it.
+
 ### Image renditions
 
 Figure walls (`<picture>` inside `.cine-wall`, `.media-grid`, `.media-tile`,
@@ -128,11 +143,19 @@ Things that are deliberately true about this codebase, and worth keeping:
   >= 80px net) and reveals it on upward scroll, on keyboard focus entering the header,
   and at `y < 240`. It must never tuck while the drawer is open, while the theme popup
   is open, while a field in it has focus, or while a scroll animation is running - a bar
-  sliding out from under an open control is the classic way a header feels broken.
+  sliding out from under an open control is the classic way a header feels broken.- The cinematic backdrop pays attention to how much it costs: under
+  `prefers-reduced-motion: reduce`, or on a `saveData` / 2g connection, it loads **one**
+  frame instead of the whole crossfade set (home page 8 frames -> 3, -911KB; inner pages
+  5 -> 1, -811KB) and still paints that frame. If you add frames to a page, the budget
+  logic follows automatically because it slices the same `img.cine-src` list.
+
 - Anchored targets get `scroll-padding-top: var(--bar-total)`, so a deep link lands below
   the bar instead of under it (checked with `#ticker`, which lands ~30px clear).
-- Keyboard behaviour in the bar: a skip link jumps past the header; opening the drawer
-  focuses the active link, traps Tab inside the bar (the rest of the page is `inert`,
+- Keyboard behaviour in the bar: the skip link targets `#main`, which carries
+  `tabindex="-1"` so focus actually lands in the content instead of bouncing off `<body>`
+  (and `#main:focus { outline: none }` stops it drawing a ring around the page). Activating
+  the skip link closes the drawer first, because an inert container cannot take focus. The
+  Opening the drawer focuses the active link, traps Tab inside the bar (the rest of the page is `inert`,
   with a focus-ring fallback where `inert` is unsupported) and restores focus to the
   toggle on `Esc`; the theme popup is a `role="menu"` with `aria-activedescendant`, so
   ArrowUp/Down/Home/End move the selection and Enter/`Esc` return focus to the toggle.

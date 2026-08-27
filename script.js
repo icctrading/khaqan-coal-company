@@ -535,7 +535,14 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
      declarative — but a `display:none` lazy image is never fetched, so
      the engine loads its own copies and starts the moment frame 0 is
      painted (later frames join as they arrive). */
-  const frames = framesFrom(imgs);
+  /* A rotating sequence is a luxury, not the point of the layer. Under
+     `prefers-reduced-motion: reduce` we paint exactly one still frame, and on a
+     saveData / 2g connection we do the same - so in both cases only the first
+     frame is ever fetched. On the home page that is ~1.4MB of decorative imagery
+     that would otherwise download at idle and never be seen. */
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const lean = reduced || !!(conn && (conn.saveData || /(^|\b)2g$/.test(conn.effectiveType || '')));
+  const frames = framesFrom(lean ? imgs.slice(0, 1) : imgs);
 
   function framesFrom(nodes) {
     const sources = nodes
@@ -830,6 +837,11 @@ const khaqanScroll = (function () {
     burger.addEventListener('click', () => setOpen(!open));
     if (scrim) scrim.addEventListener('click', () => setOpen(false));
     nav.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => { if (open) setOpen(false); }));
+    /* The skip link lives outside the bar, so it never gets that close-on-click - and
+       while the drawer is open #main is inert, so the focus it tries to move there
+       lands nowhere. Closing first makes the link behave the same in every state. */
+    const skipLink = document.querySelector('.skip-link');
+    if (skipLink) skipLink.addEventListener('click', () => { if (open) setOpen(false); });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && open) { event.preventDefault(); setOpen(false); }
     });
