@@ -86,3 +86,21 @@ https://www.vecteezy.com/free-photos/mining-3d (no stock asset was downloaded or
   ("Cinematic 3D backdrop").
 - The archival clip `coal-train-240.webm` is no longer embedded on the Supply page; it was replaced by the
   `reel-rail` render. The file and its attribution above are kept for the CRM media library.
+
+## Rendered sizes (`-768.webp`)
+
+Every photograph that appears inside a `<picture>` in a figure wall ships in two
+renditions: the master (`media/…webp`, 1376–2048 px wide) and a `…-768.webp`
+derivative for the boxes it is actually painted into (the grids render 298–610 px).
+The markup lists both in one `srcset`, so a 1x display takes the small file and a
+retina display takes the master — nobody gets upscaled, and nobody downloads a
+1376 px file for a 298 px slot.
+
+* The derivative is generated from the master, never the other way round:
+  `PIL.Image.resize(..., LANCZOS)` then `save(..., 'WEBP', quality=80, method=6, exact=True)`.
+* Ship the pair together. If you delete the master the `srcset` breaks; if you delete
+  the derivative the browser just always takes the master (works, heavier).
+* The full-viewport backdrop frames (`<img class="cine-src">`) and each page's
+  `<link rel="preload" as="image">` target deliberately have **no** small rendition —
+  the canvas reads the raw `src` attribute and paints full-bleed, and the preload has to
+  stay the same file the hero paints (see `deploy.md` §5).

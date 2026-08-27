@@ -91,6 +91,17 @@ images included), so the next page appears instantly. Browsers that cannot parse
 a plain `<link rel="prefetch">` from `script.js` instead. Both are skipped when the
 device reports `saveData` or a 2g connection.
 
+### Image renditions
+
+Figure walls (`<picture>` inside `.cine-wall`, `.media-grid`, `.media-tile`,
+`.distribution-card`) declare a `srcset` of `X-768.webp 768w, X.webp <master>w` plus a
+`sizes` list built from the measured box of that grid at 1000px and up. The `sizes` value
+must never *under*-state the rendered box, or a 2x display is handed the small file and
+goes soft; over-stating only costs bytes. See `media/credits.md` for how the pairs are
+generated and which files are deliberately single-rendition (`.cine-src` backdrop frames
+and each page's preload target - the canvas reads the raw `src` attribute, and the preload
+must name the file the hero paints).
+
 ## 6. Scrolling performance conventions
 
 Things that are deliberately true about this codebase, and worth keeping:
