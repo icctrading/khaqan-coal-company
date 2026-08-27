@@ -299,6 +299,27 @@ if (tiltScenes.length && !window.matchMedia('(prefers-reduced-motion: reduce)').
   });
 }
 
+/* Premium 3D tilt: cards lean gently toward the pointer. */
+const TILT_CARDS = '.path-card, .spec-card, .journey-card, .community-card, .qom-card, .media-tile, .media-card, .distribution-card, .transport-card';
+const canTilt = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  && window.matchMedia('(pointer: fine)').matches;
+if (canTilt) {
+  document.querySelectorAll(TILT_CARDS).forEach((card) => {
+    card.addEventListener('pointermove', (event) => {
+      if (event.pointerType && event.pointerType !== 'mouse') return;
+      const rect = card.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      const y = (event.clientY - rect.top) / rect.height - 0.5;
+      card.style.setProperty('--tilt-x', `${(x * 4.6).toFixed(2)}deg`);
+      card.style.setProperty('--tilt-y', `${(y * -4.6).toFixed(2)}deg`);
+    });
+    card.addEventListener('pointerleave', () => {
+      card.style.setProperty('--tilt-x', '0deg');
+      card.style.setProperty('--tilt-y', '0deg');
+    });
+  });
+}
+
 window.addEventListener('storage', (event) => {
   if (event.key === CMS_KEY) applyCmsData();
   if (event.key === THEME_KEY) {

@@ -1433,3 +1433,364 @@ html[data-theme="day"] .process-panel:hover, html[data-theme="day"] .image-note:
 html[data-theme="day"] .brand-sub { color: #7c651f; }
 html[data-skin="marble"] .brand-sub, html[data-skin="obsidian"] .brand-sub { color: #b99d5e; }
 html[data-skin="marble"][data-theme="day"] .brand-sub, html[data-skin="obsidian"][data-theme="day"] .brand-sub { color: #6e581c; }
+
+/* ==================================================================
+   V3 PREMIUM PASS — hero visibility, dual logos, 3D, qoms, big brand
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   A. Day/night logo variants (kills the dark shade on light modes)
+   ------------------------------------------------------------------ */
+.brand-logo-day, .emblem-picture-day { display: none; }
+html[data-theme="day"] .brand-logo-day { display: block; }
+html[data-theme="day"] .brand-logo-night { display: none; }
+html[data-theme="day"] .emblem-picture-day { display: block; }
+html[data-theme="day"] .emblem-picture-night { display: none; }
+/* Watermarks use the light artwork in day mode */
+html[data-theme="day"] .section-dark::after, html[data-theme="day"] .section-earth::after {
+  background-image: url("media/logo-mark-light.webp");
+}
+
+/* ------------------------------------------------------------------
+   B. Bigger brand lockup + logo animation
+   ------------------------------------------------------------------ */
+.brand { gap: 15px; min-width: 316px; }
+.brand-name { font-size: 1.82rem; }
+.brand-sub { margin-top: 6px; font-size: .63rem; letter-spacing: .155em; }
+.site-header .brand-logo { height: 56px; }
+.footer .brand-logo { height: 66px; }
+.footer .brand-name { font-size: 1.62rem; }
+.crm-header .brand-logo { height: 50px; }
+/* Entrance + continuous gentle levitation (img floats, container handles hover) */
+.brand-logo { animation: logoIn 1s cubic-bezier(.18, .9, .3, 1.08) both; }
+.brand-logo img { animation: logoFloat 6.5s ease-in-out infinite; }
+@keyframes logoIn {
+  from { opacity: 0; transform: scale(.86) rotate(-2.5deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-logo, .brand-logo img { animation: none; }
+}
+@media (max-width: 1180px) {
+  .brand { min-width: 262px; }
+  .brand-name { font-size: 1.62rem; }
+  .site-header .brand-logo { height: 50px; }
+}
+@media (max-width: 920px) {
+  .brand { min-width: 0; }
+  .brand-name { font-size: 1.42rem; }
+  .brand-sub { font-size: .55rem; }
+  .site-header .brand-logo { height: 44px; }
+}
+@media (max-width: 680px) {
+  .brand-name { font-size: 1.26rem; }
+  .brand-sub { font-size: .48rem; }
+  .site-header .brand-logo { height: 38px; }
+  .footer .brand-logo { height: 56px; }
+  .footer .brand-name { font-size: 1.38rem; }
+}
+
+/* ------------------------------------------------------------------
+   C. Home hero — the landing image finally gets to breathe
+   ------------------------------------------------------------------ */
+html .page-home .hero,
+html[data-theme="day"] .page-home .hero,
+html[data-skin="marble"] .page-home .hero,
+html[data-skin="obsidian"] .page-home .hero,
+html[data-skin="marble"][data-theme="day"] .page-home .hero,
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero { background: none; }
+.page-home .hero-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('media/coal-haul-truck.jpg');
+  background-size: cover;
+  background-position: 78% center;
+  transform-origin: center;
+  animation: heroKenBurns 34s ease-in-out infinite alternate;
+}
+@keyframes heroKenBurns {
+  from { transform: scale(1.03); }
+  to { transform: scale(1.13) translateX(-1.8%); }
+}
+@media (prefers-reduced-motion: reduce) { .page-home .hero-photo { animation: none; } }
+/* The hero overlay becomes a shade layer above the photo so the image shows through */
+html .page-home .hero::before {
+  opacity: 1;
+  z-index: 1;
+  mask-image: none;
+  -webkit-mask-image: none;
+  background-image:
+    linear-gradient(90deg, rgba(5, 14, 9, .97) 0%, rgba(5, 14, 9, .8) 30%, rgba(5, 14, 9, .38) 62%, rgba(5, 14, 9, .05) 100%),
+    linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-skin="marble"] .page-home .hero::before {
+  background-image:
+    linear-gradient(90deg, rgba(16, 16, 21, .97) 0%, rgba(16, 16, 21, .8) 30%, rgba(16, 16, 21, .38) 62%, rgba(16, 16, 21, .05) 100%),
+    linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-skin="obsidian"] .page-home .hero::before {
+  background-image:
+    linear-gradient(90deg, rgba(8, 8, 11, .97) 0%, rgba(8, 8, 11, .8) 30%, rgba(8, 8, 11, .38) 62%, rgba(8, 8, 11, .05) 100%),
+    linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-theme="day"] .page-home .hero::before {
+  background-image:
+    linear-gradient(90deg, rgba(244, 249, 241, .97) 0%, rgba(244, 249, 241, .8) 30%, rgba(244, 249, 241, .34) 62%, rgba(244, 249, 241, .04) 100%),
+    linear-gradient(rgba(30, 81, 52, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 81, 52, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-skin="marble"][data-theme="day"] .page-home .hero::before {
+  background-image:
+    linear-gradient(90deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .8) 30%, rgba(247, 244, 236, .32) 62%, rgba(247, 244, 236, .04) 100%),
+    linear-gradient(rgba(90, 74, 35, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 74, 35, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero::before {
+  background-image:
+    linear-gradient(90deg, rgba(242, 241, 239, .97) 0%, rgba(242, 241, 239, .8) 30%, rgba(242, 241, 239, .32) 62%, rgba(242, 241, 239, .04) 100%),
+    linear-gradient(rgba(45, 42, 35, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 42, 35, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-theme="day"] .page-home .hero-photo { filter: brightness(1.07) saturate(1.06); }
+html[data-skin="marble"] .page-home .hero-photo, html[data-skin="obsidian"] .page-home .hero-photo { filter: saturate(.92) contrast(1.05); }
+html[data-skin="marble"][data-theme="day"] .page-home .hero-photo,
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero-photo { filter: brightness(1.07) saturate(1.04); }
+
+/* ------------------------------------------------------------------
+   D. 3D card system — pointer tilt, gold edges, metallic obsidian
+   ------------------------------------------------------------------ */
+.path-card, .spec-card, .journey-card, .community-card, .qom-card,
+.media-tile, .media-card, .distribution-card, .transport-card {
+  transform: perspective(1050px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg)) translateY(var(--lift, 0px));
+  transform-style: preserve-3d;
+  transition: transform .3s cubic-bezier(.2, .8, .2, 1), border-color .45s ease, box-shadow .45s ease, background .45s ease;
+}
+.path-card:hover, .spec-card:hover, .community-card:hover, .qom-card:hover,
+.process-panel:hover, .image-note:hover { --lift: -5px; }
+.path-card, .spec-card, .community-card, .journey-card, .process-panel, .person-card, .image-note, .qom-card {
+  box-shadow: inset 0 1px 0 rgba(212, 160, 52, .13), 0 16px 40px rgba(0, 0, 0, .22);
+}
+html[data-theme="day"] .path-card, html[data-theme="day"] .spec-card, html[data-theme="day"] .community-card,
+html[data-theme="day"] .journey-card, html[data-theme="day"] .process-panel, html[data-theme="day"] .person-card,
+html[data-theme="day"] .image-note, html[data-theme="day"] .qom-card {
+  box-shadow: inset 0 1px 0 rgba(212, 160, 52, .18), 0 16px 40px rgba(70, 60, 30, .09);
+}
+/* Obsidian: bright metallic top edge */
+html[data-skin="obsidian"] .path-card, html[data-skin="obsidian"] .spec-card, html[data-skin="obsidian"] .community-card,
+html[data-skin="obsidian"] .journey-card, html[data-skin="obsidian"] .process-panel, html[data-skin="obsidian"] .person-card,
+html[data-skin="obsidian"] .image-note, html[data-skin="obsidian"] .qom-card {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), inset 0 0 0 1px rgba(212, 160, 52, .05), 0 18px 44px rgba(0, 0, 0, .45);
+}
+/* Marble: soft gallery-card depth */
+html[data-skin="marble"] .path-card, html[data-skin="marble"] .spec-card, html[data-skin="marble"] .community-card,
+html[data-skin="marble"] .journey-card, html[data-skin="marble"] .process-panel, html[data-skin="marble"] .person-card,
+html[data-skin="marble"] .image-note, html[data-skin="marble"] .qom-card {
+  box-shadow: inset 0 1px 0 rgba(246, 242, 232, .06), inset 0 1px 0 rgba(212, 160, 52, .12), 0 18px 46px rgba(0, 0, 0, .4);
+}
+/* Buttons: tactile press */
+.btn:active { transform: translateY(0) scale(.98); }
+.nav-cta:active { transform: translateY(0) scale(.98); }
+
+/* ------------------------------------------------------------------
+   E. The five qoms of Darra Adam Khel
+   ------------------------------------------------------------------ */
+.qom-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+.qom-card {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 24px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .012) 55%), var(--coal-2);
+}
+.qom-card h3 { margin: 13px 0 9px; font-size: 1.4rem; }
+.qom-card p { margin: 0; font-size: .87rem; line-height: 1.65; }
+.qom-rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--yellow);
+  font-size: .64rem;
+  font-weight: 850;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.qom-rank i { width: 7px; height: 7px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 4px rgba(212, 160, 52, .14); animation: qomLive 2.6s ease-in-out infinite; }
+@keyframes qomLive { 50% { opacity: .45; transform: scale(.8); } }
+.qom-script {
+  display: inline-block;
+  margin-left: 10px;
+  color: var(--yellow);
+  font-family: "Noto Naskh Arabic", "Geeza Pro", "Segoe UI", serif;
+  font-size: .6em;
+  font-weight: 500;
+  opacity: .92;
+  letter-spacing: 0;
+}
+.qom-card-featured {
+  grid-column: span 2;
+  grid-row: span 2;
+  padding: 34px 32px;
+  border-color: rgba(212, 160, 52, .42);
+  background:
+    radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .16), transparent 44%),
+    linear-gradient(160deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .012) 55%), var(--coal-2);
+  box-shadow: inset 0 1px 0 rgba(212, 160, 52, .22), 0 26px 64px rgba(0, 0, 0, .32), 0 0 56px rgba(212, 160, 52, .07) !important;
+}
+.qom-card-featured h3 { margin: 18px 0 12px; font-size: clamp(2.1rem, 3.4vw, 2.9rem); }
+.qom-card-featured p { max-width: 430px; font-size: .95rem; }
+.qom-badge {
+  margin-top: auto;
+  padding-top: 20px;
+}
+.qom-badge::after {
+  content: "";
+  display: inline-block;
+  padding: 11px 17px;
+  border: 1px solid rgba(212, 160, 52, .45);
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(212, 160, 52, .16), rgba(212, 160, 52, .05));
+  color: var(--yellow);
+  font-size: .66rem;
+  font-weight: 850;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.qom-facts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 34px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+.qom-facts > div { display: grid; gap: 7px; padding-right: 20px; }
+.qom-facts strong { color: var(--yellow); font-family: Georgia, serif; font-size: 1.55rem; font-weight: 400; letter-spacing: -.04em; line-height: 1; }
+.qom-facts span { color: var(--ink-soft); font-size: .74rem; line-height: 1.5; }
+@media (max-width: 920px) {
+  .qom-grid { grid-template-columns: 1fr 1fr; }
+  .qom-card-featured { grid-column: 1 / -1; grid-row: auto; }
+  .qom-facts { grid-template-columns: 1fr 1fr; gap: 22px 18px; }
+}
+@media (max-width: 680px) {
+  .qom-grid { grid-template-columns: 1fr; }
+  .qom-card { padding: 22px 20px; }
+  .qom-card-featured { padding: 26px 22px; }
+  .qom-facts { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 400px) { .qom-facts { grid-template-columns: 1fr; } }
+
+/* Hamburger menu now also covers small laptops so the bigger brand never crowds the nav */
+@media (max-width: 1020px) {
+  .menu-toggle { display: block; order: 5; margin-left: auto; }
+  .nav-actions { display: flex; align-items: center; order: 6; gap: 8px; }
+  .main-nav {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 15px;
+    right: 15px;
+    display: none;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: 15px;
+    background: rgba(15, 17, 16, .97);
+    box-shadow: var(--shadow);
+  }
+  .main-nav.open { display: flex; animation: navDrop .32s cubic-bezier(.2, .8, .2, 1) both; }
+  .main-nav a { padding: 12px 14px; border-radius: 9px; }
+  .main-nav a:hover, .main-nav a.active { background: rgba(212, 160, 52, .09); }
+  .main-nav a.active::after { display: none; }
+  html[data-theme="day"] .main-nav { background: rgba(255, 255, 255, .98); }
+  html[data-skin="marble"] .main-nav, html[data-skin="obsidian"] .main-nav { background: rgba(16, 16, 21, .98); }
+  html[data-skin="marble"][data-theme="day"] .main-nav, html[data-skin="obsidian"][data-theme="day"] .main-nav { background: rgba(252, 250, 245, .98); }
+  .skin-toggle-label { display: none; }
+  .skin-toggle { padding: 8px 9px; }
+}
+
+/* --- V3 corrections & layering polish --- */
+/* Qom badge: style the element directly (text lives inside it) */
+.qom-badge {
+  margin-top: auto;
+  padding-top: 20px;
+}
+.qom-badge {
+  margin-top: auto;
+  padding: 11px 17px;
+  width: max-content;
+  max-width: 100%;
+  border: 1px solid rgba(212, 160, 52, .45);
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(212, 160, 52, .18), rgba(212, 160, 52, .05));
+  color: var(--yellow);
+  font-size: .66rem;
+  font-weight: 850;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background .3s ease, box-shadow .3s ease, transform .3s ease;
+}
+.qom-card-featured:hover .qom-badge {
+  background: linear-gradient(120deg, rgba(212, 160, 52, .3), rgba(212, 160, 52, .1));
+  box-shadow: 0 0 26px rgba(212, 160, 52, .18);
+  transform: translateY(-2px);
+}
+
+/* Hero grid moves onto the photo layer so the video reel stays clean */
+html .page-home .hero::before,
+html[data-skin="marble"] .page-home .hero::before,
+html[data-skin="obsidian"] .page-home .hero::before,
+html[data-theme="day"] .page-home .hero::before,
+html[data-skin="marble"][data-theme="day"] .page-home .hero::before,
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero::before {
+  background-size: auto;
+  background-image: none;
+}
+html .page-home .hero::before {
+  background: linear-gradient(90deg, rgba(5, 14, 9, .97) 0%, rgba(5, 14, 9, .8) 30%, rgba(5, 14, 9, .38) 62%, rgba(5, 14, 9, .05) 100%);
+}
+html[data-skin="marble"] .page-home .hero::before { background: linear-gradient(90deg, rgba(16, 16, 21, .97) 0%, rgba(16, 16, 21, .8) 30%, rgba(16, 16, 21, .38) 62%, rgba(16, 16, 21, .05) 100%); }
+html[data-skin="obsidian"] .page-home .hero::before { background: linear-gradient(90deg, rgba(8, 8, 11, .97) 0%, rgba(8, 8, 11, .8) 30%, rgba(8, 8, 11, .38) 62%, rgba(8, 8, 11, .05) 100%); }
+html[data-theme="day"] .page-home .hero::before { background: linear-gradient(90deg, rgba(244, 249, 241, .97) 0%, rgba(244, 249, 241, .8) 30%, rgba(244, 249, 241, .34) 62%, rgba(244, 249, 241, .04) 100%); }
+html[data-skin="marble"][data-theme="day"] .page-home .hero::before { background: linear-gradient(90deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .8) 30%, rgba(247, 244, 236, .32) 62%, rgba(247, 244, 236, .04) 100%); }
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero::before { background: linear-gradient(90deg, rgba(242, 241, 239, .97) 0%, rgba(242, 241, 239, .8) 30%, rgba(242, 241, 239, .32) 62%, rgba(242, 241, 239, .04) 100%); }
+.page-home .hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px);
+  background-size: 92px 92px;
+  mask-image: linear-gradient(to right, black 0%, transparent 88%);
+  -webkit-mask-image: linear-gradient(to right, black 0%, transparent 88%);
+  pointer-events: none;
+}
+html[data-theme="day"] .page-home .hero-photo::after {
+  background-image: linear-gradient(rgba(30, 60, 40, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(30, 60, 40, .06) 1px, transparent 1px);
+}
+
+/* Hover keeps the full 3D transform (older hover rules are flattened) */
+.path-card:hover, .spec-card:hover, .community-card:hover, .qom-card:hover,
+.process-panel:hover, .image-note:hover, .journey-card:hover {
+  transform: perspective(1050px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg)) translateY(-5px);
+}
+/* Media/photo tiles keep their zoom but never flatten */
+.media-tile:hover, .media-card:hover, .distribution-card:hover, .transport-card:hover {
+  transform: perspective(1050px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg));
+}
+.qom-badge::after { content: none; }
