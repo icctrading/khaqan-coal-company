@@ -1794,3 +1794,149 @@ html[data-theme="day"] .page-home .hero-photo::after {
   transform: perspective(1050px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg));
 }
 .qom-badge::after { content: none; }
+
+/* ==================================================================
+   V4 MAJOR DESIGN UPGRADE — premium type, visible motion, hero polish
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   A. Premium typography — Playfair Display + Inter
+   ------------------------------------------------------------------ */
+body { font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.display, h1, h2, h3, .brand-name { font-family: "Playfair Display", Georgia, "Times New Roman", serif; letter-spacing: -.03em; }
+.mini-stat strong, .proof-strip strong, .qom-facts strong, .community-card .big-num, .feature-number,
+.numbered-item > b, .pullquote, .chart-head span, .performance-table tfoot th, .performance-table tfoot td,
+.crm-metrics strong, .path-card::after, .journey-card::after { font-family: "Playfair Display", Georgia, serif; }
+
+/* Bolder, more editorial scale */
+.hero .display { font-size: clamp(4rem, 6.9vw, 7.4rem); }
+.page-hero h1 { font-size: clamp(3.6rem, 6.6vw, 6.9rem); }
+h2, .section-head h2 { font-size: clamp(2.7rem, 4.9vw, 5.3rem); }
+h3 { font-size: 1.62rem; }
+.eyebrow { color: var(--yellow); }
+html[data-theme="day"] .eyebrow { color: #8a620c; }
+
+/* ------------------------------------------------------------------
+   B. The fixes — day hero clarity, no yellow line, calmer veins
+   ------------------------------------------------------------------ */
+/* Landing image: clearly visible in day mode */
+html[data-theme="day"] .page-home .hero-photo { filter: brightness(1.16) saturate(1.08) contrast(1.03); }
+html[data-skin="marble"][data-theme="day"] .page-home .hero-photo,
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero-photo { filter: brightness(1.14) saturate(1.05) contrast(1.02); }
+html[data-theme="day"] .page-home .hero::before {
+  background: linear-gradient(90deg, rgba(244, 249, 241, .96) 0%, rgba(244, 249, 241, .78) 30%, rgba(244, 249, 241, .16) 58%, rgba(244, 249, 241, 0) 74%);
+}
+html[data-skin="marble"][data-theme="day"] .page-home .hero::before {
+  background: linear-gradient(90deg, rgba(247, 244, 236, .96) 0%, rgba(247, 244, 236, .78) 30%, rgba(247, 244, 236, .14) 58%, rgba(247, 244, 236, 0) 74%);
+}
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero::before {
+  background: linear-gradient(90deg, rgba(242, 241, 239, .96) 0%, rgba(242, 241, 239, .78) 30%, rgba(242, 241, 239, .14) 58%, rgba(242, 241, 239, 0) 74%);
+}
+/* Hero note: line removed */
+.hero-note { border-top: 0; padding-top: 0; }
+/* Gold dust is a night-only effect */
+html[data-theme="day"] .hero .hero-content::after { display: none; }
+/* Marble day veining: much quieter */
+html[data-skin="marble"][data-theme="day"] body::after { opacity: .15; }
+html[data-skin="obsidian"][data-theme="day"] body::after { opacity: .3; }
+/* Section keyline: shorter and quieter */
+.section-head > div:first-child::after { width: 34px; opacity: .4; }
+
+/* ------------------------------------------------------------------
+   C. Visible motion — hero cascade, gold shimmer, logo shine
+   ------------------------------------------------------------------ */
+@keyframes heroRise {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+.hero .eyebrow, .hero .display, .hero .lede, .hero .hero-actions, .hero .hero-note {
+  animation: heroRise .9s cubic-bezier(.2, .8, .2, 1) both;
+}
+.hero .display { animation-delay: .1s; }
+.hero .lede { animation-delay: .22s; }
+.hero .hero-actions { animation-delay: .34s; }
+.hero .hero-note { animation-delay: .46s; }
+.page-hero .eyebrow, .page-hero h1, .page-hero .lede { animation: heroRise .9s cubic-bezier(.2, .8, .2, 1) both; }
+.page-hero h1 { animation-delay: .12s; }
+.page-hero .lede { animation-delay: .24s; }
+
+/* Gold shimmer flowing through the hero headline accent */
+.hero h1 span {
+  background: linear-gradient(100deg, #f6dd9a 0%, #e6b954 22%, #fff3c4 50%, #c08e22 78%, #f0cd76 100%);
+  background-size: 230% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #d9ab41;
+  animation: goldShimmer 6s ease-in-out infinite alternate;
+}
+@keyframes goldShimmer { to { background-position: 100% 0; } }
+html[data-theme="day"] .hero h1 span {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+/* Wordmark: living gold gradient */
+.brand-name {
+  background-size: 220% 100%;
+  animation: wordmarkFlow 8s ease-in-out infinite alternate;
+}
+@keyframes wordmarkFlow { to { background-position: 100% 0; } }
+
+/* Logo: light sweep across the emblem + deeper levitation */
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.site-header .brand-logo, .crm-header .brand-logo { position: relative; overflow: hidden; border-radius: 10px; }
+.site-header .brand-logo::after, .crm-header .brand-logo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 32%, rgba(255, 246, 212, .42) 46%, transparent 60%);
+  transform: translateX(-140%);
+  animation: logoShine 5.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes logoShine {
+  0%, 58% { transform: translateX(-140%); }
+  88%, 100% { transform: translateX(140%); }
+}
+
+/* Nav links: gold underline grows on hover */
+.main-nav a { position: relative; }
+.main-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -7px;
+  height: 2px;
+  margin: 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--yellow), rgba(212, 160, 52, 0));
+  transition: right .35s cubic-bezier(.2, .8, .2, 1);
+}
+.main-nav a:hover::after, .main-nav a.active::after { right: 0; }
+@media (max-width: 1020px) { .main-nav a::after { display: none; } }
+
+/* ------------------------------------------------------------------
+   D. Gold-grade buttons + footer ring
+   ------------------------------------------------------------------ */
+.btn { padding: 16px 27px; font-size: .86rem; letter-spacing: .02em; }
+.btn-primary {
+  color: #241b08;
+  background: linear-gradient(125deg, #f4cd6f 0%, #d9a838 48%, #f0c35a 100%);
+  box-shadow: 0 12px 32px rgba(212, 160, 52, .3), inset 0 1px 0 rgba(255, 250, 222, .6);
+}
+.btn-primary:hover {
+  background: linear-gradient(125deg, #f8dc92 0%, #e6ba50 48%, #f6d079 100%);
+  box-shadow: 0 18px 44px rgba(212, 160, 52, .42), inset 0 1px 0 rgba(255, 250, 222, .65);
+}
+.nav-cta { border-color: rgba(212, 160, 52, .38); }
+.nav-cta::after { color: var(--yellow); }
+.footer { border-top: 1px solid rgba(212, 160, 52, .22); }
+
+/* Entrance must not lock the hover transform */
+.brand-logo { animation: logoIn 1s cubic-bezier(.18, .9, .3, 1.08) backwards; }
+html[data-theme="day"] .brand-name { background-size: 220% 100%; }
