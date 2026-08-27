@@ -3588,3 +3588,9 @@ html[data-theme="day"] .page-hero::after {
     rgba(243, 246, 239, .4) 82%,
     rgba(243, 246, 239, .14) 100%);
 }
+
+/* V23 — the theme picker's footnote carries one inline accent; on the cream
+   panel the gold-on-cream glyph was the only unreadable thing in the menu. */
+html[data-theme="day"] .skin-menu-note b { color: #6a4407; }
+html[data-skin="marble"][data-theme="day"] .skin-menu-note b,
+html[data-skin="obsidian"][data-theme="day"] .skin-menu-note b { color: #7a5a12; }

@@ -142,7 +142,9 @@ function setSkin(skin) {
 }
 
 /* Skin picker menu behaviour. */
-function closeSkinMenus() {
+function closeSkinMenus(options) {
+  const openMenu = document.querySelector('.skin-menu[data-open]');
+  const hadFocus = openMenu && (document.activeElement === document.body || openMenu.contains(document.activeElement));
   document.querySelectorAll('.skin-menu').forEach((menu) => {
     menu.removeAttribute('data-open');
     menu.hidden = true;
@@ -150,6 +152,12 @@ function closeSkinMenus() {
   document.querySelectorAll('.skin-toggle').forEach((button) => {
     button.setAttribute('aria-expanded', 'false');
   });
+  // Escaping or picking a theme should leave the caret where the reader left it,
+  // not at the top of the document.
+  if (openMenu && hadFocus && !(options && options.keepFocus)) {
+    const button = openMenu.closest('.skin-switch') && openMenu.closest('.skin-switch').querySelector('.skin-toggle');
+    if (button) button.focus({ preventScroll: true });
+  }
 }
 
 function toggleSkinMenu(switchEl) {
@@ -190,6 +198,31 @@ themeButtons.forEach((button) => {
 document.querySelectorAll('.skin-switch').forEach((switchEl) => {
   const toggle = switchEl.querySelector('.skin-toggle');
   if (toggle) toggle.addEventListener('click', (event) => { event.stopPropagation(); toggleSkinMenu(switchEl); });
+  const menuEl = switchEl.querySelector('.skin-menu');
+  if (menuEl) {
+    /* `role=menu` means arrow keys, Home and End move the selection; Escape
+       hands focus back to the button that opened it. */
+    menuEl.addEventListener('keydown', (event) => {
+      const options = Array.from(menuEl.querySelectorAll('.skin-option'));
+      if (!options.length) return;
+      const at = options.indexOf(document.activeElement);
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        const step = event.key === 'ArrowDown' ? 1 : -1;
+        options[(at + step + options.length) % options.length].focus({ preventScroll: true });
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        options[0].focus({ preventScroll: true });
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        options[options.length - 1].focus({ preventScroll: true });
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+        closeSkinMenus();
+      }
+    });
+  }
   switchEl.querySelectorAll('.skin-option').forEach((option) => {
     option.addEventListener('click', () => setSkin(option.dataset.skin));
   });
@@ -749,8 +782,36 @@ const khaqanScroll = (function () {
   bar.addEventListener('focusin', () => bar.classList.remove('is-hidden'));
 
   /* ---------- drawer ---------- */
+  const supportsInert = 'inert' in HTMLElement.prototype;
+  const background = () => [document.getElementById('main'), document.querySelector('.footer')].filter(Boolean);
+
+  function focusables() {
+    return Array.from(bar.querySelectorAll('a[href], button')).filter((el) => el.offsetParent !== null);
+  }
+  function trapTab(event) {
+    if (event.key !== 'Tab' || !open) return;
+    const items = focusables();
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+    if (event.shiftKey && (active === first || !bar.contains(active))) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && (active === last || !bar.contains(active))) { event.preventDefault(); first.focus(); }
+    else if (!bar.contains(active)) { event.preventDefault(); first.focus(); }
+  }
+  /* While the drawer is up, the page behind it is not interactive: `inert`
+     keeps Tab out of it for free, and engines without `inert` get a trap. */
+  function setModal(next) {
+    if (supportsInert) background().forEach((el) => { if (next) el.setAttribute('inert', ''); else el.removeAttribute('inert'); });
+    // The Tab ring is owned by the bar in every engine: `inert` covers the page
+    // body but not the skip link above the header, which is still a tab stop.
+    if (next) document.addEventListener('keydown', trapTab, true);
+    else document.removeEventListener('keydown', trapTab, true);
+  }
+
   function setOpen(next) {
     open = next;
+    setModal(next);
     if (nav) nav.classList.toggle('is-open', open);
     if (scrim) scrim.classList.toggle('is-open', open);
     if (burger) {
@@ -772,7 +833,7 @@ const khaqanScroll = (function () {
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && open) { event.preventDefault(); setOpen(false); }
     });
-    drawerMode.addEventListener('change', (event) => { if (!event.matches && open) setOpen(false); measure(); });
+    drawerMode.addEventListener('change', (event) => { if (!event.matches) { if (open) setOpen(false); else setModal(false); } measure(); });
   }
 
   measure();
