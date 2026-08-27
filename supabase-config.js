@@ -8,6 +8,6 @@
   The SQL in supabase/schema.sql protects the database with RLS.
 */
 window.KHAQAN_SUPABASE = {
-  url: '',
-  anonKey: ''
+  url: 'https://xngcibugetpwdbtoplli.supabase.co',
+  anonKey: 'sb_publishable_StWLysxpxLQWUlKkJR_hTQ_BBie6gjS'
 };
