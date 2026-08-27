@@ -2339,3 +2339,94 @@ html[data-skin="marble"][data-theme="day"] .qom-facts strong { color: #8f6410; }
 html[data-skin="obsidian"][data-theme="day"] .qom-card { background: linear-gradient(180deg, #f8fafc, #e2e6ea); }
 html[data-skin="obsidian"][data-theme="day"] .qom-card-featured { background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .15), transparent 44%), linear-gradient(180deg, #f8fafc, #e2e6ea); }
 html[data-skin="obsidian"][data-theme="day"] .qom-facts strong { color: #8a620c; }
+
+/* ==================================================================
+   V6 — HD coal backdrop (fixed, live) + coal hero landing image
+   ================================================================== */
+
+/* Fixed HD coal texture behind the whole landing page — content
+   scrolls over it while the coal stays put (slow cinematic drift). */
+.coal-page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 6, .5), rgba(4, 7, 6, .68)),
+    url('media/coal-texture-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  animation: coalDrift 46s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes coalDrift {
+  from { transform: scale(1.03); }
+  to { transform: scale(1.11) translateX(-1.2%); }
+}
+@media (prefers-reduced-motion: reduce) { .coal-page-bg { animation: none; } }
+/* Keep the page above the coal layer */
+body.page-home > main, body.page-home > .footer { position: relative; z-index: 1; }
+/* Day mode: the coal glows warmer and lighter under the ivory veils */
+html[data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(240, 236, 226, .58), rgba(240, 236, 226, .74)),
+    url('media/coal-texture-bg.jpg');
+}
+html[data-skin="obsidian"][data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(238, 240, 243, .62), rgba(238, 240, 243, .76)),
+    url('media/coal-texture-bg.jpg');
+}
+
+/* The landing hero becomes the HD coal scene itself */
+.page-home .hero-photo {
+  background-image: url('media/coal-hero.jpg');
+  background-position: center;
+}
+
+/* Home sections become translucent veils so the living coal backdrop
+   shows through everywhere while scrolling (per skin × mode). */
+html[data-skin="signature"] body.page-home .section-dark, html:not([data-skin]) body.page-home .section-dark { background: rgba(7, 16, 13, .93); }
+html[data-skin="signature"] body.page-home .section-soft, html:not([data-skin]) body.page-home .section-soft { background: rgba(16, 21, 19, .9); }
+html[data-skin="signature"] body.page-home .section-earth, html:not([data-skin]) body.page-home .section-earth { background: rgba(27, 26, 20, .9); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-dark, html:not([data-skin])[data-theme="day"] body.page-home .section-dark { background: rgba(244, 247, 242, .94); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-soft, html:not([data-skin])[data-theme="day"] body.page-home .section-soft { background: rgba(232, 241, 229, .93); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-earth, html:not([data-skin])[data-theme="day"] body.page-home .section-earth { background: rgba(237, 241, 223, .93); }
+html[data-skin="marble"] body.page-home .section-dark { background: rgba(19, 24, 36, .93); }
+html[data-skin="marble"] body.page-home .section-soft { background: rgba(23, 28, 43, .9); }
+html[data-skin="marble"] body.page-home .section-earth { background: rgba(25, 28, 44, .9); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-dark { background: rgba(247, 243, 232, .94); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-soft { background: rgba(243, 239, 228, .93); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-earth { background: rgba(241, 236, 221, .93); }
+html[data-skin="obsidian"] body.page-home .section-dark { background: rgba(10, 11, 14, .94); }
+html[data-skin="obsidian"] body.page-home .section-soft { background: rgba(14, 16, 19, .92); }
+html[data-skin="obsidian"] body.page-home .section-earth { background: rgba(13, 14, 12, .92); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-dark { background: rgba(242, 244, 247, .94); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-soft { background: rgba(236, 239, 243, .93); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-earth { background: rgba(233, 236, 241, .93); }
+
+/* Cards also lift slightly translucent so the coal depth reads through */
+body.page-home .path-card, body.page-home .spec-card, body.page-home .qom-card { backdrop-filter: blur(6px); }
+body.page-home .qom-card-featured { backdrop-filter: blur(8px); }
+
+/* Frosted-glass cards over the living coal backdrop */
+html[data-skin="signature"] body.page-home .path-card, html[data-skin="signature"] body.page-home .spec-card,
+html[data-skin="signature"] body.page-home .qom-card, html:not([data-skin]) body.page-home .path-card,
+html:not([data-skin]) body.page-home .spec-card, html:not([data-skin]) body.page-home .qom-card { background: rgba(17, 21, 19, .68); }
+html[data-skin="signature"][data-theme="day"] body.page-home .path-card, html[data-skin="signature"][data-theme="day"] body.page-home .spec-card,
+html[data-skin="signature"][data-theme="day"] body.page-home .qom-card, html:not([data-skin])[data-theme="day"] body.page-home .path-card,
+html:not([data-skin])[data-theme="day"] body.page-home .spec-card, html:not([data-skin])[data-theme="day"] body.page-home .qom-card { background: rgba(255, 255, 255, .66); }
+html[data-skin="marble"] body.page-home .path-card, html[data-skin="marble"] body.page-home .spec-card, html[data-skin="marble"] body.page-home .qom-card { background: rgba(26, 32, 48, .68); }
+html[data-skin="marble"][data-theme="day"] body.page-home .path-card, html[data-skin="marble"][data-theme="day"] body.page-home .spec-card, html[data-skin="marble"][data-theme="day"] body.page-home .qom-card { background: rgba(253, 250, 241, .7); }
+html[data-skin="obsidian"] body.page-home .path-card, html[data-skin="obsidian"] body.page-home .spec-card, html[data-skin="obsidian"] body.page-home .qom-card { background: rgba(18, 20, 25, .7); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .path-card, html[data-skin="obsidian"][data-theme="day"] body.page-home .spec-card, html[data-skin="obsidian"][data-theme="day"] body.page-home .qom-card { background: rgba(248, 250, 252, .72); }
+/* Featured qom card keeps its golden aura as frosted glass */
+body.page-home .qom-card-featured {
+  background:
+    radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .18), transparent 44%),
+    linear-gradient(160deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .015) 55%), rgba(17, 21, 19, .62);
+}
+html[data-skin="marble"] body.page-home .qom-card-featured { background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .18), transparent 44%), linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .02) 55%), rgba(26, 32, 48, .62); }
+html[data-skin="obsidian"] body.page-home .qom-card-featured { background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .16), transparent 44%), linear-gradient(180deg, rgba(255, 255, 255, .06), transparent 80%), rgba(18, 20, 25, .66); }
+html[data-theme="day"] body.page-home .qom-card-featured {
+  background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .16), transparent 44%), rgba(255, 255, 255, .7);
+}
