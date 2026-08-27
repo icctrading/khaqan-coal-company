@@ -1,0 +1,275 @@
+const DEFAULT_CMS_DATA = {
+  brandName: 'Khaqan',
+  companyName: 'Khaqan Coal Company Pvt. Ltd.',
+  directorName: 'Adnan Khan',
+  ownershipLine: 'Proudly owned by the Akkhurwal Qom',
+  location: 'Darra Adam Khel, Khyber Pakhtunkhwa, Pakistan',
+  heroEyebrow: 'Darra Adam Khel · KPK · Pakistan',
+  heroDescription: 'Coal is black gold — and Khaqan Coal Company Pvt. Ltd. supplies the best-quality coal at competitive rates, with dependable logistics for customers across Pakistan and an export future ahead.',
+  phone: '',
+  whatsapp: '',
+  email: '',
+  exportHeading: 'Leading from Darra Adam Khel. Preparing for the world.',
+  exportMessage: 'Khaqan Coal Company is proud to be a leading coal supplier in Pakistan and is now preparing the relationships, standards, and distribution routes needed for export.',
+  legalName: 'Khaqan Coal Company (Private) Limited',
+  incorporationDate: '03 March 2021',
+  totalQuantity: '535,121.35 MT',
+  totalTurnover: 'PKR 21,011,459,921',
+  clientCount: '12 leading organizations'
+};
+
+const CMS_KEY = 'khaqanSiteData';
+const LEADS_KEY = 'khaqanLeads';
+const THEME_KEY = 'khaqanTheme';
+
+function readJSON(key, fallback) {
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function getCmsData() {
+  return { ...DEFAULT_CMS_DATA, ...(readJSON(CMS_KEY, {}) || {}) };
+}
+
+function saveCmsData(nextData) {
+  const next = { ...DEFAULT_CMS_DATA, ...nextData };
+  try { window.localStorage.setItem(CMS_KEY, JSON.stringify(next)); } catch (error) { /* storage can be unavailable in private previews */ }
+  applyCmsData();
+  return next;
+}
+
+window.KhaqanCMS = {
+  defaults: { ...DEFAULT_CMS_DATA },
+  get: getCmsData,
+  save: saveCmsData,
+  readLeads: () => readJSON(LEADS_KEY, []),
+  saveLeads: (leads) => {
+    try { window.localStorage.setItem(LEADS_KEY, JSON.stringify(leads)); } catch (error) { /* no-op */ }
+  }
+};
+
+function applyCmsData() {
+  const data = getCmsData();
+  document.querySelectorAll('[data-cms]').forEach((node) => {
+    const key = node.dataset.cms;
+    if (key === 'phoneDisplay') {
+      const methods = [data.phone, data.whatsapp].filter(Boolean);
+      node.textContent = methods.length ? methods.join(' · ') : 'Send your number or preferred contact method in the form.';
+      return;
+    }
+    if (Object.prototype.hasOwnProperty.call(data, key)) node.textContent = data[key];
+  });
+}
+
+function currentTheme() {
+  return window.localStorage.getItem(THEME_KEY) || 'night';
+}
+
+function updateThemeButtons() {
+  const day = document.documentElement.dataset.theme === 'day';
+  document.querySelectorAll('.theme-toggle').forEach((button) => {
+    button.setAttribute('aria-pressed', String(day));
+    button.setAttribute('aria-label', day ? 'Switch to night mode' : 'Switch to day mode');
+    const icon = button.querySelector('.theme-toggle-icon');
+    const label = button.querySelector('.theme-toggle-label');
+    if (icon) icon.textContent = day ? '☾' : '☼';
+    if (label) label.textContent = day ? 'Night' : 'Day';
+  });
+}
+
+function setTheme(theme) {
+  const nextTheme = theme === 'day' ? 'day' : 'night';
+  document.documentElement.dataset.theme = nextTheme;
+  try { window.localStorage.setItem(THEME_KEY, nextTheme); } catch (error) { /* no-op */ }
+  updateThemeButtons();
+}
+
+document.documentElement.dataset.theme = currentTheme();
+
+const path = window.location.pathname.split('/').pop() || 'index.html';
+
+document.querySelectorAll('[data-nav]').forEach((link) => {
+  const target = link.getAttribute('href').split('/').pop() || 'index.html';
+  if ((path === '' && target === 'index.html') || path === target) {
+    link.classList.add('active');
+    link.setAttribute('aria-current', 'page');
+  }
+});
+
+const header = document.querySelector('.site-header');
+const onScroll = () => {
+  if (header) header.classList.toggle('scrolled', window.scrollY > 22);
+};
+onScroll();
+window.addEventListener('scroll', onScroll, { passive: true });
+
+const themeButtons = document.querySelectorAll('.theme-toggle');
+themeButtons.forEach((button) => {
+  button.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'day' ? 'night' : 'day'));
+});
+updateThemeButtons();
+applyCmsData();
+
+async function hydrateCloudContent() {
+  if (!window.KhaqanCloud?.enabled) return;
+  try {
+    const remoteData = await window.KhaqanCloud.getSettings();
+    if (remoteData) saveCmsData({ ...getCmsData(), ...remoteData });
+  } catch (error) {
+    // Keep the local preview available if Supabase is not yet configured or reachable.
+  }
+}
+hydrateCloudContent();
+
+const toggle = document.querySelector('.menu-toggle');
+const nav = document.querySelector('.main-nav');
+if (toggle && nav) {
+  toggle.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = open ? '×' : '☰';
+  });
+  nav.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
+    nav.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.textContent = '☰';
+  }));
+}
+
+const revealItems = document.querySelectorAll('.reveal');
+if ('IntersectionObserver' in window && revealItems.length) {
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.13 });
+  revealItems.forEach((item) => observer.observe(item));
+} else {
+  revealItems.forEach((item) => item.classList.add('visible'));
+}
+
+const contactForm = document.querySelector('#contact-form');
+const formStatus = document.querySelector('.form-status');
+if (contactForm && formStatus) {
+  contactForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const payload = Object.fromEntries(new FormData(contactForm).entries());
+    const lead = {
+      ...payload,
+      id: `lead-${Date.now()}`,
+      status: 'New',
+      createdAt: new Date().toISOString()
+    };
+    const leads = readJSON(LEADS_KEY, []);
+    leads.unshift(lead);
+    try { window.localStorage.setItem(LEADS_KEY, JSON.stringify(leads)); } catch (error) { /* no-op */ }
+    if (window.KhaqanCloud?.enabled) {
+      window.KhaqanCloud.createEnquiry(lead).catch(() => {
+        // The local lead is retained if the cloud endpoint is not ready yet.
+      });
+    }
+    const name = payload.name?.trim() || 'there';
+    formStatus.textContent = `Thank you, ${name}. Your enquiry is ready for the Khaqan team.`;
+    contactForm.reset();
+  });
+}
+
+document.querySelectorAll('[data-year]').forEach((node) => {
+  node.textContent = new Date().getFullYear();
+});
+
+const tiltScenes = document.querySelectorAll('.interactive-tilt');
+if (tiltScenes.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  tiltScenes.forEach((scene) => {
+    scene.addEventListener('pointermove', (event) => {
+      if (event.pointerType && event.pointerType !== 'mouse') return;
+      const rect = scene.getBoundingClientRect();
+      const x = (event.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+      const y = (event.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+      scene.style.setProperty('--tilt-x', `${Math.max(-1, Math.min(1, x)) * 3.2}deg`);
+      scene.style.setProperty('--tilt-y', `${Math.max(-1, Math.min(1, -y)) * 2.4}deg`);
+    });
+    scene.addEventListener('pointerleave', () => {
+      scene.style.setProperty('--tilt-x', '0deg');
+      scene.style.setProperty('--tilt-y', '0deg');
+    });
+  });
+}
+
+window.addEventListener('storage', (event) => {
+  if (event.key === CMS_KEY) applyCmsData();
+  if (event.key === THEME_KEY) {
+    document.documentElement.dataset.theme = event.newValue === 'day' ? 'day' : 'night';
+    updateThemeButtons();
+  }
+});
+
+// Home-page reel: cycle through compact mining clips without loading all videos at once.
+document.querySelectorAll('[data-reel]').forEach((reel) => {
+  const slides = Array.from(reel.querySelectorAll('.reel-slide'));
+  const dotsWrap = reel.querySelector('[data-reel-dots]');
+  const count = reel.querySelector('[data-reel-count]');
+  const nextButton = reel.querySelector('[data-reel-skip]');
+  const interval = Number(reel.dataset.reelInterval) || 7200;
+  let index = 0;
+  let timer = null;
+
+  if (!slides.length) return;
+  reel.style.setProperty('--reel-duration', `${interval}ms`);
+
+  if (dotsWrap) {
+    dotsWrap.innerHTML = slides.map((_, i) => `<button class="reel-dot${i === 0 ? ' active' : ''}" data-reel-dot="${i}" type="button" aria-label="Show mining reel item ${i + 1}"></button>`).join('');
+    dotsWrap.addEventListener('click', (event) => {
+      const dot = event.target.closest('[data-reel-dot]');
+      if (!dot) return;
+      activate(Number(dot.dataset.reelDot));
+      restart();
+    });
+  }
+
+  function activate(nextIndex) {
+    index = (nextIndex + slides.length) % slides.length;
+    slides.forEach((slide, i) => {
+      const active = i === index;
+      slide.classList.toggle('active', active);
+      slide.setAttribute('aria-hidden', String(!active));
+      const video = slide.querySelector('video');
+      if (video) {
+        if (active) {
+          video.currentTime = 0;
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      }
+    });
+    if (count) count.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+    dotsWrap?.querySelectorAll('.reel-dot').forEach((dot, i) => dot.classList.toggle('active', i === index));
+  }
+
+  function stop() {
+    if (timer) window.clearInterval(timer);
+    timer = null;
+  }
+  function restart() {
+    stop();
+    timer = window.setInterval(() => activate(index + 1), interval);
+  }
+
+  nextButton?.addEventListener('click', () => { activate(index + 1); restart(); });
+  reel.addEventListener('mouseenter', stop);
+  reel.addEventListener('mouseleave', restart);
+  reel.addEventListener('focusin', stop);
+  reel.addEventListener('focusout', (event) => { if (!reel.contains(event.relatedTarget)) restart(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else restart(); });
+
+  activate(0);
+  restart();
+});

@@ -1,0 +1,52 @@
+# Khaqan Coal Company deployment checklist
+
+The current preview is an ephemeral sandbox. It can expire, which is why old preview URLs may show “Sandbox Not Found”. Vercel gives the public website a stable URL.
+
+## 1. Create the GitHub repository
+
+Create a private or public repository in the GitHub account that uses the company email, then run from this folder:
+
+```bash
+git init
+git add .
+git commit -m "Initial Khaqan Coal Company website and CRM"
+git branch -M main
+git remote add origin https://github.com/YOUR-GITHUB-USERNAME/YOUR-REPOSITORY.git
+git push -u origin main
+```
+
+Do not commit passwords, service-role keys, or `.env` files.
+
+## 2. Create the Supabase project
+
+1. Create a Supabase project using the desired company email.
+2. Open **SQL Editor**.
+3. Run `supabase/schema.sql`.
+4. Open **Authentication → Users** and create the CRM administrator with the company email.
+5. Copy that user UUID and run the final `insert into public.admin_users` statement shown in the SQL file.
+6. Open **Project Settings → API** and copy the Project URL and the public anon/publishable key into `supabase-config.js`.
+7. Never use the `service_role` key in the browser or GitHub.
+
+The website can read public site settings and create contact enquiries. Only the allow-listed authenticated CRM user can edit content or view/manage enquiries because of Row Level Security.
+
+## 3. Deploy to Vercel
+
+1. Open Vercel and choose **Add New → Project**.
+2. Import the GitHub repository.
+3. Keep the project root as `/`.
+4. No build command is required; this is a static site.
+5. Deploy.
+6. The `vercel.json` file provides clean page routes such as `/about`, `/operations`, `/contact`, and `/crm` plus caching/security headers.
+
+After deployment:
+
+- Public website: `https://YOUR-VERCEL-DOMAIN.vercel.app/`
+- CRM: `https://YOUR-VERCEL-DOMAIN.vercel.app/crm`
+
+## 4. Connect future custom domain
+
+In Vercel, open **Project → Settings → Domains**, add the company domain, and follow the DNS records Vercel provides.
+
+## Important security note
+
+The browser only needs the public Supabase anon/publishable key. The database policies in `supabase/schema.sql` are the security boundary. Never expose the Supabase service-role key, GitHub token, Vercel token, or an email password in the website code.

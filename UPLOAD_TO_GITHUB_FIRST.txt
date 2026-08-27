@@ -1,0 +1,18 @@
+KHAQAN COAL COMPANY — GITHUB UPLOAD
+
+1. Download this ZIP and choose Extract All.
+2. Open the extracted folder.
+3. Select everything INSIDE that folder.
+4. Upload the selected contents to GitHub.
+5. Do not upload the ZIP itself and do not upload the outer folder.
+
+The GitHub repository root should directly contain:
+index.html
+profile.html
+operations.html
+crm.html
+styles.css
+script.js
+vercel.json
+media/
+supabase/

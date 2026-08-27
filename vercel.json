@@ -1,0 +1,29 @@
+{
+  "cleanUrls": true,
+  "headers": [
+    {
+      "source": "/media/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/operations", "destination": "/operations.html" },
+    { "source": "/portfolio", "destination": "/profile.html" },
+    { "source": "/supply", "destination": "/supply.html" },
+    { "source": "/gallery", "destination": "/gallery.html" },
+    { "source": "/community", "destination": "/community.html" },
+    { "source": "/contact", "destination": "/contact.html" },
+    { "source": "/crm", "destination": "/crm.html" }
+  ]
+}

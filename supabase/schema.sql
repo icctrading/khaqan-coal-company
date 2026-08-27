@@ -1,0 +1,122 @@
+-- Khaqan Coal Company: Supabase starter schema
+-- Run this in Supabase Dashboard → SQL Editor.
+-- After creating the first Auth user, insert that user's UUID into admin_users.
+
+create extension if not exists pgcrypto;
+
+create table if not exists public.site_settings (
+  id text primary key default 'default',
+  brand_name text not null default 'Khaqan',
+  company_name text not null default 'Khaqan Coal Company',
+  legal_name text not null default 'Khaqan Coal Company (Private) Limited',
+  incorporation_date text not null default '03 March 2021',
+  total_quantity text not null default '535,121.35 MT',
+  total_turnover text not null default 'PKR 21,011,459,921',
+  client_count text not null default '12 leading organizations',
+  director_name text not null default 'Adnan Khan',
+  ownership_line text not null default 'Proudly owned by the Akkhurwal Qom',
+  location text not null default 'Darra Adam Khel, Khyber Pakhtunkhwa, Pakistan',
+  hero_eyebrow text not null default 'Darra Adam Khel · KPK · Pakistan',
+  hero_description text not null default 'Coal is black gold — and Khaqan Coal Company Pvt. Ltd. supplies the best-quality coal at competitive rates, with dependable logistics for customers across Pakistan and an export future ahead.',
+  export_heading text not null default 'Leading from Darra Adam Khel. Preparing for the world.',
+  export_message text not null default 'Khaqan Coal Company is proud to be a leading coal supplier in Pakistan and is now preparing the relationships, standards, and distribution routes needed for export.',
+  phone text not null default '',
+  whatsapp text not null default '',
+  email text not null default '',
+  updated_at timestamptz not null default now()
+);
+
+-- Safe migrations for an existing Khaqan Supabase project.
+alter table public.site_settings add column if not exists legal_name text not null default 'Khaqan Coal Company (Private) Limited';
+alter table public.site_settings add column if not exists incorporation_date text not null default '03 March 2021';
+alter table public.site_settings add column if not exists total_quantity text not null default '535,121.35 MT';
+alter table public.site_settings add column if not exists total_turnover text not null default 'PKR 21,011,459,921';
+alter table public.site_settings add column if not exists client_count text not null default '12 leading organizations';
+
+insert into public.site_settings (id) values ('default') on conflict (id) do nothing;
+
+create table if not exists public.enquiries (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  company text not null default '',
+  contact text not null,
+  interest text not null default 'General enquiry',
+  message text not null default '',
+  status text not null default 'New' check (status in ('New', 'Contacted', 'Won', 'Archived')),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.admin_users where user_id = auth.uid()
+  );
+$$;
+
+revoke all on function public.is_admin() from public;
+grant execute on function public.is_admin() to anon, authenticated;
+
+alter table public.site_settings enable row level security;
+alter table public.enquiries enable row level security;
+alter table public.admin_users enable row level security;
+
+-- The public website can read only the single published settings row.
+drop policy if exists "Public can read default settings" on public.site_settings;
+create policy "Public can read default settings"
+  on public.site_settings for select
+  to anon, authenticated
+  using (id = 'default');
+
+-- Only an explicitly allow-listed Auth user can change public site content.
+drop policy if exists "Admins can update settings" on public.site_settings;
+create policy "Admins can update settings"
+  on public.site_settings for update
+  to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
+
+drop policy if exists "Admins can insert settings" on public.site_settings;
+create policy "Admins can insert settings"
+  on public.site_settings for insert
+  to authenticated
+  with check (public.is_admin());
+
+-- The public Contact form can create an enquiry; only admins can read or manage them.
+drop policy if exists "Public can create enquiries" on public.enquiries;
+create policy "Public can create enquiries"
+  on public.enquiries for insert
+  to anon, authenticated
+  with check (char_length(trim(name)) between 1 and 120 and char_length(trim(contact)) between 1 and 160);
+
+drop policy if exists "Admins can read enquiries" on public.enquiries;
+create policy "Admins can read enquiries"
+  on public.enquiries for select
+  to authenticated
+  using (public.is_admin());
+
+drop policy if exists "Admins can update enquiries" on public.enquiries;
+create policy "Admins can update enquiries"
+  on public.enquiries for update
+  to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
+
+drop policy if exists "Admins can delete enquiries" on public.enquiries;
+create policy "Admins can delete enquiries"
+  on public.enquiries for delete
+  to authenticated
+  using (public.is_admin());
+
+-- Admin allow-list is intentionally not readable from the browser.
+-- Add the first administrator after signing up in Authentication → Users:
+-- insert into public.admin_users (user_id) values ('PASTE_AUTH_USER_UUID_HERE');
