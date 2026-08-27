@@ -320,6 +320,34 @@ if (canTilt) {
   });
 }
 
+/* Number count-up when the qom facts scroll into view. */
+const countEls = document.querySelectorAll('.qom-facts strong');
+if ('IntersectionObserver' in window && countEls.length
+    && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const countObserver = new IntersectionObserver((entries, obs) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      obs.unobserve(entry.target);
+      const el = entry.target;
+      const match = el.textContent.match(/^([^0-9]*)(\d+(?:\.\d+)?)([\s\S]*)$/);
+      if (!match) return;
+      const [, prefix, numText, suffix] = match;
+      const target = parseFloat(numText);
+      const decimals = (numText.split('.')[1] || '').length;
+      const duration = 1700;
+      const start = performance.now();
+      const tick = (now) => {
+        const p = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = prefix + (target * eased).toFixed(decimals) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+  }, { threshold: 0.4 });
+  countEls.forEach((el) => countObserver.observe(el));
+}
+
 window.addEventListener('storage', (event) => {
   if (event.key === CMS_KEY) applyCmsData();
   if (event.key === THEME_KEY) {

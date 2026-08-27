@@ -1940,3 +1940,402 @@ html[data-theme="day"] .hero h1 span {
 /* Entrance must not lock the hover transform */
 .brand-logo { animation: logoIn 1s cubic-bezier(.18, .9, .3, 1.08) backwards; }
 html[data-theme="day"] .brand-name { background-size: 220% 100%; }
+
+/* ==================================================================
+   V5 — visibility fixes, bigger brand, distinct skins, modern effects
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   A. Line contrast — no more invisible lines
+   ------------------------------------------------------------------ */
+.section::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='680' height='480' viewBox='0 0 680 480'%3E%3Cg fill='none' stroke='%23e9c76e' stroke-width='1.4'%3E%3Cpath d='M-30 96 C 110 30 210 150 350 96 S 560 16 720 86' stroke-opacity='.85'/%3E%3Cpath d='M-30 152 C 130 84 250 208 390 142 S 600 76 720 146' stroke-opacity='.6'/%3E%3Cpath d='M-30 210 C 150 130 270 258 410 190 S 610 122 720 196' stroke-opacity='.4'/%3E%3Cpath d='M-30 268 C 160 178 290 305 430 236 S 620 168 720 244' stroke-opacity='.26'/%3E%3Cpath d='M-30 326 C 170 226 310 352 450 282 S 630 214 720 292' stroke-opacity='.16'/%3E%3C/g%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: .85;
+}
+html[data-theme="day"] .section::before { mix-blend-mode: multiply; opacity: .5; }
+.page-home .hero-photo::after {
+  background-image: linear-gradient(rgba(255, 255, 255, .09) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .09) 1px, transparent 1px);
+}
+html[data-theme="day"] .page-home .hero-photo::after {
+  background-image: linear-gradient(rgba(20, 50, 35, .09) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 50, 35, .09) 1px, transparent 1px);
+}
+.section-head > div:first-child::after { width: 46px; height: 3px; opacity: .65; }
+
+/* ------------------------------------------------------------------
+   B. Bigger brand — header + footer lockup, properly aligned
+   ------------------------------------------------------------------ */
+.site-header .brand-logo { height: 68px; }
+.brand-name { font-size: 2.1rem; line-height: .95; font-weight: 600; }
+.brand-sub { margin-top: 7px; font-size: .67rem; letter-spacing: .17em; }
+.brand { gap: 16px; min-width: 372px; align-items: center; }
+.footer .brand { align-items: center; gap: 18px; }
+.footer .brand-logo { height: 88px; }
+.footer .brand-name { font-size: 2.3rem; line-height: .95; }
+.footer .brand-sub { margin-top: 8px; font-size: .7rem; }
+.crm-header .brand-logo { height: 58px; }
+/* Optical alignment guard for the wordmark block */
+.brand-name, .footer .brand-name { display: block; }
+@media (max-width: 1240px) {
+  .site-header .brand-logo { height: 60px; }
+  .brand-name { font-size: 1.85rem; }
+  .brand { min-width: 318px; }
+}
+@media (max-width: 1180px) {
+  .menu-toggle { display: block; order: 5; margin-left: auto; }
+  .nav-actions { display: flex; align-items: center; order: 6; gap: 8px; }
+  .main-nav {
+    position: absolute; top: calc(100% + 10px); left: 15px; right: 15px;
+    display: none; align-items: stretch; flex-direction: column; gap: 0; padding: 8px;
+    border: 1px solid var(--line-strong); border-radius: 15px;
+    background: rgba(15, 17, 16, .97); box-shadow: var(--shadow);
+  }
+  .main-nav.open { display: flex; animation: navDrop .32s cubic-bezier(.2,.8,.2,1) both; }
+  .main-nav a { padding: 12px 14px; border-radius: 9px; }
+  .main-nav a:hover, .main-nav a.active { background: rgba(212, 160, 52, .09); }
+  .main-nav a.active::after { display: none; }
+  html[data-theme="day"] .main-nav { background: rgba(255, 255, 255, .98); }
+  html[data-skin="marble"] .main-nav, html[data-skin="obsidian"] .main-nav { background: rgba(16, 16, 21, .98); }
+  html[data-skin="marble"][data-theme="day"] .main-nav, html[data-skin="obsidian"][data-theme="day"] .main-nav { background: rgba(252, 250, 245, .98); }
+  .nav-cta { display: none; }
+}
+@media (max-width: 680px) {
+  .site-header .brand-logo { height: 44px; }
+  .brand-name { font-size: 1.35rem; }
+  .brand-sub { margin-top: 4px; font-size: .5rem; }
+  .footer .brand-logo { height: 64px; }
+  .footer .brand-name { font-size: 1.55rem; }
+  .footer .brand-sub { font-size: .54rem; }
+}
+
+/* ------------------------------------------------------------------
+   C. MARBLE rework — slate black-marble with ivory veins (distinct
+      from obsidian: elegant, rounded, warm gold)
+   ------------------------------------------------------------------ */
+html[data-skin="marble"] {
+  --ink: #f4f1e8;
+  --ink-soft: #b6b4ab;
+  --coal: #141824;
+  --coal-2: #1a1f2d;
+  --coal-3: #232a3a;
+  --line: rgba(233, 235, 244, .16);
+  --line-strong: rgba(233, 235, 244, .3);
+  --sand: #d6c9a8;
+  --sand-2: #ecdfbd;
+  --ember: #c59a3a;
+  --ember-2: #e3bd63;
+  --moss: #a8a28a;
+  --yellow: #d9ab41;
+  --forest: #6e581c;
+  --mist: #cdd2c2;
+}
+html[data-skin="marble"] body {
+  background-color: var(--coal);
+  background-image:
+    radial-gradient(circle at 14% -6%, rgba(217, 171, 65, .12), transparent 32%),
+    radial-gradient(circle at 96% 10%, rgba(233, 235, 244, .06), transparent 26%),
+    linear-gradient(165deg, #171c29 0%, #121622 55%, #1a2030 100%);
+}
+/* Ivory marble veining — clearly visible */
+html[data-skin="marble"] body::after {
+  opacity: .5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560' viewBox='0 0 560 560'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011 0.021' numOctaves='5' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.88 0 0 0 0 0.9 0 0 0 0 0.96 0 0 0 0.75 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='560' height='560' filter='url(%23v)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='380' viewBox='0 0 380 380'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.017' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.92 0 0 0 0 0.88 0 0 0 0 0.78 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='380' height='380' filter='url(%23w)'/%3E%3C/svg%3E");
+  background-size: 560px 560px, 380px 380px;
+  mix-blend-mode: soft-light;
+  animation: marbleGlint 22s ease-in-out infinite alternate;
+}
+html[data-skin="marble"] .section-dark { background: radial-gradient(circle at 9% -10%, rgba(217, 171, 65, .1), transparent 38%), radial-gradient(circle at 97% 110%, rgba(233, 235, 244, .06), transparent 34%), linear-gradient(165deg, #161b28, #121621); }
+html[data-skin="marble"] .section-soft { background: radial-gradient(circle at 90% -10%, rgba(217, 171, 65, .09), transparent 42%), radial-gradient(circle at 5% 112%, rgba(233, 235, 244, .05), transparent 36%), linear-gradient(165deg, #1b2131 0%, #151a27 55%, #1d2434 100%); }
+html[data-skin="marble"] .section-earth { background: radial-gradient(circle at 88% -8%, rgba(217, 171, 65, .1), transparent 40%), radial-gradient(circle at 6% 112%, rgba(230, 200, 140, .05), transparent 34%), linear-gradient(165deg, #1d2030 0%, #171a29 58%, #201f2e 100%); }
+html[data-skin="marble"]:not([data-theme="day"]) .faq-section { background: radial-gradient(circle at 90% -10%, rgba(217, 171, 65, .09), transparent 42%), linear-gradient(165deg, #1b2131, #151a27); }
+html[data-skin="marble"] .footer { background: #10141f; }
+html[data-skin="marble"] .path-card, html[data-skin="marble"] .spec-card, html[data-skin="marble"] .qom-card { background: linear-gradient(160deg, #202639, #171c2a); }
+html[data-skin="marble"] .community-card { background: linear-gradient(150deg, #1e2434, #161b28); }
+html[data-skin="marble"] .community-card:nth-child(2) { background: linear-gradient(150deg, #232739, #181c2b); }
+html[data-skin="marble"] .process-panel { background: linear-gradient(160deg, #1e2434, #151a27); }
+html[data-skin="marble"] .person-card { background: linear-gradient(160deg, #1e2434, #141826); }
+html[data-skin="marble"] .contact-form { background: linear-gradient(160deg, #1e2434, #141826); }
+html[data-skin="marble"] .image-note { background: linear-gradient(100deg, #232940, #141826); }
+html[data-skin="marble"] .performance-table-card, html[data-skin="marble"] .performance-chart { background: linear-gradient(145deg, #1e2434, #141826); }
+html[data-skin="marble"] .client-grid article { background: #1b2131; }
+html[data-skin="marble"] .client-grid article:hover { background: #232a3e; }
+html[data-skin="marble"] .crm-card { background: linear-gradient(145deg, #1e2434, #141826); }
+html[data-skin="marble"] .crm-sidebar { background: rgba(24, 29, 43, .8); }
+html[data-skin="marble"] .crm-metrics { background: rgba(28, 34, 50, .6); }
+html[data-skin="marble"] .crm-body { background-color: #131724; background-image: radial-gradient(circle at 80% -10%, rgba(217, 171, 65, .1), transparent 30%); }
+/* Marble day — warm ivory marble, gold veins */
+html[data-skin="marble"][data-theme="day"] {
+  --coal: #f7f3e8;
+  --coal-2: #fdfaf1;
+  --coal-3: #efe9da;
+  --ink: #23201a;
+  --ink-soft: #59523f;
+  --line: rgba(60, 52, 30, .17);
+  --line-strong: rgba(60, 52, 30, .32);
+}
+html[data-skin="marble"][data-theme="day"] body { background-color: #f7f3e8; background-image: radial-gradient(circle at 12% -4%, rgba(217, 171, 65, .18), transparent 30%), radial-gradient(circle at 94% 8%, rgba(196, 178, 138, .2), transparent 26%); }
+html[data-skin="marble"][data-theme="day"] body::after { opacity: .22; }
+
+/* ------------------------------------------------------------------
+   D. OBSIDIAN rework — brushed graphite, sharp edges, bright gold
+      (distinct from marble: industrial, metallic, cool)
+   ------------------------------------------------------------------ */
+html[data-skin="obsidian"] {
+  --ink: #f2f0ea;
+  --ink-soft: #a4a8ae;
+  --coal: #0a0b0d;
+  --coal-2: #101216;
+  --coal-3: #17191f;
+  --line: rgba(212, 160, 52, .2);
+  --line-strong: rgba(212, 160, 52, .38);
+  --sand: #d3b46e;
+  --sand-2: #e9d6a2;
+  --ember: #d4a034;
+  --ember-2: #f2c65e;
+  --moss: #9a946a;
+  --yellow: #f0bd45;
+  --forest: #4d3d12;
+  --mist: #b9bcc4;
+}
+/* Brushed metal + sharp gold specular sweep */
+html[data-skin="obsidian"] body::after {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .024) 0 1px, transparent 1px 3px),
+    linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .035) 46%, rgba(212, 160, 52, .07) 50%, rgba(255, 255, 255, .035) 54%, transparent 68%);
+  opacity: .8;
+  animation: metalSweep 22s linear infinite alternate;
+}
+/* Obsidian sections: gunmetal gradients + brushed lines instead of contours */
+html[data-skin="obsidian"] .section::before {
+  background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 4px);
+  background-size: auto;
+  background-position: 0 0;
+  transform: none;
+  mix-blend-mode: overlay;
+  opacity: .7;
+  -webkit-mask-image: linear-gradient(115deg, black, transparent 70%);
+  mask-image: linear-gradient(115deg, black, transparent 70%);
+  animation: none;
+}
+html[data-theme="day"][data-skin="obsidian"] .section::before { mix-blend-mode: multiply; opacity: .35; }
+html[data-skin="obsidian"] .section-dark { background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .09), transparent 38%), linear-gradient(165deg, #101216, #0a0c0f); }
+html[data-skin="obsidian"] .section-soft { background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, .018) 50%, transparent 60%), radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .07), transparent 42%), linear-gradient(165deg, #14161b, #0e1013 60%, #121419); }
+html[data-skin="obsidian"] .section-earth { background: linear-gradient(115deg, transparent 42%, rgba(212, 160, 52, .03) 50%, transparent 58%), radial-gradient(circle at 8% -10%, rgba(212, 160, 52, .08), transparent 40%), linear-gradient(165deg, #13140e, #0d0e10 58%, #111208); }
+html[data-skin="obsidian"]:not([data-theme="day"]) .faq-section { background: radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .07), transparent 42%), linear-gradient(165deg, #14161b, #0e1013); }
+html[data-skin="obsidian"] .footer { background: #08090b; }
+html[data-skin="obsidian"] .path-card, html[data-skin="obsidian"] .spec-card, html[data-skin="obsidian"] .qom-card { background: linear-gradient(180deg, #16181e, #0e1014 80%); }
+html[data-skin="obsidian"] .community-card { background: linear-gradient(180deg, #15171c, #0e1013); }
+html[data-skin="obsidian"] .community-card:nth-child(2) { background: linear-gradient(180deg, #17191f, #101216); }
+html[data-skin="obsidian"] .process-panel { background: linear-gradient(180deg, #15171c, #0d0f13); }
+html[data-skin="obsidian"] .person-card { background: linear-gradient(180deg, #15171c, #0d0f13); }
+html[data-skin="obsidian"] .contact-form { background: linear-gradient(180deg, #15171c, #0d0f13); }
+html[data-skin="obsidian"] .image-note { background: linear-gradient(100deg, #17191f, #0b0d10); }
+html[data-skin="obsidian"] .performance-table-card, html[data-skin="obsidian"] .performance-chart { background: linear-gradient(180deg, #15171c, #0d0f13); }
+html[data-skin="obsidian"] .client-grid article { background: #121419; }
+html[data-skin="obsidian"] .client-grid article:hover { background: #191c22; }
+html[data-skin="obsidian"] .crm-card { background: linear-gradient(180deg, #15171c, #0d0f13); }
+html[data-skin="obsidian"] .crm-sidebar { background: rgba(14, 16, 20, .85); }
+html[data-skin="obsidian"] .crm-metrics { background: rgba(20, 22, 27, .6); }
+html[data-skin="obsidian"] .crm-body { background-color: #0a0b0e; background-image: radial-gradient(circle at 80% -10%, rgba(212, 160, 52, .08), transparent 30%); }
+/* Obsidian: sharp geometry */
+html[data-skin="obsidian"] .path-card, html[data-skin="obsidian"] .spec-card, html[data-skin="obsidian"] .qom-card,
+html[data-skin="obsidian"] .community-card, html[data-skin="obsidian"] .journey-card, html[data-skin="obsidian"] .media-tile,
+html[data-skin="obsidian"] .media-card, html[data-skin="obsidian"] .distribution-card, html[data-skin="obsidian"] .transport-card,
+html[data-skin="obsidian"] .callout, html[data-skin="obsidian"] .image-note, html[data-skin="obsidian"] .emblem-card,
+html[data-skin="obsidian"] .person-card, html[data-skin="obsidian"] .process-panel, html[data-skin="obsidian"] .crm-card,
+html[data-skin="obsidian"] .proof-strip, html[data-skin="obsidian"] .darra-wall figure, html[data-skin="obsidian"] .darra-strip figure,
+html[data-skin="obsidian"] .skin-menu { border-radius: 8px; }
+html[data-skin="obsidian"] .btn { border-radius: 6px; }
+html[data-skin="obsidian"] .qom-badge { border-radius: 4px; }
+html[data-skin="obsidian"] .skin-swatch { border-radius: 6px; }
+/* Obsidian day — cool platinum (clearly cooler than marble's ivory) */
+html[data-skin="obsidian"][data-theme="day"] {
+  --coal: #eef0f3;
+  --coal-2: #f8fafc;
+  --coal-3: #e2e6ea;
+  --ink: #1b1f26;
+  --ink-soft: #4e5560;
+  --line: rgba(35, 42, 52, .18);
+  --line-strong: rgba(35, 42, 52, .34);
+  --sand: #6b6425;
+  --sand-2: #524a16;
+  --moss: #71766b;
+}
+html[data-skin="obsidian"][data-theme="day"] body { background-color: #eef0f3; background-image: radial-gradient(circle at 12% -4%, rgba(212, 160, 52, .12), transparent 30%), radial-gradient(circle at 94% 8%, rgba(148, 163, 184, .22), transparent 26%), linear-gradient(165deg, #f1f3f5 0%, #eceff2 55%, #f3f5f7 100%); }
+html[data-skin="obsidian"][data-theme="day"] body::after { opacity: .3; background: repeating-linear-gradient(90deg, rgba(100, 116, 139, .05) 0 1px, transparent 1px 3px); animation: none; }
+html[data-skin="obsidian"][data-theme="day"] .section-dark { background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .1), transparent 38%), linear-gradient(165deg, #f3f5f7, #eceff2); }
+html[data-skin="obsidian"][data-theme="day"] .section-soft { background: radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .09), transparent 42%), radial-gradient(circle at 5% 112%, rgba(148, 163, 184, .18), transparent 36%), linear-gradient(165deg, #e9ecf0 0%, #f2f4f6 55%, #e4e8ec 100%); }
+html[data-skin="obsidian"][data-theme="day"] .section-earth { background: radial-gradient(circle at 8% -10%, rgba(212, 160, 52, .09), transparent 40%), radial-gradient(circle at 6% 112%, rgba(148, 163, 184, .16), transparent 34%), linear-gradient(165deg, #e6e9ee 0%, #eff1f4 58%, #dfe3e8 100%); }
+html[data-skin="obsidian"][data-theme="day"] .footer { background: #e3e7ec; }
+
+/* ------------------------------------------------------------------
+   E. Modern section effects — aurora glow + emblem watermark together
+   ------------------------------------------------------------------ */
+.section-dark::after, .section-earth::after {
+  background-image:
+    radial-gradient(620px 460px at 88% 16%, rgba(212, 160, 52, .09), transparent 70%),
+    radial-gradient(520px 400px at 10% 88%, rgba(239, 209, 116, .05), transparent 70%),
+    url("media/logo-mark.webp");
+  background-repeat: no-repeat;
+  background-position: 88% 16%, 10% 88%, right -70px center;
+  background-size: auto, auto, min(42vw, 500px) auto;
+  opacity: 1;
+}
+html[data-theme="day"] .section-dark::after, html[data-theme="day"] .section-earth::after {
+  background-image:
+    radial-gradient(620px 460px at 88% 16%, rgba(212, 160, 52, .1), transparent 70%),
+    radial-gradient(520px 400px at 10% 88%, rgba(212, 160, 52, .06), transparent 70%),
+    url("media/logo-mark-light.webp");
+  background-position: 88% 16%, 10% 88%, right -70px center;
+  background-size: auto, auto, min(42vw, 500px) auto;
+}
+.section-earth::after { background-position: 88% 16%, 10% 88%, left -70px center; }
+html[data-theme="day"] .section-earth::after { background-position: 88% 16%, 10% 88%, left -70px center; }
+/* Aurora washes also reach the soft sections */
+.section-soft { position: relative; }
+.section-soft::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(680px 480px at 92% 6%, rgba(212, 160, 52, .07), transparent 68%),
+    radial-gradient(520px 420px at 6% 92%, rgba(239, 209, 116, .045), transparent 70%);
+  opacity: 1;
+}
+html[data-theme="day"] .section-soft::after {
+  background-image:
+    radial-gradient(680px 480px at 92% 6%, rgba(212, 160, 52, .1), transparent 68%),
+    radial-gradient(520px 420px at 6% 92%, rgba(212, 160, 52, .06), transparent 70%);
+}
+
+/* ------------------------------------------------------------------
+   F. Hero modernization — glass chips, scroll cue, glass reel
+   ------------------------------------------------------------------ */
+.hero .eyebrow, .page-hero .eyebrow {
+  padding: 9px 16px;
+  border: 1px solid rgba(212, 160, 52, .34);
+  border-radius: 999px;
+  background: rgba(10, 14, 12, .42);
+  backdrop-filter: blur(10px);
+}
+html[data-theme="day"] .hero .eyebrow, html[data-theme="day"] .page-hero .eyebrow {
+  background: rgba(255, 255, 255, .52);
+  border-color: rgba(140, 116, 43, .38);
+}
+html[data-skin="obsidian"] .hero .eyebrow, html[data-skin="obsidian"] .page-hero .eyebrow { border-radius: 6px; }
+.hero-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 40px;
+  margin-right: 12px;
+  padding: 10px 16px;
+  border: 1px solid rgba(212, 160, 52, .3);
+  border-radius: 999px;
+  background: rgba(10, 14, 12, .45);
+  backdrop-filter: blur(10px);
+  color: var(--ink-soft);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: border-color .3s ease, transform .3s ease, background .3s ease;
+}
+.hero-note:hover { border-color: rgba(212, 160, 52, .6); transform: translateY(-2px); }
+html[data-theme="day"] .hero-note {
+  background: rgba(255, 253, 248, .6);
+  border-color: rgba(140, 116, 43, .35);
+  color: #4d4635;
+}
+html[data-skin="obsidian"] .hero-note { border-radius: 5px; }
+.hero-note i { flex: 0 0 auto; }
+.hero-scroll {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  color: var(--ink-soft);
+  font-size: .58rem;
+  font-weight: 800;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  transition: color .3s ease;
+}
+.hero-scroll:hover { color: var(--yellow); }
+.hero-scroll i {
+  position: relative;
+  width: 24px;
+  height: 38px;
+  border: 2px solid rgba(212, 160, 52, .55);
+  border-radius: 14px;
+}
+.hero-scroll i::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 4px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--yellow);
+  transform: translate(-50%, 0);
+  animation: scrollDot 1.9s cubic-bezier(.4, 0, .2, 1) infinite;
+}
+@keyframes scrollDot {
+  0% { opacity: 0; transform: translate(-50%, 0); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, 15px); }
+}
+@media (max-width: 680px) { .hero-scroll { display: none; } }
+.page-home .home-reel {
+  box-shadow: 0 34px 90px rgba(0, 0, 0, .5), 0 0 70px rgba(212, 160, 52, .1);
+}
+/* Page heroes: aurora orbs drift */
+.page-hero-orb { opacity: .75; }
+.page-hero .story-3d-scene, .page-hero .valley-scene, .page-hero .beacon-horizon { opacity: .92; }
+
+/* ------------------------------------------------------------------
+   G. Counters + polish
+   ------------------------------------------------------------------ */
+.qom-facts strong { font-variant-numeric: tabular-nums; }
+.proof-strip strong { font-variant-numeric: tabular-nums; }
+/* CRM heading gets the chip treatment too */
+.crm-heading .eyebrow {
+  padding: 8px 14px;
+  border: 1px solid rgba(212, 160, 52, .32);
+  border-radius: 999px;
+  background: rgba(10, 14, 12, .4);
+  backdrop-filter: blur(8px);
+}
+html[data-theme="day"] .crm-heading .eyebrow { background: rgba(255, 255, 255, .55); border-color: rgba(140, 116, 43, .35); }
+
+/* Qom cards + facts — correct light treatment in every day mode */
+html[data-skin="signature"][data-theme="day"] .qom-card, html:not([data-skin])[data-theme="day"] .qom-card {
+  background: linear-gradient(160deg, #ffffff, #e8f1e5);
+  border-color: rgba(16, 74, 38, .22);
+}
+html[data-skin="signature"][data-theme="day"] .qom-card-featured, html:not([data-skin])[data-theme="day"] .qom-card-featured {
+  background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .15), transparent 44%), linear-gradient(160deg, #ffffff, #e8f1e5);
+  border-color: rgba(140, 116, 43, .42);
+}
+html[data-skin="signature"][data-theme="day"] .qom-rank, html[data-skin="signature"][data-theme="day"] .qom-script,
+html[data-skin="signature"][data-theme="day"] .qom-facts strong, html:not([data-skin])[data-theme="day"] .qom-rank,
+html:not([data-skin])[data-theme="day"] .qom-script, html:not([data-skin])[data-theme="day"] .qom-facts strong { color: #7d560a; }
+html[data-skin="signature"][data-theme="day"] .qom-badge, html:not([data-skin])[data-theme="day"] .qom-badge {
+  color: #8f620b;
+  border-color: rgba(140, 116, 43, .45);
+  background: linear-gradient(120deg, rgba(212, 160, 52, .16), rgba(212, 160, 52, .05));
+}
+html[data-skin="marble"][data-theme="day"] .qom-card { background: linear-gradient(160deg, #fdfaf1, #efe9da); }
+html[data-skin="marble"][data-theme="day"] .qom-card-featured { background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .16), transparent 44%), linear-gradient(160deg, #fdfaf1, #efe9da); }
+html[data-skin="marble"][data-theme="day"] .qom-facts strong { color: #8f6410; }
+html[data-skin="obsidian"][data-theme="day"] .qom-card { background: linear-gradient(180deg, #f8fafc, #e2e6ea); }
+html[data-skin="obsidian"][data-theme="day"] .qom-card-featured { background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .15), transparent 44%), linear-gradient(180deg, #f8fafc, #e2e6ea); }
+html[data-skin="obsidian"][data-theme="day"] .qom-facts strong { color: #8a620c; }
