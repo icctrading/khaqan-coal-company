@@ -4,8 +4,8 @@ const DEFAULT_CMS_DATA = {
   directorName: 'Adnan Khan',
   ownershipLine: 'Proudly owned by the Akkhurwal Qom',
   location: 'Darra Adam Khel, Khyber Pakhtunkhwa, Pakistan',
-  heroEyebrow: 'Darra Adam Khel · KPK · Pakistan',
-  heroDescription: 'Coal is black gold — and Khaqan Coal Company Pvt. Ltd. supplies the best-quality coal at competitive rates, with dependable logistics for customers across Pakistan and an export future ahead.',
+  heroEyebrow: 'Akkhurwal Qom · Darra Adam Khel · KPK, Pakistan',
+  heroDescription: 'Best-quality coal at good prices — mined and moved with pride from Darra Adam Khel to customers across Pakistan.',
   phone: '',
   whatsapp: '',
   email: '',
@@ -21,6 +21,13 @@ const DEFAULT_CMS_DATA = {
 const CMS_KEY = 'khaqanSiteData';
 const LEADS_KEY = 'khaqanLeads';
 const THEME_KEY = 'khaqanTheme';
+const SKIN_KEY = 'khaqanSkin';
+const SKINS = ['signature', 'marble', 'obsidian'];
+const THEME_COLORS = {
+  signature: { day: '#f4f7f2', night: '#07100d' },
+  marble: { day: '#f7f4ec', night: '#121218' },
+  obsidian: { day: '#f2f1ef', night: '#0b0b0e' }
+};
 
 function readJSON(key, fallback) {
   try {
@@ -69,6 +76,11 @@ function currentTheme() {
   return window.localStorage.getItem(THEME_KEY) || 'night';
 }
 
+function currentSkin() {
+  const skin = window.localStorage.getItem(SKIN_KEY);
+  return SKINS.indexOf(skin) > -1 ? skin : 'signature';
+}
+
 function updateThemeButtons() {
   const day = document.documentElement.dataset.theme === 'day';
   document.querySelectorAll('.theme-toggle').forEach((button) => {
@@ -81,14 +93,82 @@ function updateThemeButtons() {
   });
 }
 
+function updateSkinButtons() {
+  const skin = currentSkin();
+  document.querySelectorAll('.skin-option').forEach((button) => {
+    const active = button.dataset.skin === skin;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-checked', String(active));
+  });
+}
+
+function updateThemeColorMeta() {
+  const skin = currentSkin();
+  const mode = document.documentElement.dataset.theme === 'day' ? 'day' : 'night';
+  const color = (THEME_COLORS[skin] || THEME_COLORS.signature)[mode];
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta && color) meta.setAttribute('content', color);
+}
+
+/* Brief global transition class so skin / day-night changes cross-fade smoothly. */
+function withThemeTransition(apply) {
+  const root = document.documentElement;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) { apply(); return; }
+  root.classList.add('theming');
+  apply();
+  window.setTimeout(() => root.classList.remove('theming'), 700);
+}
+
 function setTheme(theme) {
   const nextTheme = theme === 'day' ? 'day' : 'night';
-  document.documentElement.dataset.theme = nextTheme;
-  try { window.localStorage.setItem(THEME_KEY, nextTheme); } catch (error) { /* no-op */ }
+  withThemeTransition(() => {
+    document.documentElement.dataset.theme = nextTheme;
+    try { window.localStorage.setItem(THEME_KEY, nextTheme); } catch (error) { /* no-op */ }
+  });
   updateThemeButtons();
+  updateThemeColorMeta();
+}
+
+function setSkin(skin) {
+  const nextSkin = SKINS.indexOf(skin) > -1 ? skin : 'signature';
+  withThemeTransition(() => {
+    document.documentElement.dataset.skin = nextSkin;
+    try { window.localStorage.setItem(SKIN_KEY, nextSkin); } catch (error) { /* no-op */ }
+  });
+  updateSkinButtons();
+  updateThemeColorMeta();
+  closeSkinMenus();
+}
+
+/* Skin picker menu behaviour. */
+function closeSkinMenus() {
+  document.querySelectorAll('.skin-menu').forEach((menu) => {
+    menu.removeAttribute('data-open');
+    menu.hidden = true;
+  });
+  document.querySelectorAll('.skin-toggle').forEach((button) => {
+    button.setAttribute('aria-expanded', 'false');
+  });
+}
+
+function toggleSkinMenu(switchEl) {
+  const menu = switchEl.querySelector('.skin-menu');
+  if (!menu) return;
+  const willOpen = menu.hidden;
+  closeSkinMenus();
+  if (willOpen) {
+    menu.hidden = false;
+    menu.setAttribute('data-open', '');
+    const button = switchEl.querySelector('.skin-toggle');
+    if (button) button.setAttribute('aria-expanded', 'true');
+    const first = menu.querySelector('.skin-option');
+    if (first) first.focus({ preventScroll: true });
+  }
 }
 
 document.documentElement.dataset.theme = currentTheme();
+document.documentElement.dataset.skin = currentSkin();
 
 const path = window.location.pathname.split('/').pop() || 'index.html';
 
@@ -111,7 +191,23 @@ const themeButtons = document.querySelectorAll('.theme-toggle');
 themeButtons.forEach((button) => {
   button.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'day' ? 'night' : 'day'));
 });
+
+document.querySelectorAll('.skin-switch').forEach((switchEl) => {
+  const toggle = switchEl.querySelector('.skin-toggle');
+  if (toggle) toggle.addEventListener('click', (event) => { event.stopPropagation(); toggleSkinMenu(switchEl); });
+  switchEl.querySelectorAll('.skin-option').forEach((option) => {
+    option.addEventListener('click', () => setSkin(option.dataset.skin));
+  });
+});
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('.skin-switch')) closeSkinMenus();
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeSkinMenus();
+});
 updateThemeButtons();
+updateSkinButtons();
+updateThemeColorMeta();
 applyCmsData();
 
 async function hydrateCloudContent() {
@@ -203,11 +299,66 @@ if (tiltScenes.length && !window.matchMedia('(prefers-reduced-motion: reduce)').
   });
 }
 
+/* Premium 3D tilt: cards lean gently toward the pointer. */
+const TILT_CARDS = '.path-card, .spec-card, .journey-card, .community-card, .qom-card, .media-tile, .media-card, .distribution-card, .transport-card';
+const canTilt = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  && window.matchMedia('(pointer: fine)').matches;
+if (canTilt) {
+  document.querySelectorAll(TILT_CARDS).forEach((card) => {
+    card.addEventListener('pointermove', (event) => {
+      if (event.pointerType && event.pointerType !== 'mouse') return;
+      const rect = card.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      const y = (event.clientY - rect.top) / rect.height - 0.5;
+      card.style.setProperty('--tilt-x', `${(x * 4.6).toFixed(2)}deg`);
+      card.style.setProperty('--tilt-y', `${(y * -4.6).toFixed(2)}deg`);
+    });
+    card.addEventListener('pointerleave', () => {
+      card.style.setProperty('--tilt-x', '0deg');
+      card.style.setProperty('--tilt-y', '0deg');
+    });
+  });
+}
+
+/* Number count-up when the qom facts scroll into view. */
+const countEls = document.querySelectorAll('.qom-facts strong');
+if ('IntersectionObserver' in window && countEls.length
+    && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const countObserver = new IntersectionObserver((entries, obs) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      obs.unobserve(entry.target);
+      const el = entry.target;
+      const match = el.textContent.match(/^([^0-9]*)(\d+(?:\.\d+)?)([\s\S]*)$/);
+      if (!match) return;
+      const [, prefix, numText, suffix] = match;
+      const target = parseFloat(numText);
+      const decimals = (numText.split('.')[1] || '').length;
+      const duration = 1700;
+      const start = performance.now();
+      const tick = (now) => {
+        const p = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = prefix + (target * eased).toFixed(decimals) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+  }, { threshold: 0.4 });
+  countEls.forEach((el) => countObserver.observe(el));
+}
+
 window.addEventListener('storage', (event) => {
   if (event.key === CMS_KEY) applyCmsData();
   if (event.key === THEME_KEY) {
     document.documentElement.dataset.theme = event.newValue === 'day' ? 'day' : 'night';
     updateThemeButtons();
+    updateThemeColorMeta();
+  }
+  if (event.key === SKIN_KEY && SKINS.indexOf(event.newValue) > -1) {
+    document.documentElement.dataset.skin = event.newValue;
+    updateSkinButtons();
+    updateThemeColorMeta();
   }
 });
 
@@ -217,6 +368,7 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   const dotsWrap = reel.querySelector('[data-reel-dots]');
   const count = reel.querySelector('[data-reel-count]');
   const nextButton = reel.querySelector('[data-reel-skip]');
+  const progress = reel.querySelector('.reel-progress');
   const interval = Number(reel.dataset.reelInterval) || 7200;
   let index = 0;
   let timer = null;
@@ -252,14 +404,21 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
     });
     if (count) count.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
     dotsWrap?.querySelectorAll('.reel-dot').forEach((dot, i) => dot.classList.toggle('active', i === index));
+    if (progress) {
+      progress.classList.remove('run');
+      void progress.offsetWidth; /* restart the timeline */
+      progress.classList.add('run');
+    }
   }
 
   function stop() {
     if (timer) window.clearInterval(timer);
     timer = null;
+    if (progress) progress.classList.add('paused');
   }
   function restart() {
     stop();
+    if (progress) progress.classList.remove('paused');
     timer = window.setInterval(() => activate(index + 1), interval);
   }
 

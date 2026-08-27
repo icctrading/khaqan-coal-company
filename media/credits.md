@@ -35,3 +35,15 @@ The Darra references remain linked to their original YouTube uploads rather than
 - `coal-train-240.webm` / `coal-train-poster.jpg` — “Eerste kolentrein uit Duitsland over de Maas bij Roermond-519002.ogv”, historical coal-train transport footage from the Netherlands Institute for Sound and Vision, licensed CC BY-SA 3.0 NL: https://commons.wikimedia.org/wiki/File:Eerste_kolentrein_uit_Duitsland_over_de_Maas_bij_Roermond-519002.ogv
 
 Please review each license and attribution requirement before deploying the site commercially. For the strongest brand result, replace these reference assets with original photographs and videos from Khaqan Coal Company’s own operation.
+
+---
+
+## Official brand assets & local photography (added 2026)
+
+- `media/brand/logo-official-black.png`, `media/brand/logo-official-ivory.png`, `media/brand/logo-official-ivory-2.png` — official Khaqan Coal Company logo artwork, supplied by the company. All rights reserved.
+- `media/logo-official.png`, `media/logo-mark.png` — transparent production versions derived from the official logo for headers, footers, and the CRM.
+- `media/logo-official-black.jpg` — presentation lockup used for social sharing (og:image).
+- `favicon.png` — favicon derived from the official emblem.
+- `media/darra-photo-1.jpg` … `media/darra-photo-4.jpg` — photographs of Darra Adam Khel supplied by the company; used on the Gallery, Community, and About pages.
+
+- `media/mine-3d-terraces.jpg`, `media/mine-3d-tunnel.jpg`, `media/mine-3d-trucks.jpg`, `media/mine-3d-underground.jpg`, `media/mine-3d-stockpile.jpg` — original AI-generated 3D-style mountain coal mining visualizations created for this site (2026); no third-party licensing required. They replace the former open-pit reference photos that did not match mountain coal mining.

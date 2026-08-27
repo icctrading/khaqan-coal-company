@@ -1311,12 +1311,12 @@ h1, h2, h3, .display { text-wrap: balance; }
 .footer-top { padding-bottom: 58px; }
 
 /* Inner pages receive a visual, photographic hero while preserving readable copy. */
-.page-about .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.88) 45%, rgba(7,19,12,.28) 100%), url('media/mining-aerial.jpg') center / cover no-repeat; }
-.page-operations .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.8) 46%, rgba(7,19,12,.25) 100%), url('media/mining-pit.jpg') center / cover no-repeat; }
+.page-about .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.88) 45%, rgba(7,19,12,.28) 100%), url('media/mine-3d-terraces.jpg') center / cover no-repeat; }
+.page-operations .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.8) 46%, rgba(7,19,12,.25) 100%), url('media/mine-3d-underground.jpg') center / cover no-repeat; }
 .page-supply .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.82) 48%, rgba(7,19,12,.25) 100%), url('media/coal-rail-transport.jpg') center / cover no-repeat; }
 .page-gallery .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.82) 48%, rgba(7,19,12,.22) 100%), url('media/coal-haul-truck.jpg') center / cover no-repeat; }
 .page-community .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.84) 48%, rgba(7,19,12,.22) 100%), url('media/darra-coal-mines-max.jpg') center / cover no-repeat; }
-.page-contact .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.84) 48%, rgba(7,19,12,.24) 100%), url('media/mining-site.jpg') center / cover no-repeat; }
+.page-contact .page-hero { background: linear-gradient(90deg, rgba(6,17,11,.98) 0%, rgba(7,19,12,.84) 48%, rgba(7,19,12,.24) 100%), url('media/mine-3d-trucks.jpg') center / cover no-repeat; }
 .page-hero::before { background-image: linear-gradient(120deg, transparent 44%, rgba(222,239,217,.12) 44.2%, transparent 44.7%), linear-gradient(160deg, transparent 57%, rgba(222,239,217,.08) 57.2%, transparent 57.7%); mix-blend-mode: screen; }
 .page-hero-orb { opacity: .6; }
 
@@ -1329,12 +1329,12 @@ html[data-theme="day"] .hero::after { background: linear-gradient(transparent, #
 html[data-theme="day"] .hero h1, html[data-theme="day"] .hero .lede { color: #102819; }
 html[data-theme="day"] .hero h1 span { color: #8f4d21; }
 html[data-theme="day"] .hero-note { color: #2a5637; border-top-color: rgba(15,58,31,.24); }
-html[data-theme="day"] .page-about .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.18) 100%), url('media/mining-aerial.jpg') center / cover no-repeat; }
-html[data-theme="day"] .page-operations .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.15) 100%), url('media/mining-pit.jpg') center / cover no-repeat; }
+html[data-theme="day"] .page-about .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.18) 100%), url('media/mine-3d-terraces.jpg') center / cover no-repeat; }
+html[data-theme="day"] .page-operations .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.15) 100%), url('media/mine-3d-underground.jpg') center / cover no-repeat; }
 html[data-theme="day"] .page-supply .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.15) 100%), url('media/coal-rail-transport.jpg') center / cover no-repeat; }
 html[data-theme="day"] .page-gallery .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.15) 100%), url('media/coal-haul-truck.jpg') center / cover no-repeat; }
 html[data-theme="day"] .page-community .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.16) 100%), url('media/darra-coal-mines-max.jpg') center / cover no-repeat; }
-html[data-theme="day"] .page-contact .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.16) 100%), url('media/mining-site.jpg') center / cover no-repeat; }
+html[data-theme="day"] .page-contact .page-hero { background: linear-gradient(90deg, rgba(244,249,241,.99) 0%, rgba(244,249,241,.92) 46%, rgba(244,249,241,.16) 100%), url('media/mine-3d-trucks.jpg') center / cover no-repeat; }
 html[data-theme="day"] .page-hero h1, html[data-theme="day"] .page-hero .lede { color: #102819; }
 html[data-theme="day"] .page-hero::before { mix-blend-mode: multiply; opacity: .28; }
 html[data-theme="day"] .page-hero-orb { opacity: .36; }
@@ -1525,7 +1525,7 @@ html[data-theme="day"] .journey-copy p { color: #355a3d; }
 .reel-year-bg { background-image: url('media/coal-mine-transport.jpg'); }
 .year-2223 .reel-year-bg { background-position: 40% center; }
 .year-2324 .reel-year-bg { background-image: url('media/coal-haul-truck.jpg'); background-position: 65% center; }
-.year-2425 .reel-year-bg { background-image: url('media/mining-aerial.jpg'); background-position: center; }
+.year-2425 .reel-year-bg { background-image: url('media/mine-3d-terraces.jpg'); background-position: center; }
 .year-2526 .reel-year-bg { background-image: url('media/coal-haul-truck.jpg'); background-position: 78% center; }
 .reel-supply-bg { background-image: url('media/mining-conveyor.jpg'); background-position: center; }
 .reel-year-slide.active .reel-year-bg, .reel-supply-slide.active .reel-supply-bg { transform: scale(1.11); }
