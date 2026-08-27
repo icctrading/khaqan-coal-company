@@ -369,6 +369,9 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   const count = reel.querySelector('[data-reel-count]');
   const nextButton = reel.querySelector('[data-reel-skip]');
   const progress = reel.querySelector('.reel-progress');
+  const band = reel.closest('section') || reel.parentElement;
+  const chapterButtons = Array.from((band || document).querySelectorAll('[data-reel-jump]'));
+  const tagOut = reel.querySelector('[data-reel-tag-out]');
   const interval = Number(reel.dataset.reelInterval) || 7200;
   let index = 0;
   let timer = null;
@@ -385,6 +388,24 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
       restart();
     });
   }
+
+  // Chapter rail: pre-authored buttons beside the stage jump the reel to a slide,
+  // and behave as a real tablist (arrow keys move focus and advance the cut).
+  chapterButtons.forEach((button, i) => {
+    button.addEventListener('click', () => {
+      activate(Number(button.dataset.reelJump));
+      restart();
+    });
+    button.addEventListener('keydown', (event) => {
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+      if (step === undefined && event.key !== 'Home' && event.key !== 'End') return;
+      event.preventDefault();
+      const target = event.key === 'Home' ? 0 : event.key === 'End' ? chapterButtons.length - 1 : (i + step + chapterButtons.length) % chapterButtons.length;
+      chapterButtons[target].focus();
+      activate(Number(chapterButtons[target].dataset.reelJump));
+      restart();
+    });
+  });
 
   function activate(nextIndex) {
     index = (nextIndex + slides.length) % slides.length;
@@ -403,7 +424,13 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
       }
     });
     if (count) count.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+    if (tagOut) tagOut.textContent = slides[index].dataset.reelTag || '';
     dotsWrap?.querySelectorAll('.reel-dot').forEach((dot, i) => dot.classList.toggle('active', i === index));
+    chapterButtons.forEach((button, i) => {
+      const on = i === index;
+      button.classList.toggle('active', on);
+      button.setAttribute('aria-selected', String(on));
+    });
     if (progress) {
       progress.classList.remove('run');
       void progress.offsetWidth; /* restart the timeline */
@@ -423,10 +450,12 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   }
 
   nextButton?.addEventListener('click', () => { activate(index + 1); restart(); });
-  reel.addEventListener('mouseenter', stop);
-  reel.addEventListener('mouseleave', restart);
-  reel.addEventListener('focusin', stop);
-  reel.addEventListener('focusout', (event) => { if (!reel.contains(event.relatedTarget)) restart(); });
+  // Hover/focus pauses the whole deck — rail included — so a reader can study a frame.
+  const pauseZone = band && band.matches('.reel-deck, .reel-band, section') ? band : reel;
+  pauseZone.addEventListener('mouseenter', stop);
+  pauseZone.addEventListener('mouseleave', restart);
+  pauseZone.addEventListener('focusin', stop);
+  pauseZone.addEventListener('focusout', (event) => { if (!pauseZone.contains(event.relatedTarget)) restart(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else restart(); });
 
   activate(0);
@@ -434,9 +463,9 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
 });
 
 /* =====================================================================
-   Cinematic 3D backdrop — the landing page background is a live
-   crossfading sequence of high-quality 3D renders with a slow camera
-   drift (a "video" that needs no video download).
+   Cinematic 3D backdrop — every page carries a fixed, live layer of
+   high-quality coal renders that slowly crossfade with a camera drift
+   (a "video" that needs no video download).
    ===================================================================== */
 (function () {
   const host = document.querySelector('.coal-page-bg');
@@ -446,6 +475,7 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   if (!canvas || !imgs.length) return;
   const ctx = canvas.getContext('2d');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 
   const SEG = 8200;    // ms a frame stays in view
   const FADE = 2800;   // crossfade window inside the segment
@@ -458,7 +488,38 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
     [1.05, 1.12, 0.000, 0.014, 0.003, 0.006]
   ];
 
-  let W = 0, H = 0, dpr = 1, raf = 0, segStart = 0, idx = 0, settled = 0;
+  let W = 0, H = 0, dpr = 1, raf = 0, segStart = 0, idx = 0, live = 0, started = false;
+
+  /* The markup keeps the frames as hidden <img> tags so the HTML stays
+     declarative — but a `display:none` lazy image is never fetched, so
+     the engine loads its own copies and starts the moment frame 0 is
+     painted (later frames join as they arrive). */
+  const frames = framesFrom(imgs);
+
+  function framesFrom(nodes) {
+    const sources = nodes
+      .map((node) => node.getAttribute('src'))
+      .filter(Boolean);
+    const images = sources.map((src, i) => {
+      const image = new Image();
+      image.decoding = 'async';
+      image.dataset.cineIndex = String(i);
+      /* Only the opening frame is urgent — the rest of the sequence is
+         fetched once the page itself has settled, so the reel, the hero
+         and the copy all win the first race. */
+      if (i < 2) { image.fetchPriority = 'high'; image.src = src; }
+      return image;
+    });
+    const rest = images.filter((image) => !image.getAttribute('src'));
+    const queue = () => rest.forEach((image, i) => {
+      const go = () => { image.src = sources[Number(image.dataset.cineIndex)]; };
+      if (window.requestIdleCallback) window.requestIdleCallback(go, { timeout: 2600 });
+      else window.setTimeout(go, 700 + i * 320);
+    });
+    if (document.readyState === 'complete') queue();
+    else window.addEventListener('load', queue, { once: true });
+    return images;
+  }
 
   function size() {
     dpr = Math.min(window.devicePixelRatio || 1, 1.75);
@@ -481,42 +542,50 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
     return true;
   }
 
-  function frame(now) {
-    const el = now - segStart;
-    const p = Math.min(1, el / SEG);
+  function paint(driftP, fadeP) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const d = drift[idx % drift.length];
-    if (!draw(imgs[idx], d, p)) draw(imgs[0], drift[0], 0.5);
-    const fp = (el - (SEG - FADE)) / FADE;
-    if (fp > 0) {
-      const nextIdx = (idx + 1) % imgs.length;
-      ctx.globalAlpha = Math.min(1, fp);
-      draw(imgs[nextIdx], drift[nextIdx % drift.length], 0);
+    if (!draw(frames[idx], d, driftP)) {
+      for (let i = 0; i < frames.length; i++) if (draw(frames[i], drift[i % drift.length], .5)) break;
+    }
+    if (fadeP > 0) {
+      const nextIdx = (idx + 1) % frames.length;
+      ctx.globalAlpha = Math.min(1, fadeP);
+      draw(frames[nextIdx], drift[nextIdx % drift.length], 0);
       ctx.globalAlpha = 1;
     }
-    if (p >= 1) { idx = (idx + 1) % imgs.length; segStart = now; }
+  }
+
+  function repaint() {
+    const el = window.performance.now() - segStart;
+    paint(Math.min(1, el / SEG), fadeOf(el));
+  }
+
+  function fadeOf(el) {
+    return Math.max(0, Math.min(1, (el - (SEG - FADE)) / FADE));
+  }
+
+  function frame(now) {
+    const el = now - segStart;
+    paint(Math.min(1, el / SEG), fadeOf(el));
+    if (el >= SEG) { idx = (idx + 1) % frames.length; segStart = now; }
     raf = window.requestAnimationFrame(frame);
   }
 
-  function still() {
+  function start() {
+    if (started || !live) return;
+    started = true;
     size();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    draw(imgs[0], drift[0], 0.5);
-  }
-
-  function ready() {
-    if (settled < imgs.length) return;
-    size();
-    if (reduced) { still(); return; }
+    if (reduced || frames.length < 2) { segStart = window.performance.now(); paint(.5, 0); return; }
     segStart = window.performance.now();
     window.cancelAnimationFrame(raf);
     raf = window.requestAnimationFrame(frame);
   }
 
-  imgs.forEach((im, i) => {
-    const done = () => { settled++; ready(); };
-    if (im.complete && im.naturalWidth) done();
-    else { im.addEventListener('load', done, { once: true }); im.addEventListener('error', done, { once: true }); }
+  frames.forEach((image) => {
+    const done = () => { live++; start(); };
+    if (image.complete && image.naturalWidth) done();
+    else { image.addEventListener('load', done, { once: true }); image.addEventListener('error', done, { once: true }); }
   });
 
   let rt = 0;
@@ -524,12 +593,12 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
     window.clearTimeout(rt);
     rt = window.setTimeout(() => {
       size();
-      if (reduced) { ctx.clearRect(0, 0, canvas.width, canvas.height); draw(imgs[0], drift[0], 0.5); }
+      if (started) repaint();
     }, 160);
   }, { passive: true });
 
   document.addEventListener('visibilitychange', () => {
-    if (reduced) return;
+    if (reduced || !started) return;
     if (document.hidden) window.cancelAnimationFrame(raf);
     else { segStart = window.performance.now(); window.cancelAnimationFrame(raf); raf = window.requestAnimationFrame(frame); }
   });

@@ -32,7 +32,7 @@ The website uses the following reference media until the company’s own Darra A
 
 The Darra references remain linked to their original YouTube uploads rather than copied locally. Please confirm the uploader’s permission before using them in a commercial launch.
 - `hauler-360.webm` / `hauler-poster.jpg` — “Articulated hauler dump truck.webm”, by Wikideas1, dedicated under CC0: https://commons.wikimedia.org/wiki/File:Articulated_hauler_dump_truck.webm
-- `coal-train-240.webm` / `coal-train-poster.jpg` — “Eerste kolentrein uit Duitsland over de Maas bij Roermond-519002.ogv”, historical coal-train transport footage from the Netherlands Institute for Sound and Vision, licensed CC BY-SA 3.0 NL: https://commons.wikimedia.org/wiki/File:Eerste_kolentrein_uit_Duitsland_over_de_Maas_bij_Roermond-519002.ogv
+- `coal-train-240.webm` / `coal-train-poster.jpg` (CRM media library only) — “Eerste kolentrein uit Duitsland over de Maas bij Roermond-519002.ogv”, historical coal-train transport footage from the Netherlands Institute for Sound and Vision, licensed CC BY-SA 3.0 NL: https://commons.wikimedia.org/wiki/File:Eerste_kolentrein_uit_Duitsland_over_de_Maas_bij_Roermond-519002.ogv
 
 Please review each license and attribution requirement before deploying the site commercially. For the strongest brand result, replace these reference assets with original photographs and videos from Khaqan Coal Company’s own operation.
 
@@ -58,3 +58,31 @@ Please review each license and attribution requirement before deploying the site
 ## WebP optimisation (added 2026-08)
 
 All page imagery now ships as WebP through `<picture>` (with the original JPG as fallback) or as a WebP CSS background. Originals are retained on disk. The landing-page background video (`coal-mining-360.webm` as a fixed full-page loop) was removed; it remains available for the home reel and CRM library.
+
+## Reel and backdrop renders (added 2026-08-27)
+
+- `media/cine/reel-bucketwheel.jpg/.webp` — bucket-wheel excavator cutting a highwall bench at sunrise.
+- `media/cine/reel-underground.jpg/.webp` — lit underground development heading with roof bolts and a shuttle car.
+- `media/cine/reel-aerial.jpg/.webp` — aerial view of a terraced mountain open-pit with haul ramps.
+- `media/cine/reel-rail.jpg/.webp` — wagon-loading gantry at a mountain railhead at dusk.
+- `media/cine/reel-stockpile.jpg/.webp` — reclaimed stockpile domes with stacker/reclaimer at blue hour.
+- `media/cine/reel-haulroad.jpg/.webp` — loaded haul trucks on a switchback mountain haul road.
+- `media/cine/reel-conveyor.jpg/.webp` — covered transfer conveyor crossing a valley between pits.
+- `media/cine/reel-coalfaces.jpg/.webp` — macro study of coal faces, lumps and geology samples.
+
+All eight are original 3D renders generated for this site in the same visual language as the existing
+`media/mine-3d-*` and `media/cine/hero-*` frames. No third-party licensing required; style reference only:
+https://www.vecteezy.com/free-photos/mining-3d (no stock asset was downloaded or rehosted).
+
+- `media/cine/thumb-coal-mining.webp`, `thumb-excavator.webp`, `thumb-hauler.webp`, `thumb-darra-photo-2.webp`,
+  `thumb-reel-*.webp` — 220px derivative thumbnails cut from assets already in this repository, used only by the
+  home-page reel chapter rail so the strip stays under ~10KB per item.
+
+## Usage notes (2026-08-27)
+
+- Every public page now carries the fixed cinematic backdrop (`.coal-page-bg`): the home page cycles
+  `hero-01…hero-05` plus three reel frames, and each inner page cycles its own five-frame set drawn from
+  `media/cine/*`, `media/mine-3d-*`, `media/darra-photo-*` and the transport photos. See `script.js`
+  ("Cinematic 3D backdrop").
+- The archival clip `coal-train-240.webm` is no longer embedded on the Supply page; it was replaced by the
+  `reel-rail` render. The file and its attribution above are kept for the CRM media library.
