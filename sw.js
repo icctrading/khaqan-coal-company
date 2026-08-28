@@ -12,7 +12,7 @@
  * the oldest half once the entry count passes MAX_ENTRIES, so a long visit can't
  * grow the origin's quota without bound.
  */
-const VERSION = 'khaqan-coal-v13';
+const VERSION = 'khaqan-coal-v14';
 const ASSETS = VERSION + ':assets';
 const PAGES = VERSION + ':pages';
 const LIST = VERSION + ':list';
