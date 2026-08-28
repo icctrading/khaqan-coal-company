@@ -144,6 +144,33 @@ Two rules to keep:
   picture (142KB vs 89KB on `excavator-poster`) and are painted on every load, poster or
   no poster.
 
+### Install metadata (theme-color, manifest, icons)
+
+`site.webmanifest` and the `theme-color` meta must agree with what the page actually
+paints, because Chrome tints the browser chrome with the meta and paints
+`background_color` behind the splash screen:
+
+- `script.js#updateThemeColorMeta()` reads `getComputedStyle(body).backgroundColor` after
+  the `.theming` transition class is applied and writes that. It does **not** consult the
+  `THEME_COLORS` table for the normal case (the table is only a fallback when nothing is
+  painted): a hand-kept table here disagreed with `--coal` on four of six theme/skin pairs.
+  The read must suppress the transition with an **inline `!important`** - the cross-fade
+  rule in `themes.css` ends in `!important`, and a plain inline override loses to it, so
+  the value read is the colour the transition is coming *from* (a stale-looking meta is
+  the symptom). Verify by toggling and reading the meta after ~250ms, mid-fade: it must
+  already be the target colour.
+- The manifest's `background_color`/`theme_color` are the *default* (night signature) body
+  colour `#07100d`, and the icons in `media/icons/` are filled with exactly that, so
+  splash -> icon -> first frame are one colour. Icon corner pixels are asserted against
+  the manifest value by `/home/user/.tools/manifest.js` (kept outside the repo).
+- Icons are honest about their own bytes: `sizes` must equal the real pixel size,
+  `purpose: "any"` and `"maskable"` are separate entries (never `"any maskable"`), and
+  maskable art keeps the mark inside the central 80% safe zone on an opaque background.
+  They live under `media/` so the service worker caches them on demand - they are *not*
+  in `SHELL`, which is for the first paint, not for an install flow that may never happen.
+- `profile.html` is a `<meta http-equiv="refresh">` stub and deliberately carries no
+  install metadata: it is thrown away 0ms later.
+
 ## 6. Scrolling performance conventions
 
 Things that are deliberately true about this codebase, and worth keeping:

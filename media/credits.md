@@ -121,3 +121,30 @@ transparent surround survives. The `-128` pair is what the service worker precac
 
 Video posters are `.webp` only. The three `*-poster.jpg` masters are kept because the CRM
 media library lists them as source files, but no page markup references them.
+
+## App icons (`media/icons/`)
+
+`icon-192.png`, `icon-512.png` (purpose `any`) and `icon-maskable-192/-512.png` (purpose
+`maskable`) plus `apple-touch-icon.png` (180) are all composed from `logo-mark.png` on a
+`#07100d` fill - the night signature body colour, which is also the manifest's
+`background_color`, so the splash screen, the icon and the first painted frame are one
+colour. Regenerate with:
+
+```python
+from PIL import Image
+src = Image.open('media/logo-mark.png').convert('RGBA')
+for name, size, frac in (('icon-192', 192, .80), ('icon-512', 512, .80),
+                         ('icon-maskable-192', 192, .60), ('icon-maskable-512', 512, .60),
+                         ('apple-touch-icon', 180, .72)):
+    c = Image.new('RGBA', (size, size), (7, 16, 13, 255))
+    w = int(size * frac); h = round(src.height * w / src.width)
+    c.alpha_composite(src.resize((w, h), Image.LANCZOS), ((size - w) // 2, (size - h) // 2))
+    c.convert('RGB').quantize(colors=255, method=Image.MEDIANCUT,
+                              dither=Image.Dither.FLOYDSTEINBERG).save(f'media/icons/{name}.png', 'PNG', optimize=True)
+```
+
+Quantising with Floyd-Steinberg dithering is what keeps the gold gradients band-free while
+taking the 512px file from 184KB (true-colour, transparent) to ~55KB. The maskable tier
+uses `frac = .60` so the artwork stays inside the launcher's central 80% safe zone.
+`favicon.png` (128, true alpha) is untouched and still serves the tab and the `any` slot
+at small sizes.

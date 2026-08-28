@@ -25,8 +25,8 @@ const SKIN_KEY = 'khaqanSkin';
 const SKINS = ['signature', 'marble', 'obsidian'];
 const THEME_COLORS = {
   signature: { day: '#f4f7f2', night: '#07100d' },
-  marble: { day: '#f7f4ec', night: '#121218' },
-  obsidian: { day: '#f2f1ef', night: '#0b0b0e' }
+  marble: { day: '#f7f3e8', night: '#141824' },
+  obsidian: { day: '#eef0f3', night: '#0a0b0d' }
 };
 
 function readJSON(key, fallback) {
@@ -103,11 +103,31 @@ function updateSkinButtons() {
 }
 
 function updateThemeColorMeta() {
-  const skin = currentSkin();
-  const mode = document.documentElement.dataset.theme === 'day' ? 'day' : 'night';
-  const color = (THEME_COLORS[skin] || THEME_COLORS.signature)[mode];
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta && color) meta.setAttribute('content', color);
+  if (!meta) return;
+  // Follow the colour actually painted behind the content, not a table someone has to
+  // remember to update: THEME_COLORS used to disagree with the CSS on four of six
+  // theme/skin pairs. Transitions are suppressed for the read so a skin cross-fade
+  // cannot report an interpolated mid-frame, and the painted value is converted to hex
+  // because theme-color only accepts colour keywords / hex / rgb().
+  const mode = document.documentElement.dataset.theme === 'day' ? 'day' : 'night';
+  const fallback = (THEME_COLORS[currentSkin()] || THEME_COLORS.signature)[mode];
+  const body = document.body;
+  const prevTransition = body.style.transition;
+  // Important, and inline: the .theming cross-fade rule in themes.css ends in
+  // !important, so a plain override loses to it and the read hands back the colour the
+  // transition is coming *from*. Inline-important is the only thing that outranks it.
+  body.style.setProperty('transition', 'none', 'important');
+  let painted = getComputedStyle(body).backgroundColor;
+  if (/rgba\(\s*[^)]+,\s*0\s*\)$/.test(painted) || painted === 'transparent') {
+    painted = getComputedStyle(document.documentElement).backgroundColor;
+  }
+  if (prevTransition) body.style.transition = prevTransition; else body.style.removeProperty('transition');
+  const nums = (painted.match(/\d+(\.\d+)?/g) || []).slice(0, 3).map((n) => Math.round(+n));
+  const color = nums.length === 3
+    ? '#' + nums.map((n) => Math.max(0, Math.min(255, n)).toString(16).padStart(2, '0')).join('')
+    : fallback;
+  if (color) meta.setAttribute('content', color);
 }
 
 /* Brief global transition class so skin / day-night changes cross-fade smoothly. */

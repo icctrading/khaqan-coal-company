@@ -12,7 +12,7 @@
  * the oldest half once the entry count passes MAX_ENTRIES, so a long visit can't
  * grow the origin's quota without bound.
  */
-const VERSION = 'khaqan-coal-v6';
+const VERSION = 'khaqan-coal-v10';
 const ASSETS = VERSION + ':assets';
 const PAGES = VERSION + ':pages';
 const LIST = VERSION + ':list';
@@ -23,14 +23,14 @@ const SHELL = [
   './index.html',
   './about.html', './operations.html', './supply.html', './gallery.html',
   './community.html', './contact.html', './crm.html',
-  './styles.css?v=3', './themes.css?v=16', './script.js?v=10',
+  './styles.css?v=3', './themes.css?v=16', './script.js?v=13',
   './supabase-config.js?v=1', './cloud.js?v=1',
   './crm.css?v=2', './crm.js?v=1', './crm-cloud.js?v=1',
   './media/logo-mark-128.webp', './media/logo-mark-light-128.webp',
   './media/coal-texture-bg.webp'
 ];
 
-const isAsset = (url) => /\.(css|js|mjs|webp|avif|jpe?g|png|svg|gif|woff2?|ttf|mp4|webm)$/i.test(url.pathname);
+const isAsset = (url) => /\.(css|js|mjs|webp|avif|jpe?g|png|svg|gif|woff2?|ttf|mp4|webm|webmanifest)$/i.test(url.pathname);
 const isMedia = (url) => /\/media\//.test(url.pathname);
 const sameOrigin = (url) => url.origin === self.location.origin;
 const listable = (url) => isAsset(url) || isMedia(url) || /\.(html?)$/i.test(url.pathname) || url.pathname.endsWith('/');
