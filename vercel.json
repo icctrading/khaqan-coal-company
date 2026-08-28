@@ -23,7 +23,7 @@
       ]
     },
     {
-      "source": "/(.*)\\.(?:css|js)",
+      "source": "/(.*)\\.(css|js)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -41,7 +41,7 @@
       ]
     },
     {
-      "source": "/(favicon|apple-touch-icon)\\.(?:png|svg|ico)",
+      "source": "/(favicon|apple-touch-icon)\\.(png|svg|ico)",
       "headers": [
         {
           "key": "Cache-Control",
