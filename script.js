@@ -81,6 +81,14 @@ function currentSkin() {
   return SKINS.indexOf(skin) > -1 ? skin : 'signature';
 }
 
+/* Keep the selected skin between the shared and refinement sheets so the original
+   cascade order survives while visitors download only one skin block. */
+function syncSkinStylesheet(skin) {
+  document.querySelectorAll('link[data-skin-stylesheet]').forEach((link) => {
+    link.media = link.dataset.skinStylesheet === skin ? 'all' : 'not all';
+  });
+}
+
 function updateThemeButtons() {
   const day = document.documentElement.dataset.theme === 'day';
   document.querySelectorAll('.theme-toggle').forEach((button) => {
@@ -154,6 +162,7 @@ function setSkin(skin) {
   const nextSkin = SKINS.indexOf(skin) > -1 ? skin : 'signature';
   withThemeTransition(() => {
     document.documentElement.dataset.skin = nextSkin;
+    syncSkinStylesheet(nextSkin);
     try { window.localStorage.setItem(SKIN_KEY, nextSkin); } catch (error) { /* no-op */ }
   });
   updateSkinButtons();
@@ -197,6 +206,11 @@ function toggleSkinMenu(switchEl) {
 
 document.documentElement.dataset.theme = currentTheme();
 document.documentElement.dataset.skin = currentSkin();
+syncSkinStylesheet(document.documentElement.dataset.skin);
+const skinStyleObserver = new MutationObserver(() => {
+  syncSkinStylesheet(document.documentElement.dataset.skin);
+});
+skinStyleObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-skin'] });
 
 const path = window.location.pathname.split('/').pop() || 'index.html';
 
@@ -395,6 +409,7 @@ window.addEventListener('storage', (event) => {
   }
   if (event.key === SKIN_KEY && SKINS.indexOf(event.newValue) > -1) {
     document.documentElement.dataset.skin = event.newValue;
+    syncSkinStylesheet(event.newValue);
     updateSkinButtons();
     updateThemeColorMeta();
   }

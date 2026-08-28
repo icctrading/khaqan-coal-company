@@ -1,0 +1,2897 @@
+/* Khaqan Coal theme system — shared refinements and signature skin.
+   Load after themes.css and the selected per-skin sheet. */
+
+/* Neutral night tint for inner-page photo heroes (kills the green cast) */
+html[data-skin="marble"] .page-hero::after,
+html[data-skin="obsidian"] .page-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(14, 14, 19, .9) 0%, rgba(14, 14, 19, .55) 45%, rgba(14, 14, 19, .12) 100%);
+  pointer-events: none;
+}
+html[data-skin="marble"][data-theme="day"] .page-hero::after { background: linear-gradient(90deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .88) 42%, rgba(247, 244, 236, .18) 100%); }
+html[data-skin="obsidian"][data-theme="day"] .page-hero::after { background: linear-gradient(90deg, rgba(242, 241, 239, .97) 0%, rgba(242, 241, 239, .88) 42%, rgba(242, 241, 239, .16) 100%); }
+
+/* ------------------------------------------------------------------
+   5. SIGNATURE skin — day-mode readability upgrades (WCAG AA push)
+   ------------------------------------------------------------------ */
+html[data-skin="signature"][data-theme="day"] p, html:not([data-skin])[data-theme="day"] p { color: #3a5342; }
+html[data-skin="signature"][data-theme="day"] .eyebrow, html:not([data-skin])[data-theme="day"] .eyebrow { color: #35563b; }
+html[data-skin="signature"][data-theme="day"] .brand-sub, html:not([data-skin])[data-theme="day"] .brand-sub { color: #4c6652; }
+html[data-skin="signature"][data-theme="day"] .hero-note, html:not([data-skin])[data-theme="day"] .hero-note { color: #274531; }
+html[data-skin="signature"][data-theme="day"] .marquee-item, html:not([data-skin])[data-theme="day"] .marquee-item { color: #2e5539; }
+html[data-skin="signature"][data-theme="day"] .ticker-note, html:not([data-skin])[data-theme="day"] .ticker-note { color: #2f5538; }
+html[data-skin="signature"][data-theme="day"] .ticker-item em, html:not([data-skin])[data-theme="day"] .ticker-item em { color: #3d6746; }
+html[data-skin="signature"][data-theme="day"] .footer-links a, html[data-skin="signature"][data-theme="day"] .footer-links span,
+html[data-skin="signature"][data-theme="day"] .footer p, html[data-skin="signature"][data-theme="day"] .footer-bottom,
+html:not([data-skin])[data-theme="day"] .footer-links a, html:not([data-skin])[data-theme="day"] .footer-links span,
+html:not([data-skin])[data-theme="day"] .footer p, html:not([data-skin])[data-theme="day"] .footer-bottom { color: #355640; }
+html[data-skin="signature"][data-theme="day"] .media-credit, html:not([data-skin])[data-theme="day"] .media-credit { color: #36543d; }
+html[data-skin="signature"][data-theme="day"] .image-note p, html:not([data-skin])[data-theme="day"] .image-note p { color: #2b4a33; }
+html[data-skin="signature"][data-theme="day"] .faq-list details p, html:not([data-skin])[data-theme="day"] .faq-list details p { color: #33503e; }
+html[data-skin="signature"][data-theme="day"] .mini-stat span, html:not([data-skin])[data-theme="day"] .mini-stat span { color: #3d5c46; }
+html[data-skin="signature"][data-theme="day"] .crm-metrics span, html[data-skin="signature"][data-theme="day"] .crm-sidebar-note p,
+html[data-skin="signature"][data-theme="day"] .crm-table th, html[data-skin="signature"][data-theme="day"] .crm-media-grid span,
+html:not([data-skin])[data-theme="day"] .crm-metrics span, html:not([data-skin])[data-theme="day"] .crm-sidebar-note p,
+html:not([data-skin])[data-theme="day"] .crm-table th, html:not([data-skin])[data-theme="day"] .crm-media-grid span { color: #46594a; }
+html[data-skin="signature"][data-theme="day"] .crm-tab, html:not([data-skin])[data-theme="day"] .crm-tab { color: #46594a; }
+html[data-skin="signature"][data-theme="day"] .crm-table td small, html:not([data-skin])[data-theme="day"] .crm-table td small { color: #4a6350; }
+html[data-skin="signature"][data-theme="day"] .performance-note, html:not([data-skin])[data-theme="day"] .performance-note { color: #46604e; }
+/* Gold text on light surfaces gets a darker, readable tone */
+html[data-skin="signature"][data-theme="day"] .proof-strip strong,
+html[data-skin="signature"][data-theme="day"] .performance-table tfoot th, html[data-skin="signature"][data-theme="day"] .performance-table tfoot td,
+html[data-skin="signature"][data-theme="day"] .ticker-item strong, html[data-skin="signature"][data-theme="day"] .client-grid article span,
+html:not([data-skin])[data-theme="day"] .proof-strip strong,
+html:not([data-skin])[data-theme="day"] .performance-table tfoot th, html:not([data-skin])[data-theme="day"] .performance-table tfoot td,
+html:not([data-skin])[data-theme="day"] .ticker-item strong, html:not([data-skin])[data-theme="day"] .client-grid article span { color: #7d560a; }
+
+/* ------------------------------------------------------------------
+   6. Premium motion — gold shimmer, hover polish, emblem showcase
+   ------------------------------------------------------------------ */
+.btn-primary { position: relative; overflow: hidden; }
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 25%, rgba(255, 248, 214, .55) 48%, transparent 62%);
+  transform: translateX(-130%);
+  transition: transform .7s cubic-bezier(.2, .8, .2, 1);
+  pointer-events: none;
+}
+.btn-primary:hover::before { transform: translateX(130%); }
+.nav-cta { position: relative; overflow: hidden; }
+.nav-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(242, 198, 94, .28) 50%, transparent 66%);
+  transform: translateX(-120%);
+  transition: transform .8s cubic-bezier(.2, .8, .2, 1);
+  pointer-events: none;
+}
+.nav-cta:hover::before { transform: translateX(120%); }
+
+/* Official emblem showcase (about page + anywhere .emblem-card is used) */
+.emblem-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 46px 40px;
+  overflow: hidden;
+  border: 1px solid rgba(212, 160, 52, .3);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(circle at 50% 8%, rgba(212, 160, 52, .12), transparent 42%),
+    linear-gradient(150deg, #14141a, #0b0b0f 70%);
+  box-shadow: var(--shadow);
+}
+.emblem-card .emblem-picture {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 430px);
+  animation: emblemFloat 7s ease-in-out infinite;
+}
+.emblem-card .emblem-picture img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 22px 44px rgba(0, 0, 0, .5));
+}
+@keyframes emblemFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+.emblem-card::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 160, 52, .16), transparent 66%);
+  animation: emblemPulse 6s ease-in-out infinite;
+}
+@keyframes emblemPulse { 0%, 100% { transform: scale(1); opacity: .8; } 50% { transform: scale(1.14); opacity: 1; } }
+.emblem-card::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: -40%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(212, 160, 52, .07) 60deg, transparent 120deg, rgba(212, 160, 52, .05) 220deg, transparent 300deg);
+  animation: emblemSpin 26s linear infinite;
+}
+@keyframes emblemSpin { to { transform: rotate(360deg); } }
+.emblem-caption {
+  position: relative;
+  z-index: 2;
+  margin-top: 28px;
+  color: var(--ink-soft);
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.emblem-caption b { display: block; margin-top: 6px; color: var(--yellow); letter-spacing: .14em; }
+html[data-theme="day"] .emblem-card {
+  border-color: rgba(160, 116, 22, .32);
+  background: radial-gradient(circle at 50% 8%, rgba(212, 160, 52, .14), transparent 42%), linear-gradient(150deg, #fdfbf5, #efe9da 75%);
+  box-shadow: 0 25px 70px rgba(90, 74, 35, .14);
+}
+html[data-theme="day"] .emblem-card::before { background: radial-gradient(circle, rgba(212, 160, 52, .2), transparent 66%); }
+
+/* Darra Adam Khel photo wall (gallery) + strip (community) */
+.darra-wall {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 150px;
+  gap: 16px;
+}
+.darra-wall figure {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--coal-3);
+}
+.darra-wall .dw-tall { grid-row: span 3; }
+.darra-wall .dw-wide { grid-column: span 2; grid-row: span 2; }
+.darra-wall img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(.9) contrast(1.05);
+  transition: transform .9s cubic-bezier(.2, .8, .2, 1), filter .5s ease;
+}
+.darra-wall figure:hover img { transform: scale(1.06); filter: saturate(1.05) contrast(1.06); }
+.darra-wall figcaption {
+  position: absolute;
+  z-index: 2;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+  padding: 10px 14px;
+  border: 1px solid rgba(212, 160, 52, .3);
+  border-radius: 11px;
+  background: rgba(10, 10, 13, .66);
+  backdrop-filter: blur(10px);
+  color: #f0e4c2;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  transform: translateY(10px);
+  opacity: 0;
+  transition: transform .45s cubic-bezier(.2, .8, .2, 1), opacity .45s ease, background .3s ease;
+}
+.darra-wall figure:hover figcaption, .darra-wall figure:focus-within figcaption { transform: none; opacity: 1; }
+.darra-wall figure::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 46%, rgba(8, 8, 11, .5));
+  pointer-events: none;
+}
+.darra-strip {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 16px;
+}
+.darra-strip figure {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  min-height: 300px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.darra-strip img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(.9) contrast(1.05);
+  transition: transform .9s cubic-bezier(.2, .8, .2, 1);
+}
+.darra-strip figure:hover img { transform: scale(1.06); }
+.darra-strip figcaption {
+  position: absolute;
+  z-index: 2;
+  right: 14px;
+  bottom: 14px;
+  padding: 9px 13px;
+  border: 1px solid rgba(212, 160, 52, .3);
+  border-radius: 999px;
+  background: rgba(10, 10, 13, .66);
+  backdrop-filter: blur(10px);
+  color: #f0e4c2;
+  font-size: .64rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.darra-strip figure::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(8, 8, 11, .52));
+  pointer-events: none;
+}
+@media (max-width: 920px) {
+  .darra-wall { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 140px; }
+  .darra-wall .dw-tall { grid-row: span 3; }
+  .darra-wall .dw-wide { grid-column: span 2; grid-row: span 2; }
+  .darra-strip { grid-template-columns: 1fr 1fr; }
+  .darra-strip figure:first-child { grid-column: 1 / -1; min-height: 260px; }
+}
+@media (max-width: 680px) {
+  .darra-wall { grid-template-columns: 1fr; grid-auto-rows: auto; }
+  .darra-wall .dw-tall, .darra-wall .dw-wide { grid-column: auto; grid-row: auto; }
+  .darra-wall figure { min-height: 250px; }
+  .darra-wall figcaption { transform: none; opacity: 1; }
+  .darra-strip { grid-template-columns: 1fr; }
+  .darra-strip figure { min-height: 230px; }
+  .darra-strip figcaption { position: static; display: inline-block; margin-top: 10px; }
+  .darra-strip figure { min-height: 0; }
+  .darra-strip img { position: static; height: 230px; }
+}
+
+/* CRM media grid: logo cell */
+.crm-media-grid article.crm-logo-cell img { object-fit: contain; height: 145px; padding: 18px; background: #fbf8f1; }
+
+/* ------------------------------------------------------------------
+   7. Responsive hardening — tablets, phones, big screens
+   ------------------------------------------------------------------ */
+/* Tablets & small laptops: the full nav no longer fits — use the menu */
+@media (max-width: 920px) {
+  .menu-toggle { display: block; order: 5; margin-left: auto; }
+  .nav-actions { display: flex; align-items: center; order: 6; gap: 8px; }
+  .main-nav {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 15px;
+    right: 15px;
+    display: none;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: 15px;
+    background: rgba(15, 17, 16, .97);
+    box-shadow: var(--shadow);
+  }
+  .main-nav.open { display: flex; animation: navDrop .32s cubic-bezier(.2, .8, .2, 1) both; }
+  @keyframes navDrop { from { opacity: 0; transform: translateY(-9px); } to { opacity: 1; transform: none; } }
+  .main-nav a { padding: 12px 14px; border-radius: 9px; }
+  .main-nav a:hover, .main-nav a.active { background: rgba(212, 160, 52, .09); }
+  .main-nav a.active::after { display: none; }
+  html[data-theme="day"] .main-nav { background: rgba(255, 255, 255, .98); }
+  html[data-skin="marble"] .main-nav, html[data-skin="obsidian"] .main-nav { background: rgba(16, 16, 21, .98); }
+  html[data-skin="marble"][data-theme="day"] .main-nav, html[data-skin="obsidian"][data-theme="day"] .main-nav { background: rgba(252, 250, 245, .98); }
+}
+/* Keep header controls compact on tighter widths */
+@media (max-width: 1080px) {
+  .skin-toggle-label { display: none; }
+  .skin-toggle { padding: 9px 11px; }
+}
+@media (max-width: 920px) {
+  .skin-toggle { padding: 8px 9px; }
+  .skin-toggle-label { display: none; }
+  .nav-wrap { gap: 14px; }
+}
+/* Small phones */
+@media (max-width: 400px) {
+  .container { width: min(calc(100% - 26px), var(--max)); }
+  .hero .display { font-size: clamp(2.55rem, 13vw, 3.4rem); }
+  .page-hero h1 { font-size: clamp(2.5rem, 12.5vw, 3.4rem); }
+  .hero-actions .btn { width: 100%; }
+  .mini-stat strong { font-size: 1.55rem; }
+  .crm-metrics { grid-template-columns: 1fr; }
+  .crm-metrics article { border-right: 0; border-bottom: 1px solid var(--line); }
+  .crm-metrics article:last-child { border-bottom: 0; }
+  .crm-nav-actions { gap: 6px; }
+}
+/* Large desktops: let the layout breathe */
+@media (min-width: 1600px) {
+  :root { --max: 1340px; }
+  body { font-size: 15.5px; }
+  .section { padding: 148px 0; }
+  .hero .display { font-size: clamp(4.2rem, 5.6vw, 7.6rem); }
+  .page-hero h1 { font-size: clamp(3.6rem, 5.4vw, 7.2rem); }
+  .emblem-card .emblem-picture { width: min(100%, 500px); }
+}
+/* Landscape phones: keep the hero usable */
+@media (max-height: 560px) and (max-width: 920px) {
+  .hero { min-height: 620px; }
+  .hero-content { padding-top: 118px; padding-bottom: 70px; }
+  .page-hero { min-height: 420px; }
+  .page-hero-content { padding-top: 112px; padding-bottom: 46px; }
+}
+/* Touch-friendly tap targets */
+@media (pointer: coarse) {
+  .main-nav a { padding: 6px 2px; }
+  .menu-toggle { min-width: 44px; min-height: 44px; }
+  .theme-toggle, .skin-toggle { min-height: 40px; }
+}
+
+/* CRM nav: keep theme controls reachable on all sizes */
+.crm-nav-actions { flex-wrap: wrap; }
+@media (max-width: 640px) {
+  .crm-nav-actions .btn { display: none; }
+  .crm-nav-actions { gap: 7px; }
+}
+
+/* ------------------------------------------------------------------
+   8. Night-mode neutral polish for marble & obsidian (misc surfaces)
+   ------------------------------------------------------------------ */
+html[data-skin="marble"] .route-node, html[data-skin="obsidian"] .route-node { color: #8d8878; }
+html[data-skin="marble"] .route-rail, html[data-skin="obsidian"] .route-rail { background: rgba(246, 242, 232, .17); }
+html[data-skin="marble"] .supply-board-note, html[data-skin="obsidian"] .supply-board-note { color: #8d8878; }
+html[data-skin="marble"] .route-node b, html[data-skin="obsidian"] .route-node b { color: #a29b8a; }
+html[data-skin="marble"] .bar-track, html[data-skin="obsidian"] .bar-track { background: rgba(246, 242, 232, .13); }
+html[data-skin="marble"] .client-grid, html[data-skin="obsidian"] .client-grid { background: rgba(246, 242, 232, .14); }
+html[data-skin="marble"] .profile-meta, html[data-skin="marble"] .profile-meta div,
+html[data-skin="obsidian"] .profile-meta, html[data-skin="obsidian"] .profile-meta div { border-color: var(--line); }
+html[data-skin="marble"] .proof-strip, html[data-skin="obsidian"] .proof-strip { border-color: var(--line); }
+html[data-skin="marble"] .performance-table th, html[data-skin="marble"] .performance-table td,
+html[data-skin="obsidian"] .performance-table th, html[data-skin="obsidian"] .performance-table td { border-color: var(--line); }
+html[data-skin="marble"] .journey-card, html[data-skin="obsidian"] .journey-card { border-color: var(--line); }
+html[data-skin="marble"] .path-card, html[data-skin="obsidian"] .path-card,
+html[data-skin="marble"] .spec-card, html[data-skin="obsidian"] .spec-card { border-color: var(--line); }
+html[data-skin="marble"] .faq-list, html[data-skin="marble"] .faq-list details,
+html[data-skin="obsidian"] .faq-list, html[data-skin="obsidian"] .faq-list details { border-color: var(--line); }
+
+/* ==================================================================
+   V2 REFINEMENT PASS — richer backgrounds, full theme coverage,
+   logo-matched wordmark, contrast hardening
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   A. Brand wordmark follows the official logo lettering (gold serif)
+   ------------------------------------------------------------------ */
+.brand-name {
+  background: linear-gradient(102deg, #f6dd9a 0%, #e6b954 30%, #c08e22 58%, #f0cd76 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #d9ab41;
+  letter-spacing: -.02em;
+  filter: drop-shadow(0 1px 10px rgba(212, 160, 52, .22));
+}
+html[data-theme="day"] .brand-name {
+  background: linear-gradient(102deg, #8a620c 0%, #a97a17 32%, #6e4e09 60%, #9c7318 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #8a620c;
+  filter: none;
+}
+.brand-sub { letter-spacing: .16em; }
+.footer .brand-name, .crm-header .brand-name { filter: drop-shadow(0 1px 8px rgba(212, 160, 52, .18)); }
+
+/* ------------------------------------------------------------------
+   B. Living section backgrounds — no more flat, empty canvases
+   ------------------------------------------------------------------ */
+.section { position: relative; z-index: 0; }
+
+/* Topographic contour motif — soft gold curves drifting at the edges */
+.section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='680' height='480' viewBox='0 0 680 480'%3E%3Cg fill='none' stroke='%23d8c489' stroke-width='1.1'%3E%3Cpath d='M-30 96 C 110 30 210 150 350 96 S 560 16 720 86' stroke-opacity='.5'/%3E%3Cpath d='M-30 152 C 130 84 250 208 390 142 S 600 76 720 146' stroke-opacity='.36'/%3E%3Cpath d='M-30 210 C 150 130 270 258 410 190 S 610 122 720 196' stroke-opacity='.24'/%3E%3Cpath d='M-30 268 C 160 178 290 305 430 236 S 620 168 720 244' stroke-opacity='.16'/%3E%3Cpath d='M-30 326 C 170 226 310 352 450 282 S 630 214 720 292' stroke-opacity='.1'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left -110px bottom -70px;
+  background-size: 720px auto;
+  mix-blend-mode: soft-light;
+  animation: contourDrift 90s ease-in-out infinite alternate;
+}
+.section-soft::before { background-position: left -110px top -60px; transform: scaleX(-1); animation: none; }
+.section-earth::before { background-position: left -120px top -70px; }
+@keyframes contourDrift { from { background-position-x: -110px; } to { background-position-x: -70px; } }
+@media (prefers-reduced-motion: reduce) { .section::before { animation: none; } }
+
+/* Section glow layer (brand watermark removed 2026-08) */
+.section-dark::after, .section-earth::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Layered ambient washes per skin — night only */
+html[data-skin="signature"]:not([data-theme="day"]) .section-dark, html:not([data-skin]):not([data-theme="day"]) .section-dark {
+  background: radial-gradient(circle at 8% -10%, rgba(239, 209, 116, .05), transparent 38%),
+              radial-gradient(circle at 98% 112%, rgba(141, 175, 118, .055), transparent 34%), var(--coal);
+}
+html[data-skin="signature"]:not([data-theme="day"]) .section-soft, html:not([data-skin]):not([data-theme="day"]) .section-soft {
+  background: radial-gradient(circle at 92% -8%, rgba(239, 209, 116, .04), transparent 40%),
+              radial-gradient(circle at 4% 112%, rgba(128, 163, 116, .05), transparent 36%), #101513;
+}
+html[data-skin="signature"]:not([data-theme="day"]) .section-earth, html:not([data-skin]):not([data-theme="day"]) .section-earth {
+  background: radial-gradient(circle at 10% -10%, rgba(214, 193, 154, .05), transparent 38%),
+              radial-gradient(circle at 96% 110%, rgba(239, 107, 61, .035), transparent 32%), #1b1a14;
+}
+html[data-skin="marble"] .section-dark {
+  background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .07), transparent 38%),
+              radial-gradient(circle at 97% 110%, rgba(246, 242, 232, .035), transparent 34%), #121218;
+}
+html[data-skin="marble"] .section-soft {
+  background: radial-gradient(circle at 90% -10%, rgba(212, 160, 52, .06), transparent 42%),
+              radial-gradient(circle at 5% 112%, rgba(246, 242, 232, .03), transparent 36%),
+              linear-gradient(160deg, #17171f 0%, #131319 55%, #191922 100%);
+}
+html[data-skin="marble"] .section-earth {
+  background: radial-gradient(circle at 88% -8%, rgba(212, 160, 52, .07), transparent 40%),
+              radial-gradient(circle at 6% 112%, rgba(239, 225, 189, .04), transparent 34%),
+              linear-gradient(160deg, #1a1a14 0%, #15150f 58%, #1c1c15 100%);
+}
+html[data-skin="obsidian"] .section-dark {
+  background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .06), transparent 38%),
+              linear-gradient(160deg, #0d0d11 0%, #0a0a0d 55%, #0e0e13 100%);
+}
+html[data-skin="obsidian"] .section-soft {
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, .02) 50%, transparent 60%),
+              radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .055), transparent 42%),
+              linear-gradient(160deg, #131318 0%, #0e0e12 60%, #121218 100%);
+}
+html[data-skin="obsidian"] .section-earth {
+  background: linear-gradient(115deg, transparent 42%, rgba(212, 160, 52, .028) 50%, transparent 58%),
+              radial-gradient(circle at 8% -10%, rgba(212, 160, 52, .06), transparent 40%),
+              linear-gradient(160deg, #14130d 0%, #0e0e10 58%, #13130e 100%);
+}
+/* Day washes */
+html[data-skin="marble"][data-theme="day"] .section-dark {
+  background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .13), transparent 38%), #f7f4ec;
+}
+html[data-skin="marble"][data-theme="day"] .section-soft {
+  background: radial-gradient(circle at 90% -10%, rgba(212, 160, 52, .11), transparent 42%),
+              radial-gradient(circle at 5% 112%, rgba(184, 168, 128, .14), transparent 36%),
+              linear-gradient(160deg, #f3efe4 0%, #f8f5ec 55%, #efe9da 100%);
+}
+html[data-skin="marble"][data-theme="day"] .section-earth {
+  background: radial-gradient(circle at 88% -8%, rgba(212, 160, 52, .12), transparent 40%),
+              radial-gradient(circle at 6% 112%, rgba(184, 168, 128, .12), transparent 34%),
+              linear-gradient(160deg, #f1ecdd 0%, #f5f0e3 58%, #ece4d1 100%);
+}
+html[data-skin="obsidian"][data-theme="day"] .section-dark {
+  background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .11), transparent 38%), #f2f1ef;
+}
+html[data-skin="obsidian"][data-theme="day"] .section-soft {
+  background: radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .1), transparent 42%),
+              radial-gradient(circle at 5% 112%, rgba(160, 160, 160, .13), transparent 36%),
+              linear-gradient(160deg, #efeeec 0%, #f5f4f2 55%, #e9e7e3 100%);
+}
+html[data-skin="obsidian"][data-theme="day"] .section-earth {
+  background: radial-gradient(circle at 8% -10%, rgba(212, 160, 52, .1), transparent 40%),
+              radial-gradient(circle at 6% 112%, rgba(160, 160, 160, .12), transparent 34%),
+              linear-gradient(160deg, #e9e7e2 0%, #f1f0ee 58%, #e2e0db 100%);
+}
+/* FAQ section follows the soft washes */
+html[data-skin="marble"]:not([data-theme="day"]) .faq-section { background: radial-gradient(circle at 90% -10%, rgba(212, 160, 52, .06), transparent 42%), linear-gradient(160deg, #17171f, #131319); }
+html[data-skin="obsidian"]:not([data-theme="day"]) .faq-section { background: radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .055), transparent 42%), linear-gradient(160deg, #131318, #0e0e12); }
+html[data-skin="marble"][data-theme="day"] .faq-section { background: radial-gradient(circle at 90% -10%, rgba(212, 160, 52, .11), transparent 42%), linear-gradient(160deg, #f3efe4, #f8f5ec); }
+html[data-skin="obsidian"][data-theme="day"] .faq-section { background: radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .1), transparent 42%), linear-gradient(160deg, #efeeec, #f5f4f2); }
+
+/* Business snapshot section: quiet graph-paper motif behind the numbers */
+.business-snapshot::before {
+  background-image:
+    linear-gradient(rgba(212, 160, 52, .07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 160, 52, .07) 1px, transparent 1px);
+  background-size: 46px 46px, 46px 46px;
+  background-repeat: repeat, repeat;
+  background-position: 0 0;
+  -webkit-mask-image: radial-gradient(130% 100% at 18% 0%, black, transparent 68%);
+  mask-image: radial-gradient(130% 100% at 18% 0%, black, transparent 68%);
+  transform: none;
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Callout panels: gold inner ring + soft glow */
+.callout { position: relative; }
+.callout::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 1px solid rgba(212, 160, 52, .26);
+  box-shadow: inset 0 0 70px rgba(212, 160, 52, .045);
+}
+
+/* ------------------------------------------------------------------
+   C. Full marble / obsidian coverage — every remaining surface
+   ------------------------------------------------------------------ */
+/* Border lines that were locked to the green palette */
+html[data-skin="marble"] .rule, html[data-skin="marble"] .feature-card, html[data-skin="marble"] .numbered-item,
+html[data-skin="marble"] .mini-stats, html[data-skin="marble"] .mini-stat, html[data-skin="marble"] .faq-list, html[data-skin="marble"] .faq-list details,
+html[data-skin="obsidian"] .rule, html[data-skin="obsidian"] .feature-card, html[data-skin="obsidian"] .numbered-item,
+html[data-skin="obsidian"] .mini-stats, html[data-skin="obsidian"] .mini-stat, html[data-skin="obsidian"] .faq-list, html[data-skin="obsidian"] .faq-list details { border-color: var(--line); }
+
+/* Export panel — gold & charcoal instead of forest green */
+html[data-skin="marble"] .export-panel, html[data-skin="obsidian"] .export-panel {
+  background: radial-gradient(circle at 77% 45%, rgba(212, 160, 52, .16), transparent 27%), linear-gradient(130deg, #1c1a12, #2c2410 53%, #191712);
+  border-color: rgba(212, 160, 52, .3);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, .45), 0 0 70px rgba(212, 160, 52, .05) inset;
+}
+html[data-skin="marble"] .export-node, html[data-skin="obsidian"] .export-node { color: rgba(239, 225, 189, .62); }
+html[data-skin="marble"] .export-node span, html[data-skin="obsidian"] .export-node span { border-color: rgba(239, 225, 189, .33); background: rgba(14, 14, 19, .3); }
+html[data-skin="marble"] .export-node.active span, html[data-skin="obsidian"] .export-node.active span { color: #241d08; border-color: #e3bd63; background: linear-gradient(140deg, #f2c65e, #c08e22); }
+html[data-skin="marble"] .export-line, html[data-skin="obsidian"] .export-line { background: rgba(239, 225, 189, .24); }
+html[data-skin="marble"] .export-copy p, html[data-skin="obsidian"] .export-copy p { color: #d3ccc0; }
+html[data-skin="marble"][data-theme="day"] .export-copy p, html[data-skin="obsidian"][data-theme="day"] .export-copy p { color: #e6ddc8; }
+
+/* Distribution & transport photo cards */
+html[data-skin="marble"] .distribution-card, html[data-skin="marble"] .transport-card { background: #101017; border-color: rgba(246, 242, 232, .14); }
+html[data-skin="obsidian"] .distribution-card, html[data-skin="obsidian"] .transport-card { background: #0e0e13; border-color: rgba(212, 160, 52, .16); }
+
+/* Home reel controls */
+html[data-skin="marble"] .reel-footer, html[data-skin="obsidian"] .reel-footer { background: rgba(12, 12, 17, .92); border-top-color: rgba(212, 160, 52, .22); }
+html[data-skin="marble"] .reel-live, html[data-skin="obsidian"] .reel-live { color: #d5c089; }
+html[data-skin="marble"] .reel-skip, html[data-skin="obsidian"] .reel-skip { color: #cdc6b2; }
+html[data-skin="marble"] .reel-live i, html[data-skin="obsidian"] .reel-live i { background: #e3bd63; box-shadow: 0 0 0 5px rgba(212, 160, 52, .14); }
+
+/* Journey card icon ring */
+html[data-skin="marble"] .journey-card .path-icon { border-color: #101016; }
+html[data-skin="obsidian"] .journey-card .path-icon { border-color: #0b0b0f; }
+html[data-skin="marble"][data-theme="day"] .journey-card .path-icon { border-color: #f6f1e3; color: #241d08; }
+html[data-skin="obsidian"][data-theme="day"] .journey-card .path-icon { border-color: #f2f1ef; color: #20180a; }
+
+/* Gallery hero (gallery page top) */
+html[data-skin="marble"] .gallery-hero { background: radial-gradient(circle at 78% 20%, rgba(212, 160, 52, .16), transparent 27%), linear-gradient(118deg, #101016, #1c1c18 65%, #26241c); }
+html[data-skin="obsidian"] .gallery-hero { background: radial-gradient(circle at 78% 20%, rgba(212, 160, 52, .14), transparent 27%), linear-gradient(118deg, #0c0c10, #16161c 65%, #1c1a12); }
+
+/* Footer night tones */
+html[data-skin="marble"]:not([data-theme="day"]) .footer { background: #0e0e14; }
+html[data-skin="obsidian"]:not([data-theme="day"]) .footer { background: #09090d; }
+html[data-skin="marble"]:not([data-theme="day"]) .footer-bottom, html[data-skin="obsidian"]:not([data-theme="day"]) .footer-bottom { color: #8d8878; }
+html[data-skin="marble"][data-theme="day"] .footer-bottom { color: #5d5237; }
+html[data-skin="obsidian"][data-theme="day"] .footer-bottom { color: #53504a; }
+
+/* Supply board internals */
+html[data-skin="marble"] .supply-board-top i, html[data-skin="obsidian"] .supply-board-top i { background: #e3bd63; box-shadow: 0 0 0 5px rgba(212, 160, 52, .13); }
+html[data-skin="marble"] .board-terrain, html[data-skin="obsidian"] .board-terrain { background: linear-gradient(155deg, #4a4430, #14131a 70%); }
+html[data-skin="marble"] .mine-depth, html[data-skin="obsidian"] .mine-depth { background: linear-gradient(160deg, #2e2a1d, #0d0d10 64%); border-color: rgba(206, 193, 145, .22); }
+/* Supply board stays a dark signal island in day — keep its text light */
+html[data-skin="marble"][data-theme="day"] .supply-board, html[data-skin="obsidian"][data-theme="day"] .supply-board {
+  background: radial-gradient(circle at 74% 38%, rgba(212, 160, 52, .17), transparent 25%), linear-gradient(150deg, #292417, #13120d 65%);
+  border-color: rgba(140, 116, 43, .42);
+}
+html[data-skin="marble"][data-theme="day"] .supply-board-top, html[data-skin="obsidian"][data-theme="day"] .supply-board-top { color: #efe1bd; }
+html[data-skin="marble"][data-theme="day"] .supply-board-top strong, html[data-skin="obsidian"][data-theme="day"] .supply-board-top strong { color: #d5c089; }
+html[data-skin="marble"][data-theme="day"] .route-node, html[data-skin="obsidian"][data-theme="day"] .route-node { color: #b3ab97; }
+html[data-skin="marble"][data-theme="day"] .route-node b, html[data-skin="obsidian"][data-theme="day"] .route-node b { color: #d8cfb4; background: #2a251c; border-color: #5c5137; }
+html[data-skin="marble"][data-theme="day"] .route-node.active, html[data-skin="obsidian"][data-theme="day"] .route-node.active { color: #efe1bd; }
+html[data-skin="marble"][data-theme="day"] .supply-board-note, html[data-skin="obsidian"][data-theme="day"] .supply-board-note { color: #b3ab97; }
+html[data-skin="marble"][data-theme="day"] .supply-board-note strong, html[data-skin="obsidian"][data-theme="day"] .supply-board-note strong { color: #efe1bd; }
+
+/* Field art (valley / beacon / mine scenes) gets a brand-gold grade per skin */
+html[data-skin="marble"] .valley-scene, html[data-skin="marble"] .beacon-horizon, html[data-skin="marble"] .mine-animation,
+html[data-skin="marble"] .story-3d-scene, html[data-skin="marble"] .surface-mine-animation { filter: sepia(.3) saturate(.88); }
+html[data-skin="obsidian"] .valley-scene, html[data-skin="obsidian"] .beacon-horizon, html[data-skin="obsidian"] .mine-animation,
+html[data-skin="obsidian"] .story-3d-scene, html[data-skin="obsidian"] .surface-mine-animation { filter: grayscale(.24) sepia(.16) brightness(.94); }
+
+/* Director portrait illustration follows the skin mood */
+html[data-skin="marble"] .portrait::before { filter: saturate(.72) sepia(.16); }
+html[data-skin="obsidian"] .portrait::before { filter: saturate(.5) sepia(.1) contrast(1.05); }
+
+/* Form fields */
+html[data-skin="marble"] .field input, html[data-skin="marble"] .field select, html[data-skin="marble"] .field textarea { background: #0e0e14; }
+html[data-skin="obsidian"] .field input, html[data-skin="obsidian"] .field select, html[data-skin="obsidian"] .field textarea { background: #0b0b0f; }
+html[data-skin="marble"][data-theme="day"] .field input, html[data-skin="marble"][data-theme="day"] .field select, html[data-skin="marble"][data-theme="day"] .field textarea,
+html[data-skin="obsidian"][data-theme="day"] .field input, html[data-skin="obsidian"][data-theme="day"] .field select, html[data-skin="obsidian"][data-theme="day"] .field textarea { background: rgba(255, 253, 248, .85); color: #241d10; }
+
+/* ------------------------------------------------------------------
+   D. Contrast hardening — day modes, all skins
+   ------------------------------------------------------------------ */
+/* Gallery illustrated frames are always dark: lock their text light */
+.visual-copy h3 { color: #f2ede0; }
+.visual-copy p { color: #b6b1a3; }
+.visual-copy > span { color: #e8b06a; }
+/* Director role line: readable gold in day */
+html[data-theme="day"] .person-info .role { color: #8a620c; }
+html[data-skin="marble"][data-theme="day"] .person-info .role, html[data-skin="obsidian"][data-theme="day"] .person-info .role { color: #8a620c; }
+/* Small gold numerals in day need the deeper tone */
+html[data-skin="marble"][data-theme="day"] .feature-number, html[data-skin="obsidian"][data-theme="day"] .feature-number { color: #8a620c; }
+/* Big numbers & kickers keep brand gold but stay legible */
+html[data-skin="marble"][data-theme="day"] .mini-stat strong, html[data-skin="obsidian"][data-theme="day"] .mini-stat strong,
+html[data-skin="marble"][data-theme="day"] .big-num, html[data-skin="obsidian"][data-theme="day"] .big-num { color: #8f6410; }
+/* FAQ gold marker in day */
+html[data-skin="marble"][data-theme="day"] .faq-list summary::after, html[data-skin="obsidian"][data-theme="day"] .faq-list summary::after { color: #8a620c; }
+/* Signature day: leftover weak accents */
+html[data-skin="signature"][data-theme="day"] .person-info .role, html:not([data-skin])[data-theme="day"] .person-info .role { color: #8f620b; }
+html[data-skin="signature"][data-theme="day"] .mini-stat strong, html:not([data-skin])[data-theme="day"] .mini-stat strong { color: #7d560a; }
+/* Night: soften the giant watermark quote on quote cards for marble/obsidian */
+html[data-skin="marble"] .quote-card::before, html[data-skin="obsidian"] .quote-card::before { color: rgba(212, 160, 52, .22); }
+
+/* ------------------------------------------------------------------
+   F. CRM — full marble / obsidian coverage
+   ------------------------------------------------------------------ */
+html[data-skin="marble"] .crm-live-badge, html[data-skin="obsidian"] .crm-live-badge {
+  color: #d5c089; border-color: rgba(212, 160, 52, .32); background: rgba(212, 160, 52, .08);
+}
+html[data-skin="marble"] .crm-live-badge i, html[data-skin="obsidian"] .crm-live-badge i { background: #e3bd63; box-shadow: 0 0 0 5px rgba(212, 160, 52, .13); }
+html[data-skin="marble"] .crm-metrics span, html[data-skin="obsidian"] .crm-metrics span { color: #a8a294; }
+html[data-skin="marble"] .crm-metrics small, html[data-skin="obsidian"] .crm-metrics small { color: #8d8878; }
+html[data-skin="marble"] .crm-sidebar-label, html[data-skin="obsidian"] .crm-sidebar-label { color: #8d8878; }
+html[data-skin="marble"] .crm-tab span, html[data-skin="obsidian"] .crm-tab span { color: #b99d5e; }
+html[data-skin="marble"] .crm-tab:hover, html[data-skin="marble"] .crm-tab.active,
+html[data-skin="obsidian"] .crm-tab:hover, html[data-skin="obsidian"] .crm-tab.active { color: #f0ead9; background: rgba(212, 160, 52, .1); }
+html[data-skin="marble"] .crm-card-status, html[data-skin="obsidian"] .crm-card-status { color: #c9b487; border-color: rgba(212, 160, 52, .26); }
+html[data-skin="marble"] .crm-save-status, html[data-skin="obsidian"] .crm-save-status { color: #c9b487; }
+html[data-skin="marble"] .crm-table th, html[data-skin="obsidian"] .crm-table th { color: #8d8878; }
+html[data-skin="marble"] .crm-table td, html[data-skin="obsidian"] .crm-table td { color: #c7c2b4; }
+html[data-skin="marble"] .crm-table td small, html[data-skin="obsidian"] .crm-table td small { color: #8b8677; }
+html[data-skin="marble"] .crm-sidebar-note p, html[data-skin="obsidian"] .crm-sidebar-note p { color: #8b8677; }
+html[data-skin="marble"] .crm-cloud-card.cloud-connected, html[data-skin="obsidian"] .crm-cloud-card.cloud-connected {
+  border-color: rgba(212, 160, 52, .42); background: linear-gradient(120deg, rgba(52, 42, 16, .88), rgba(12, 12, 17, .93));
+}
+/* CRM day — gold-tinted status furniture */
+html[data-skin="marble"][data-theme="day"] .crm-live-badge, html[data-skin="obsidian"][data-theme="day"] .crm-live-badge {
+  color: #6e581c; border-color: rgba(140, 116, 43, .4); background: rgba(212, 160, 52, .12);
+}
+html[data-skin="marble"][data-theme="day"] .crm-live-badge i, html[data-skin="obsidian"][data-theme="day"] .crm-live-badge i { background: #b8891f; box-shadow: 0 0 0 5px rgba(212, 160, 52, .16); }
+html[data-skin="marble"][data-theme="day"] .crm-metrics small, html[data-skin="obsidian"][data-theme="day"] .crm-metrics small { color: #6b6555; }
+html[data-skin="marble"][data-theme="day"] .crm-sidebar-label, html[data-skin="obsidian"][data-theme="day"] .crm-sidebar-label { color: #6b6555; }
+html[data-skin="marble"][data-theme="day"] .crm-card-status, html[data-skin="obsidian"][data-theme="day"] .crm-card-status { color: #6e581c; }
+html[data-skin="marble"][data-theme="day"] .crm-save-status, html[data-skin="obsidian"][data-theme="day"] .crm-save-status { color: #6e581c; }
+html[data-skin="marble"][data-theme="day"] .crm-danger:hover, html[data-skin="obsidian"][data-theme="day"] .crm-danger:hover { color: #a3401a; }
+
+/* ------------------------------------------------------------------
+   G. Final polish
+   ------------------------------------------------------------------ */
+/* Section headlines get a quiet gold keyline for structure */
+.section-head > div:first-child::after {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 2px;
+  margin-top: 18px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--yellow), transparent);
+  opacity: .55;
+}
+/* Cards: unified hover lift + gold edge for every skin */
+.path-card, .spec-card, .community-card, .process-panel, .person-card, .quote-card, .crm-card, .image-note {
+  transition: transform .45s cubic-bezier(.2, .8, .2, 1), border-color .45s ease, box-shadow .45s ease, background .45s ease;
+}
+.path-card:hover, .spec-card:hover, .community-card:hover, .process-panel:hover, .image-note:hover {
+  transform: translateY(-4px);
+  border-color: rgba(212, 160, 52, .38);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, .28), 0 0 44px rgba(212, 160, 52, .05);
+}
+html[data-theme="day"] .path-card:hover, html[data-theme="day"] .spec-card:hover, html[data-theme="day"] .community-card:hover,
+html[data-theme="day"] .process-panel:hover, html[data-theme="day"] .image-note:hover {
+  box-shadow: 0 22px 55px rgba(70, 60, 30, .12), 0 0 44px rgba(212, 160, 52, .06);
+}
+/* Media tiles: slow zoom shimmer on hover */
+.media-tile, .media-card, .media-wall figure, .darra-wall figure, .darra-strip figure { isolation: isolate; }
+
+/* Sub-line of the lockup: warm gold letterspacing, matching the emblem's edge text */
+.brand-sub { color: #b99d5e; }
+html[data-theme="day"] .brand-sub { color: #7c651f; }
+html[data-skin="marble"] .brand-sub, html[data-skin="obsidian"] .brand-sub { color: #b99d5e; }
+html[data-skin="marble"][data-theme="day"] .brand-sub, html[data-skin="obsidian"][data-theme="day"] .brand-sub { color: #6e581c; }
+
+/* ==================================================================
+   V3 PREMIUM PASS — hero visibility, dual logos, 3D, qoms, big brand
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   A. Day/night logo variants (kills the dark shade on light modes)
+   ------------------------------------------------------------------ */
+.brand-logo-day, .emblem-picture-day { display: none; }
+html[data-theme="day"] .brand-logo-day { display: block; }
+html[data-theme="day"] .brand-logo-night { display: none; }
+html[data-theme="day"] .emblem-picture-day { display: block; }
+html[data-theme="day"] .emblem-picture-night { display: none; }
+
+/* ------------------------------------------------------------------
+   B. Bigger brand lockup + logo animation
+   ------------------------------------------------------------------ */
+.brand { gap: 15px; min-width: 316px; }
+.brand-name { font-size: 1.82rem; }
+.brand-sub { margin-top: 6px; font-size: .63rem; letter-spacing: .155em; }
+.site-header .brand-logo { height: 56px; }
+.footer .brand-logo { height: 66px; }
+.footer .brand-name { font-size: 1.62rem; }
+.crm-header .brand-logo { height: 50px; }
+/* Entrance + continuous gentle levitation (img floats, container handles hover) */
+.brand-logo { animation: logoIn 1s cubic-bezier(.18, .9, .3, 1.08) both; }
+.brand-logo img { animation: logoFloat 6.5s ease-in-out infinite; }
+@keyframes logoIn {
+  from { opacity: 0; transform: scale(.86) rotate(-2.5deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-logo, .brand-logo img { animation: none; }
+}
+@media (max-width: 1180px) {
+  .brand { min-width: 262px; }
+  .brand-name { font-size: 1.62rem; }
+  .site-header .brand-logo { height: 50px; }
+}
+@media (max-width: 920px) {
+  .brand { min-width: 0; }
+  .brand-name { font-size: 1.42rem; }
+  .brand-sub { font-size: .55rem; }
+  .site-header .brand-logo { height: 44px; }
+}
+@media (max-width: 680px) {
+  .brand-name { font-size: 1.26rem; }
+  .brand-sub { font-size: .48rem; }
+  .site-header .brand-logo { height: 38px; }
+  .footer .brand-logo { height: 56px; }
+  .footer .brand-name { font-size: 1.38rem; }
+}
+
+/* ------------------------------------------------------------------
+   C. Home hero — the landing image finally gets to breathe
+   ------------------------------------------------------------------ */
+html .page-home .hero,
+html[data-theme="day"] .page-home .hero,
+html[data-skin="marble"] .page-home .hero,
+html[data-skin="obsidian"] .page-home .hero,
+html[data-skin="marble"][data-theme="day"] .page-home .hero,
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero { background: none; }
+.page-home .hero-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('media/coal-haul-truck.jpg');
+  background-size: cover;
+  background-position: 78% center;
+  transform-origin: center;
+  animation: heroKenBurns 34s ease-in-out infinite alternate;
+}
+@keyframes heroKenBurns {
+  from { transform: scale(1.03); }
+  to { transform: scale(1.13) translateX(-1.8%); }
+}
+@media (prefers-reduced-motion: reduce) { .page-home .hero-photo { animation: none; } }
+/* The hero overlay becomes a shade layer above the photo so the image shows through */
+html .page-home .hero::before {
+  opacity: 1;
+  z-index: 1;
+  mask-image: none;
+  -webkit-mask-image: none;
+  background-image:
+    linear-gradient(90deg, rgba(5, 14, 9, .97) 0%, rgba(5, 14, 9, .8) 30%, rgba(5, 14, 9, .38) 62%, rgba(5, 14, 9, .05) 100%),
+    linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-skin="marble"] .page-home .hero::before {
+  background-image:
+    linear-gradient(90deg, rgba(16, 16, 21, .97) 0%, rgba(16, 16, 21, .8) 30%, rgba(16, 16, 21, .38) 62%, rgba(16, 16, 21, .05) 100%),
+    linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-skin="obsidian"] .page-home .hero::before {
+  background-image:
+    linear-gradient(90deg, rgba(8, 8, 11, .97) 0%, rgba(8, 8, 11, .8) 30%, rgba(8, 8, 11, .38) 62%, rgba(8, 8, 11, .05) 100%),
+    linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-theme="day"] .page-home .hero::before {
+  background-image:
+    linear-gradient(90deg, rgba(244, 249, 241, .97) 0%, rgba(244, 249, 241, .8) 30%, rgba(244, 249, 241, .34) 62%, rgba(244, 249, 241, .04) 100%),
+    linear-gradient(rgba(30, 81, 52, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 81, 52, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-skin="marble"][data-theme="day"] .page-home .hero::before {
+  background-image:
+    linear-gradient(90deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .8) 30%, rgba(247, 244, 236, .32) 62%, rgba(247, 244, 236, .04) 100%),
+    linear-gradient(rgba(90, 74, 35, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 74, 35, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero::before {
+  background-image:
+    linear-gradient(90deg, rgba(242, 241, 239, .97) 0%, rgba(242, 241, 239, .8) 30%, rgba(242, 241, 239, .32) 62%, rgba(242, 241, 239, .04) 100%),
+    linear-gradient(rgba(45, 42, 35, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 42, 35, .05) 1px, transparent 1px);
+  background-size: auto, 92px 92px, 92px 92px;
+}
+html[data-theme="day"] .page-home .hero-photo { filter: brightness(1.07) saturate(1.06); }
+html[data-skin="marble"] .page-home .hero-photo, html[data-skin="obsidian"] .page-home .hero-photo { filter: saturate(.92) contrast(1.05); }
+html[data-skin="marble"][data-theme="day"] .page-home .hero-photo,
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero-photo { filter: brightness(1.07) saturate(1.04); }
+
+/* ------------------------------------------------------------------
+   D. 3D card system — pointer tilt, gold edges, metallic obsidian
+   ------------------------------------------------------------------ */
+.path-card, .spec-card, .journey-card, .community-card, .qom-card,
+.media-tile, .media-card, .distribution-card, .transport-card {
+  transform: perspective(1050px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg)) translateY(var(--lift, 0px));
+  transform-style: preserve-3d;
+  transition: transform .3s cubic-bezier(.2, .8, .2, 1), border-color .45s ease, box-shadow .45s ease, background .45s ease;
+}
+.path-card:hover, .spec-card:hover, .community-card:hover, .qom-card:hover,
+.process-panel:hover, .image-note:hover { --lift: -5px; }
+.path-card, .spec-card, .community-card, .journey-card, .process-panel, .person-card, .image-note, .qom-card {
+  box-shadow: inset 0 1px 0 rgba(212, 160, 52, .13), 0 16px 40px rgba(0, 0, 0, .22);
+}
+html[data-theme="day"] .path-card, html[data-theme="day"] .spec-card, html[data-theme="day"] .community-card,
+html[data-theme="day"] .journey-card, html[data-theme="day"] .process-panel, html[data-theme="day"] .person-card,
+html[data-theme="day"] .image-note, html[data-theme="day"] .qom-card {
+  box-shadow: inset 0 1px 0 rgba(212, 160, 52, .18), 0 16px 40px rgba(70, 60, 30, .09);
+}
+/* Obsidian: bright metallic top edge */
+html[data-skin="obsidian"] .path-card, html[data-skin="obsidian"] .spec-card, html[data-skin="obsidian"] .community-card,
+html[data-skin="obsidian"] .journey-card, html[data-skin="obsidian"] .process-panel, html[data-skin="obsidian"] .person-card,
+html[data-skin="obsidian"] .image-note, html[data-skin="obsidian"] .qom-card {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), inset 0 0 0 1px rgba(212, 160, 52, .05), 0 18px 44px rgba(0, 0, 0, .45);
+}
+/* Marble: soft gallery-card depth */
+html[data-skin="marble"] .path-card, html[data-skin="marble"] .spec-card, html[data-skin="marble"] .community-card,
+html[data-skin="marble"] .journey-card, html[data-skin="marble"] .process-panel, html[data-skin="marble"] .person-card,
+html[data-skin="marble"] .image-note, html[data-skin="marble"] .qom-card {
+  box-shadow: inset 0 1px 0 rgba(246, 242, 232, .06), inset 0 1px 0 rgba(212, 160, 52, .12), 0 18px 46px rgba(0, 0, 0, .4);
+}
+/* Buttons: tactile press */
+.btn:active { transform: translateY(0) scale(.98); }
+.nav-cta:active { transform: translateY(0) scale(.98); }
+
+/* ------------------------------------------------------------------
+   E. The five qoms of Darra Adam Khel
+   ------------------------------------------------------------------ */
+.qom-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+.qom-card {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 24px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .012) 55%), var(--coal-2);
+}
+.qom-card h3 { margin: 13px 0 9px; font-size: 1.4rem; }
+.qom-card p { margin: 0; font-size: .87rem; line-height: 1.65; }
+.qom-rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--yellow);
+  font-size: .64rem;
+  font-weight: 850;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.qom-rank i { width: 7px; height: 7px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 4px rgba(212, 160, 52, .14); animation: qomLive 2.6s ease-in-out infinite; }
+@keyframes qomLive { 50% { opacity: .45; transform: scale(.8); } }
+.qom-script {
+  display: inline-block;
+  margin-left: 10px;
+  color: var(--yellow);
+  font-family: "Noto Naskh Arabic", "Geeza Pro", "Segoe UI", serif;
+  font-size: .6em;
+  font-weight: 500;
+  opacity: .92;
+  letter-spacing: 0;
+}
+.qom-card-featured {
+  grid-column: span 2;
+  grid-row: span 2;
+  padding: 34px 32px;
+  border-color: rgba(212, 160, 52, .42);
+  background:
+    radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .16), transparent 44%),
+    linear-gradient(160deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .012) 55%), var(--coal-2);
+  box-shadow: inset 0 1px 0 rgba(212, 160, 52, .22), 0 26px 64px rgba(0, 0, 0, .32), 0 0 56px rgba(212, 160, 52, .07) !important;
+}
+.qom-card-featured h3 { margin: 18px 0 12px; font-size: clamp(2.1rem, 3.4vw, 2.9rem); }
+.qom-card-featured p { max-width: 430px; font-size: .95rem; }
+.qom-badge {
+  margin-top: auto;
+  padding-top: 20px;
+}
+.qom-badge::after {
+  content: "";
+  display: inline-block;
+  padding: 11px 17px;
+  border: 1px solid rgba(212, 160, 52, .45);
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(212, 160, 52, .16), rgba(212, 160, 52, .05));
+  color: var(--yellow);
+  font-size: .66rem;
+  font-weight: 850;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.qom-facts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 34px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+.qom-facts > div { display: grid; gap: 7px; padding-right: 20px; }
+.qom-facts strong { color: var(--yellow); font-family: Georgia, serif; font-size: 1.55rem; font-weight: 400; letter-spacing: -.04em; line-height: 1; }
+.qom-facts span { color: var(--ink-soft); font-size: .74rem; line-height: 1.5; }
+@media (max-width: 920px) {
+  .qom-grid { grid-template-columns: 1fr 1fr; }
+  .qom-card-featured { grid-column: 1 / -1; grid-row: auto; }
+  .qom-facts { grid-template-columns: 1fr 1fr; gap: 22px 18px; }
+}
+@media (max-width: 680px) {
+  .qom-grid { grid-template-columns: 1fr; }
+  .qom-card { padding: 22px 20px; }
+  .qom-card-featured { padding: 26px 22px; }
+  .qom-facts { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 400px) { .qom-facts { grid-template-columns: 1fr; } }
+
+/* Hamburger menu now also covers small laptops so the bigger brand never crowds the nav */
+@media (max-width: 1020px) {
+  .menu-toggle { display: block; order: 5; margin-left: auto; }
+  .nav-actions { display: flex; align-items: center; order: 6; gap: 8px; }
+  .main-nav {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 15px;
+    right: 15px;
+    display: none;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: 15px;
+    background: rgba(15, 17, 16, .97);
+    box-shadow: var(--shadow);
+  }
+  .main-nav.open { display: flex; animation: navDrop .32s cubic-bezier(.2, .8, .2, 1) both; }
+  .main-nav a { padding: 12px 14px; border-radius: 9px; }
+  .main-nav a:hover, .main-nav a.active { background: rgba(212, 160, 52, .09); }
+  .main-nav a.active::after { display: none; }
+  html[data-theme="day"] .main-nav { background: rgba(255, 255, 255, .98); }
+  html[data-skin="marble"] .main-nav, html[data-skin="obsidian"] .main-nav { background: rgba(16, 16, 21, .98); }
+  html[data-skin="marble"][data-theme="day"] .main-nav, html[data-skin="obsidian"][data-theme="day"] .main-nav { background: rgba(252, 250, 245, .98); }
+  .skin-toggle-label { display: none; }
+  .skin-toggle { padding: 8px 9px; }
+}
+
+/* --- V3 corrections & layering polish --- */
+/* Qom badge: style the element directly (text lives inside it) */
+.qom-badge {
+  margin-top: auto;
+  padding-top: 20px;
+}
+.qom-badge {
+  margin-top: auto;
+  padding: 11px 17px;
+  width: max-content;
+  max-width: 100%;
+  border: 1px solid rgba(212, 160, 52, .45);
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(212, 160, 52, .18), rgba(212, 160, 52, .05));
+  color: var(--yellow);
+  font-size: .66rem;
+  font-weight: 850;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background .3s ease, box-shadow .3s ease, transform .3s ease;
+}
+.qom-card-featured:hover .qom-badge {
+  background: linear-gradient(120deg, rgba(212, 160, 52, .3), rgba(212, 160, 52, .1));
+  box-shadow: 0 0 26px rgba(212, 160, 52, .18);
+  transform: translateY(-2px);
+}
+
+/* Hero grid moves onto the photo layer so the video reel stays clean */
+html .page-home .hero::before,
+html[data-skin="marble"] .page-home .hero::before,
+html[data-skin="obsidian"] .page-home .hero::before,
+html[data-theme="day"] .page-home .hero::before,
+html[data-skin="marble"][data-theme="day"] .page-home .hero::before,
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero::before {
+  background-size: auto;
+  background-image: none;
+}
+html .page-home .hero::before {
+  background: linear-gradient(90deg, rgba(5, 14, 9, .97) 0%, rgba(5, 14, 9, .8) 30%, rgba(5, 14, 9, .38) 62%, rgba(5, 14, 9, .05) 100%);
+}
+html[data-skin="marble"] .page-home .hero::before { background: linear-gradient(90deg, rgba(16, 16, 21, .97) 0%, rgba(16, 16, 21, .8) 30%, rgba(16, 16, 21, .38) 62%, rgba(16, 16, 21, .05) 100%); }
+html[data-skin="obsidian"] .page-home .hero::before { background: linear-gradient(90deg, rgba(8, 8, 11, .97) 0%, rgba(8, 8, 11, .8) 30%, rgba(8, 8, 11, .38) 62%, rgba(8, 8, 11, .05) 100%); }
+html[data-theme="day"] .page-home .hero::before { background: linear-gradient(90deg, rgba(244, 249, 241, .97) 0%, rgba(244, 249, 241, .8) 30%, rgba(244, 249, 241, .34) 62%, rgba(244, 249, 241, .04) 100%); }
+html[data-skin="marble"][data-theme="day"] .page-home .hero::before { background: linear-gradient(90deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .8) 30%, rgba(247, 244, 236, .32) 62%, rgba(247, 244, 236, .04) 100%); }
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero::before { background: linear-gradient(90deg, rgba(242, 241, 239, .97) 0%, rgba(242, 241, 239, .8) 30%, rgba(242, 241, 239, .32) 62%, rgba(242, 241, 239, .04) 100%); }
+.page-home .hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px);
+  background-size: 92px 92px;
+  mask-image: linear-gradient(to right, black 0%, transparent 88%);
+  -webkit-mask-image: linear-gradient(to right, black 0%, transparent 88%);
+  pointer-events: none;
+}
+html[data-theme="day"] .page-home .hero-photo::after {
+  background-image: linear-gradient(rgba(30, 60, 40, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(30, 60, 40, .06) 1px, transparent 1px);
+}
+
+/* Hover keeps the full 3D transform (older hover rules are flattened) */
+.path-card:hover, .spec-card:hover, .community-card:hover, .qom-card:hover,
+.process-panel:hover, .image-note:hover, .journey-card:hover {
+  transform: perspective(1050px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg)) translateY(-5px);
+}
+/* Media/photo tiles keep their zoom but never flatten */
+.media-tile:hover, .media-card:hover, .distribution-card:hover, .transport-card:hover {
+  transform: perspective(1050px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg));
+}
+.qom-badge::after { content: none; }
+
+/* ==================================================================
+   V4 MAJOR DESIGN UPGRADE — premium type, visible motion, hero polish
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   A. Premium typography — Playfair Display + Inter
+   ------------------------------------------------------------------ */
+body { font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.display, h1, h2, h3, .brand-name { font-family: "Playfair Display", Georgia, "Times New Roman", serif; letter-spacing: -.03em; }
+.mini-stat strong, .proof-strip strong, .qom-facts strong, .community-card .big-num, .feature-number,
+.numbered-item > b, .pullquote, .chart-head span, .performance-table tfoot th, .performance-table tfoot td,
+.crm-metrics strong, .path-card::after, .journey-card::after { font-family: "Playfair Display", Georgia, serif; }
+
+/* Bolder, more editorial scale */
+.hero .display { font-size: clamp(4rem, 6.9vw, 7.4rem); }
+.page-hero h1 { font-size: clamp(3.6rem, 6.6vw, 6.9rem); }
+h2, .section-head h2 { font-size: clamp(2.7rem, 4.9vw, 5.3rem); }
+h3 { font-size: 1.62rem; }
+.eyebrow { color: var(--yellow); }
+html[data-theme="day"] .eyebrow { color: #8a620c; }
+
+/* ------------------------------------------------------------------
+   B. The fixes — day hero clarity, no yellow line, calmer veins
+   ------------------------------------------------------------------ */
+/* Landing image: clearly visible in day mode */
+html[data-theme="day"] .page-home .hero-photo { filter: brightness(1.16) saturate(1.08) contrast(1.03); }
+html[data-skin="marble"][data-theme="day"] .page-home .hero-photo,
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero-photo { filter: brightness(1.14) saturate(1.05) contrast(1.02); }
+html[data-theme="day"] .page-home .hero::before {
+  background: linear-gradient(90deg, rgba(244, 249, 241, .96) 0%, rgba(244, 249, 241, .78) 30%, rgba(244, 249, 241, .16) 58%, rgba(244, 249, 241, 0) 74%);
+}
+html[data-skin="marble"][data-theme="day"] .page-home .hero::before {
+  background: linear-gradient(90deg, rgba(247, 244, 236, .96) 0%, rgba(247, 244, 236, .78) 30%, rgba(247, 244, 236, .14) 58%, rgba(247, 244, 236, 0) 74%);
+}
+html[data-skin="obsidian"][data-theme="day"] .page-home .hero::before {
+  background: linear-gradient(90deg, rgba(242, 241, 239, .96) 0%, rgba(242, 241, 239, .78) 30%, rgba(242, 241, 239, .14) 58%, rgba(242, 241, 239, 0) 74%);
+}
+/* Hero note: line removed */
+.hero-note { border-top: 0; padding-top: 0; }
+/* Gold dust is a night-only effect */
+html[data-theme="day"] .hero .hero-content::after { display: none; }
+/* Marble day veining: much quieter */
+html[data-skin="marble"][data-theme="day"] body::after { opacity: .15; }
+html[data-skin="obsidian"][data-theme="day"] body::after { opacity: .3; }
+/* Section keyline: shorter and quieter */
+.section-head > div:first-child::after { width: 34px; opacity: .4; }
+
+/* ------------------------------------------------------------------
+   C. Visible motion — hero cascade, gold shimmer, logo shine
+   ------------------------------------------------------------------ */
+@keyframes heroRise {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+.hero .eyebrow, .hero .display, .hero .lede, .hero .hero-actions, .hero .hero-note {
+  animation: heroRise .9s cubic-bezier(.2, .8, .2, 1) both;
+}
+.hero .display { animation-delay: .1s; }
+.hero .lede { animation-delay: .22s; }
+.hero .hero-actions { animation-delay: .34s; }
+.hero .hero-note { animation-delay: .46s; }
+.page-hero .eyebrow, .page-hero h1, .page-hero .lede { animation: heroRise .9s cubic-bezier(.2, .8, .2, 1) both; }
+.page-hero h1 { animation-delay: .12s; }
+.page-hero .lede { animation-delay: .24s; }
+
+/* Gold shimmer flowing through the hero headline accent */
+.hero h1 span {
+  background: linear-gradient(100deg, #f6dd9a 0%, #e6b954 22%, #fff3c4 50%, #c08e22 78%, #f0cd76 100%);
+  background-size: 230% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #d9ab41;
+  animation: goldShimmer 6s ease-in-out infinite alternate;
+}
+@keyframes goldShimmer { to { background-position: 100% 0; } }
+html[data-theme="day"] .hero h1 span {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+/* Wordmark: living gold gradient */
+.brand-name {
+  background-size: 220% 100%;
+  animation: wordmarkFlow 8s ease-in-out infinite alternate;
+}
+@keyframes wordmarkFlow { to { background-position: 100% 0; } }
+
+/* Logo: light sweep across the emblem + deeper levitation */
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.site-header .brand-logo, .crm-header .brand-logo { position: relative; overflow: hidden; border-radius: 10px; }
+.site-header .brand-logo::after, .crm-header .brand-logo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 32%, rgba(255, 246, 212, .42) 46%, transparent 60%);
+  transform: translateX(-140%);
+  animation: logoShine 5.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes logoShine {
+  0%, 58% { transform: translateX(-140%); }
+  88%, 100% { transform: translateX(140%); }
+}
+
+/* Nav links: gold underline grows on hover */
+.main-nav a { position: relative; }
+.main-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -7px;
+  height: 2px;
+  margin: 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--yellow), rgba(212, 160, 52, 0));
+  transition: right .35s cubic-bezier(.2, .8, .2, 1);
+}
+.main-nav a:hover::after, .main-nav a.active::after { right: 0; }
+@media (max-width: 1020px) { .main-nav a::after { display: none; } }
+
+/* ------------------------------------------------------------------
+   D. Gold-grade buttons + footer ring
+   ------------------------------------------------------------------ */
+.btn { padding: 16px 27px; font-size: .86rem; letter-spacing: .02em; }
+.btn-primary {
+  color: #241b08;
+  background: linear-gradient(125deg, #f4cd6f 0%, #d9a838 48%, #f0c35a 100%);
+  box-shadow: 0 12px 32px rgba(212, 160, 52, .3), inset 0 1px 0 rgba(255, 250, 222, .6);
+}
+.btn-primary:hover {
+  background: linear-gradient(125deg, #f8dc92 0%, #e6ba50 48%, #f6d079 100%);
+  box-shadow: 0 18px 44px rgba(212, 160, 52, .42), inset 0 1px 0 rgba(255, 250, 222, .65);
+}
+.nav-cta { border-color: rgba(212, 160, 52, .38); }
+.nav-cta::after { color: var(--yellow); }
+.footer { border-top: 1px solid rgba(212, 160, 52, .22); }
+
+/* Entrance must not lock the hover transform */
+.brand-logo { animation: logoIn 1s cubic-bezier(.18, .9, .3, 1.08) backwards; }
+html[data-theme="day"] .brand-name { background-size: 220% 100%; }
+
+/* ==================================================================
+   V5 — visibility fixes, bigger brand, distinct skins, modern effects
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   A. Line contrast — no more invisible lines
+   ------------------------------------------------------------------ */
+.section::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='680' height='480' viewBox='0 0 680 480'%3E%3Cg fill='none' stroke='%23e9c76e' stroke-width='1.4'%3E%3Cpath d='M-30 96 C 110 30 210 150 350 96 S 560 16 720 86' stroke-opacity='.85'/%3E%3Cpath d='M-30 152 C 130 84 250 208 390 142 S 600 76 720 146' stroke-opacity='.6'/%3E%3Cpath d='M-30 210 C 150 130 270 258 410 190 S 610 122 720 196' stroke-opacity='.4'/%3E%3Cpath d='M-30 268 C 160 178 290 305 430 236 S 620 168 720 244' stroke-opacity='.26'/%3E%3Cpath d='M-30 326 C 170 226 310 352 450 282 S 630 214 720 292' stroke-opacity='.16'/%3E%3C/g%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: .85;
+}
+html[data-theme="day"] .section::before { mix-blend-mode: multiply; opacity: .5; }
+.page-home .hero-photo::after {
+  background-image: linear-gradient(rgba(255, 255, 255, .09) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .09) 1px, transparent 1px);
+}
+html[data-theme="day"] .page-home .hero-photo::after {
+  background-image: linear-gradient(rgba(20, 50, 35, .09) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 50, 35, .09) 1px, transparent 1px);
+}
+.section-head > div:first-child::after { width: 46px; height: 3px; opacity: .65; }
+
+/* ------------------------------------------------------------------
+   B. Bigger brand — header + footer lockup, properly aligned
+   ------------------------------------------------------------------ */
+.site-header .brand-logo { height: 68px; }
+.brand-name { font-size: 2.1rem; line-height: .95; font-weight: 600; }
+.brand-sub { margin-top: 7px; font-size: .67rem; letter-spacing: .17em; }
+.brand { gap: 16px; min-width: 372px; align-items: center; }
+.footer .brand { align-items: center; gap: 18px; }
+.footer .brand-logo { height: 88px; }
+.footer .brand-name { font-size: 2.3rem; line-height: .95; }
+.footer .brand-sub { margin-top: 8px; font-size: .7rem; }
+.crm-header .brand-logo { height: 58px; }
+/* Optical alignment guard for the wordmark block */
+.brand-name, .footer .brand-name { display: block; }
+@media (max-width: 1240px) {
+  .site-header .brand-logo { height: 60px; }
+  .brand-name { font-size: 1.85rem; }
+  .brand { min-width: 318px; }
+}
+@media (max-width: 1180px) {
+  .menu-toggle { display: block; order: 5; margin-left: auto; }
+  .nav-actions { display: flex; align-items: center; order: 6; gap: 8px; }
+  .main-nav {
+    position: absolute; top: calc(100% + 10px); left: 15px; right: 15px;
+    display: none; align-items: stretch; flex-direction: column; gap: 0; padding: 8px;
+    border: 1px solid var(--line-strong); border-radius: 15px;
+    background: rgba(15, 17, 16, .97); box-shadow: var(--shadow);
+  }
+  .main-nav.open { display: flex; animation: navDrop .32s cubic-bezier(.2,.8,.2,1) both; }
+  .main-nav a { padding: 12px 14px; border-radius: 9px; }
+  .main-nav a:hover, .main-nav a.active { background: rgba(212, 160, 52, .09); }
+  .main-nav a.active::after { display: none; }
+  html[data-theme="day"] .main-nav { background: rgba(255, 255, 255, .98); }
+  html[data-skin="marble"] .main-nav, html[data-skin="obsidian"] .main-nav { background: rgba(16, 16, 21, .98); }
+  html[data-skin="marble"][data-theme="day"] .main-nav, html[data-skin="obsidian"][data-theme="day"] .main-nav { background: rgba(252, 250, 245, .98); }
+  .nav-cta { display: none; }
+}
+@media (max-width: 680px) {
+  .site-header .brand-logo { height: 44px; }
+  .brand-name { font-size: 1.35rem; }
+  .brand-sub { margin-top: 4px; font-size: .5rem; }
+  .footer .brand-logo { height: 64px; }
+  .footer .brand-name { font-size: 1.55rem; }
+  .footer .brand-sub { font-size: .54rem; }
+}
+
+/* ------------------------------------------------------------------
+   C. MARBLE rework — slate black-marble with ivory veins (distinct
+      from obsidian: elegant, rounded, warm gold)
+   ------------------------------------------------------------------ */
+html[data-skin="marble"] {
+  --ink: #f4f1e8;
+  --ink-soft: #b6b4ab;
+  --coal: #141824;
+  --coal-2: #1a1f2d;
+  --coal-3: #232a3a;
+  --line: rgba(233, 235, 244, .16);
+  --line-strong: rgba(233, 235, 244, .3);
+  --sand: #d6c9a8;
+  --sand-2: #ecdfbd;
+  --ember: #c59a3a;
+  --ember-2: #e3bd63;
+  --moss: #a8a28a;
+  --yellow: #d9ab41;
+  --forest: #6e581c;
+  --mist: #cdd2c2;
+}
+html[data-skin="marble"] body {
+  background-color: var(--coal);
+  background-image:
+    radial-gradient(circle at 14% -6%, rgba(217, 171, 65, .12), transparent 32%),
+    radial-gradient(circle at 96% 10%, rgba(233, 235, 244, .06), transparent 26%),
+    linear-gradient(165deg, #171c29 0%, #121622 55%, #1a2030 100%);
+}
+/* Ivory marble veining — clearly visible */
+html[data-skin="marble"] body::after {
+  opacity: .5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560' viewBox='0 0 560 560'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011 0.021' numOctaves='5' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.88 0 0 0 0 0.9 0 0 0 0 0.96 0 0 0 0.75 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='560' height='560' filter='url(%23v)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='380' viewBox='0 0 380 380'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.017' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.92 0 0 0 0 0.88 0 0 0 0 0.78 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='380' height='380' filter='url(%23w)'/%3E%3C/svg%3E");
+  background-size: 560px 560px, 380px 380px;
+  mix-blend-mode: soft-light;
+  animation: marbleGlint 22s ease-in-out infinite alternate;
+}
+html[data-skin="marble"] .section-dark { background: radial-gradient(circle at 9% -10%, rgba(217, 171, 65, .1), transparent 38%), radial-gradient(circle at 97% 110%, rgba(233, 235, 244, .06), transparent 34%), linear-gradient(165deg, #161b28, #121621); }
+html[data-skin="marble"] .section-soft { background: radial-gradient(circle at 90% -10%, rgba(217, 171, 65, .09), transparent 42%), radial-gradient(circle at 5% 112%, rgba(233, 235, 244, .05), transparent 36%), linear-gradient(165deg, #1b2131 0%, #151a27 55%, #1d2434 100%); }
+html[data-skin="marble"] .section-earth { background: radial-gradient(circle at 88% -8%, rgba(217, 171, 65, .1), transparent 40%), radial-gradient(circle at 6% 112%, rgba(230, 200, 140, .05), transparent 34%), linear-gradient(165deg, #1d2030 0%, #171a29 58%, #201f2e 100%); }
+html[data-skin="marble"]:not([data-theme="day"]) .faq-section { background: radial-gradient(circle at 90% -10%, rgba(217, 171, 65, .09), transparent 42%), linear-gradient(165deg, #1b2131, #151a27); }
+html[data-skin="marble"] .footer { background: #10141f; }
+html[data-skin="marble"] .path-card, html[data-skin="marble"] .spec-card, html[data-skin="marble"] .qom-card { background: linear-gradient(160deg, #202639, #171c2a); }
+html[data-skin="marble"] .community-card { background: linear-gradient(150deg, #1e2434, #161b28); }
+html[data-skin="marble"] .community-card:nth-child(2) { background: linear-gradient(150deg, #232739, #181c2b); }
+html[data-skin="marble"] .process-panel { background: linear-gradient(160deg, #1e2434, #151a27); }
+html[data-skin="marble"] .person-card { background: linear-gradient(160deg, #1e2434, #141826); }
+html[data-skin="marble"] .contact-form { background: linear-gradient(160deg, #1e2434, #141826); }
+html[data-skin="marble"] .image-note { background: linear-gradient(100deg, #232940, #141826); }
+html[data-skin="marble"] .performance-table-card, html[data-skin="marble"] .performance-chart { background: linear-gradient(145deg, #1e2434, #141826); }
+html[data-skin="marble"] .client-grid article { background: #1b2131; }
+html[data-skin="marble"] .client-grid article:hover { background: #232a3e; }
+html[data-skin="marble"] .crm-card { background: linear-gradient(145deg, #1e2434, #141826); }
+html[data-skin="marble"] .crm-sidebar { background: rgba(24, 29, 43, .8); }
+html[data-skin="marble"] .crm-metrics { background: rgba(28, 34, 50, .6); }
+html[data-skin="marble"] .crm-body { background-color: #131724; background-image: radial-gradient(circle at 80% -10%, rgba(217, 171, 65, .1), transparent 30%); }
+/* Marble day — warm ivory marble, gold veins */
+html[data-skin="marble"][data-theme="day"] {
+  --coal: #f7f3e8;
+  --coal-2: #fdfaf1;
+  --coal-3: #efe9da;
+  --ink: #23201a;
+  --ink-soft: #59523f;
+  --line: rgba(60, 52, 30, .17);
+  --line-strong: rgba(60, 52, 30, .32);
+}
+html[data-skin="marble"][data-theme="day"] body { background-color: #f7f3e8; background-image: radial-gradient(circle at 12% -4%, rgba(217, 171, 65, .18), transparent 30%), radial-gradient(circle at 94% 8%, rgba(196, 178, 138, .2), transparent 26%); }
+html[data-skin="marble"][data-theme="day"] body::after { opacity: .22; }
+
+/* ------------------------------------------------------------------
+   D. OBSIDIAN rework — brushed graphite, sharp edges, bright gold
+      (distinct from marble: industrial, metallic, cool)
+   ------------------------------------------------------------------ */
+html[data-skin="obsidian"] {
+  --ink: #f2f0ea;
+  --ink-soft: #a4a8ae;
+  --coal: #0a0b0d;
+  --coal-2: #101216;
+  --coal-3: #17191f;
+  --line: rgba(212, 160, 52, .2);
+  --line-strong: rgba(212, 160, 52, .38);
+  --sand: #d3b46e;
+  --sand-2: #e9d6a2;
+  --ember: #d4a034;
+  --ember-2: #f2c65e;
+  --moss: #9a946a;
+  --yellow: #f0bd45;
+  --forest: #4d3d12;
+  --mist: #b9bcc4;
+}
+/* Brushed metal + sharp gold specular sweep */
+html[data-skin="obsidian"] body::after {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .024) 0 1px, transparent 1px 3px),
+    linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .035) 46%, rgba(212, 160, 52, .07) 50%, rgba(255, 255, 255, .035) 54%, transparent 68%);
+  opacity: .8;
+  animation: metalSweep 22s linear infinite alternate;
+}
+/* Obsidian sections: gunmetal gradients + brushed lines instead of contours */
+html[data-skin="obsidian"] .section::before {
+  background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 4px);
+  background-size: auto;
+  background-position: 0 0;
+  transform: none;
+  mix-blend-mode: overlay;
+  opacity: .7;
+  -webkit-mask-image: linear-gradient(115deg, black, transparent 70%);
+  mask-image: linear-gradient(115deg, black, transparent 70%);
+  animation: none;
+}
+html[data-theme="day"][data-skin="obsidian"] .section::before { mix-blend-mode: multiply; opacity: .35; }
+html[data-skin="obsidian"] .section-dark { background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .09), transparent 38%), linear-gradient(165deg, #101216, #0a0c0f); }
+html[data-skin="obsidian"] .section-soft { background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, .018) 50%, transparent 60%), radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .07), transparent 42%), linear-gradient(165deg, #14161b, #0e1013 60%, #121419); }
+html[data-skin="obsidian"] .section-earth { background: linear-gradient(115deg, transparent 42%, rgba(212, 160, 52, .03) 50%, transparent 58%), radial-gradient(circle at 8% -10%, rgba(212, 160, 52, .08), transparent 40%), linear-gradient(165deg, #13140e, #0d0e10 58%, #111208); }
+html[data-skin="obsidian"]:not([data-theme="day"]) .faq-section { background: radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .07), transparent 42%), linear-gradient(165deg, #14161b, #0e1013); }
+html[data-skin="obsidian"] .footer { background: #08090b; }
+html[data-skin="obsidian"] .path-card, html[data-skin="obsidian"] .spec-card, html[data-skin="obsidian"] .qom-card { background: linear-gradient(180deg, #16181e, #0e1014 80%); }
+html[data-skin="obsidian"] .community-card { background: linear-gradient(180deg, #15171c, #0e1013); }
+html[data-skin="obsidian"] .community-card:nth-child(2) { background: linear-gradient(180deg, #17191f, #101216); }
+html[data-skin="obsidian"] .process-panel { background: linear-gradient(180deg, #15171c, #0d0f13); }
+html[data-skin="obsidian"] .person-card { background: linear-gradient(180deg, #15171c, #0d0f13); }
+html[data-skin="obsidian"] .contact-form { background: linear-gradient(180deg, #15171c, #0d0f13); }
+html[data-skin="obsidian"] .image-note { background: linear-gradient(100deg, #17191f, #0b0d10); }
+html[data-skin="obsidian"] .performance-table-card, html[data-skin="obsidian"] .performance-chart { background: linear-gradient(180deg, #15171c, #0d0f13); }
+html[data-skin="obsidian"] .client-grid article { background: #121419; }
+html[data-skin="obsidian"] .client-grid article:hover { background: #191c22; }
+html[data-skin="obsidian"] .crm-card { background: linear-gradient(180deg, #15171c, #0d0f13); }
+html[data-skin="obsidian"] .crm-sidebar { background: rgba(14, 16, 20, .85); }
+html[data-skin="obsidian"] .crm-metrics { background: rgba(20, 22, 27, .6); }
+html[data-skin="obsidian"] .crm-body { background-color: #0a0b0e; background-image: radial-gradient(circle at 80% -10%, rgba(212, 160, 52, .08), transparent 30%); }
+/* Obsidian: sharp geometry */
+html[data-skin="obsidian"] .path-card, html[data-skin="obsidian"] .spec-card, html[data-skin="obsidian"] .qom-card,
+html[data-skin="obsidian"] .community-card, html[data-skin="obsidian"] .journey-card, html[data-skin="obsidian"] .media-tile,
+html[data-skin="obsidian"] .media-card, html[data-skin="obsidian"] .distribution-card, html[data-skin="obsidian"] .transport-card,
+html[data-skin="obsidian"] .callout, html[data-skin="obsidian"] .image-note, html[data-skin="obsidian"] .emblem-card,
+html[data-skin="obsidian"] .person-card, html[data-skin="obsidian"] .process-panel, html[data-skin="obsidian"] .crm-card,
+html[data-skin="obsidian"] .proof-strip, html[data-skin="obsidian"] .darra-wall figure, html[data-skin="obsidian"] .darra-strip figure,
+html[data-skin="obsidian"] .skin-menu { border-radius: 8px; }
+html[data-skin="obsidian"] .btn { border-radius: 6px; }
+html[data-skin="obsidian"] .qom-badge { border-radius: 4px; }
+html[data-skin="obsidian"] .skin-swatch { border-radius: 6px; }
+/* Obsidian day — cool platinum (clearly cooler than marble's ivory) */
+html[data-skin="obsidian"][data-theme="day"] {
+  --coal: #eef0f3;
+  --coal-2: #f8fafc;
+  --coal-3: #e2e6ea;
+  --ink: #1b1f26;
+  --ink-soft: #4e5560;
+  --line: rgba(35, 42, 52, .18);
+  --line-strong: rgba(35, 42, 52, .34);
+  --sand: #6b6425;
+  --sand-2: #524a16;
+  --moss: #71766b;
+}
+html[data-skin="obsidian"][data-theme="day"] body { background-color: #eef0f3; background-image: radial-gradient(circle at 12% -4%, rgba(212, 160, 52, .12), transparent 30%), radial-gradient(circle at 94% 8%, rgba(148, 163, 184, .22), transparent 26%), linear-gradient(165deg, #f1f3f5 0%, #eceff2 55%, #f3f5f7 100%); }
+html[data-skin="obsidian"][data-theme="day"] body::after { opacity: .3; background: repeating-linear-gradient(90deg, rgba(100, 116, 139, .05) 0 1px, transparent 1px 3px); animation: none; }
+html[data-skin="obsidian"][data-theme="day"] .section-dark { background: radial-gradient(circle at 9% -10%, rgba(212, 160, 52, .1), transparent 38%), linear-gradient(165deg, #f3f5f7, #eceff2); }
+html[data-skin="obsidian"][data-theme="day"] .section-soft { background: radial-gradient(circle at 91% -8%, rgba(212, 160, 52, .09), transparent 42%), radial-gradient(circle at 5% 112%, rgba(148, 163, 184, .18), transparent 36%), linear-gradient(165deg, #e9ecf0 0%, #f2f4f6 55%, #e4e8ec 100%); }
+html[data-skin="obsidian"][data-theme="day"] .section-earth { background: radial-gradient(circle at 8% -10%, rgba(212, 160, 52, .09), transparent 40%), radial-gradient(circle at 6% 112%, rgba(148, 163, 184, .16), transparent 34%), linear-gradient(165deg, #e6e9ee 0%, #eff1f4 58%, #dfe3e8 100%); }
+html[data-skin="obsidian"][data-theme="day"] .footer { background: #e3e7ec; }
+
+/* ------------------------------------------------------------------
+   E. Modern section effects — aurora glow + emblem watermark together
+   ------------------------------------------------------------------ */
+.section-dark::after, .section-earth::after {
+  background-image:
+    radial-gradient(620px 460px at 88% 16%, rgba(212, 160, 52, .09), transparent 70%),
+    radial-gradient(520px 400px at 10% 88%, rgba(239, 209, 116, .05), transparent 70%);
+  background-repeat: no-repeat;
+  background-position: 88% 16%, 10% 88%;
+  background-size: auto, auto;
+}
+html[data-theme="day"] .section-dark::after, html[data-theme="day"] .section-earth::after {
+  background-image:
+    radial-gradient(620px 460px at 88% 16%, rgba(212, 160, 52, .1), transparent 70%),
+    radial-gradient(520px 400px at 10% 88%, rgba(212, 160, 52, .06), transparent 70%);
+  background-position: 88% 16%, 10% 88%;
+  background-size: auto, auto;
+}
+/* Aurora washes also reach the soft sections */
+.section-soft { position: relative; }
+.section-soft::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(680px 480px at 92% 6%, rgba(212, 160, 52, .07), transparent 68%),
+    radial-gradient(520px 420px at 6% 92%, rgba(239, 209, 116, .045), transparent 70%);
+  opacity: 1;
+}
+html[data-theme="day"] .section-soft::after {
+  background-image:
+    radial-gradient(680px 480px at 92% 6%, rgba(212, 160, 52, .1), transparent 68%),
+    radial-gradient(520px 420px at 6% 92%, rgba(212, 160, 52, .06), transparent 70%);
+}
+
+/* ------------------------------------------------------------------
+   F. Hero modernization — glass chips, scroll cue, glass reel
+   ------------------------------------------------------------------ */
+.hero .eyebrow, .page-hero .eyebrow {
+  padding: 9px 16px;
+  border: 1px solid rgba(212, 160, 52, .34);
+  border-radius: 999px;
+  background: rgba(10, 14, 12, .42);
+  backdrop-filter: blur(10px);
+}
+html[data-theme="day"] .hero .eyebrow, html[data-theme="day"] .page-hero .eyebrow {
+  background: rgba(255, 255, 255, .52);
+  border-color: rgba(140, 116, 43, .38);
+}
+html[data-skin="obsidian"] .hero .eyebrow, html[data-skin="obsidian"] .page-hero .eyebrow { border-radius: 6px; }
+.hero-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 40px;
+  margin-right: 12px;
+  padding: 10px 16px;
+  border: 1px solid rgba(212, 160, 52, .3);
+  border-radius: 999px;
+  background: rgba(10, 14, 12, .45);
+  backdrop-filter: blur(10px);
+  color: var(--ink-soft);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: border-color .3s ease, transform .3s ease, background .3s ease;
+}
+.hero-note:hover { border-color: rgba(212, 160, 52, .6); transform: translateY(-2px); }
+html[data-theme="day"] .hero-note {
+  background: rgba(255, 253, 248, .6);
+  border-color: rgba(140, 116, 43, .35);
+  color: #4d4635;
+}
+html[data-skin="obsidian"] .hero-note { border-radius: 5px; }
+.hero-note i { flex: 0 0 auto; }
+.hero-scroll {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  color: var(--ink-soft);
+  font-size: .58rem;
+  font-weight: 800;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  transition: color .3s ease;
+}
+.hero-scroll:hover { color: var(--yellow); }
+.hero-scroll i {
+  position: relative;
+  width: 24px;
+  height: 38px;
+  border: 2px solid rgba(212, 160, 52, .55);
+  border-radius: 14px;
+}
+.hero-scroll i::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 4px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--yellow);
+  transform: translate(-50%, 0);
+  animation: scrollDot 1.9s cubic-bezier(.4, 0, .2, 1) infinite;
+}
+@keyframes scrollDot {
+  0% { opacity: 0; transform: translate(-50%, 0); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, 15px); }
+}
+@media (max-width: 680px) { .hero-scroll { display: none; } }
+.page-home .home-reel {
+  box-shadow: 0 34px 90px rgba(0, 0, 0, .5), 0 0 70px rgba(212, 160, 52, .1);
+}
+/* Page heroes: aurora orbs drift */
+.page-hero-orb { opacity: .75; }
+.page-hero .story-3d-scene, .page-hero .valley-scene, .page-hero .beacon-horizon { opacity: .92; }
+
+/* ------------------------------------------------------------------
+   G. Counters + polish
+   ------------------------------------------------------------------ */
+.qom-facts strong { font-variant-numeric: tabular-nums; }
+.proof-strip strong { font-variant-numeric: tabular-nums; }
+/* CRM heading gets the chip treatment too */
+.crm-heading .eyebrow {
+  padding: 8px 14px;
+  border: 1px solid rgba(212, 160, 52, .32);
+  border-radius: 999px;
+  background: rgba(10, 14, 12, .4);
+  backdrop-filter: blur(8px);
+}
+html[data-theme="day"] .crm-heading .eyebrow { background: rgba(255, 255, 255, .55); border-color: rgba(140, 116, 43, .35); }
+
+/* Qom cards + facts — correct light treatment in every day mode */
+html[data-skin="signature"][data-theme="day"] .qom-card, html:not([data-skin])[data-theme="day"] .qom-card {
+  background: linear-gradient(160deg, #ffffff, #e8f1e5);
+  border-color: rgba(16, 74, 38, .22);
+}
+html[data-skin="signature"][data-theme="day"] .qom-card-featured, html:not([data-skin])[data-theme="day"] .qom-card-featured {
+  background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .15), transparent 44%), linear-gradient(160deg, #ffffff, #e8f1e5);
+  border-color: rgba(140, 116, 43, .42);
+}
+html[data-skin="signature"][data-theme="day"] .qom-rank, html[data-skin="signature"][data-theme="day"] .qom-script,
+html[data-skin="signature"][data-theme="day"] .qom-facts strong, html:not([data-skin])[data-theme="day"] .qom-rank,
+html:not([data-skin])[data-theme="day"] .qom-script, html:not([data-skin])[data-theme="day"] .qom-facts strong { color: #7d560a; }
+html[data-skin="signature"][data-theme="day"] .qom-badge, html:not([data-skin])[data-theme="day"] .qom-badge {
+  color: #8f620b;
+  border-color: rgba(140, 116, 43, .45);
+  background: linear-gradient(120deg, rgba(212, 160, 52, .16), rgba(212, 160, 52, .05));
+}
+html[data-skin="marble"][data-theme="day"] .qom-card { background: linear-gradient(160deg, #fdfaf1, #efe9da); }
+html[data-skin="marble"][data-theme="day"] .qom-card-featured { background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .16), transparent 44%), linear-gradient(160deg, #fdfaf1, #efe9da); }
+html[data-skin="marble"][data-theme="day"] .qom-facts strong { color: #8f6410; }
+html[data-skin="obsidian"][data-theme="day"] .qom-card { background: linear-gradient(180deg, #f8fafc, #e2e6ea); }
+html[data-skin="obsidian"][data-theme="day"] .qom-card-featured { background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .15), transparent 44%), linear-gradient(180deg, #f8fafc, #e2e6ea); }
+html[data-skin="obsidian"][data-theme="day"] .qom-facts strong { color: #8a620c; }
+
+/* ==================================================================
+   V6 — HD coal backdrop (fixed, live) + coal hero landing image
+   ================================================================== */
+
+/* Fixed HD coal texture behind the whole landing page — content
+   scrolls over it while the coal stays put (slow cinematic drift). */
+.coal-page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 6, .5), rgba(4, 7, 6, .68)),
+    url('media/coal-texture-bg.webp');
+  background-size: cover;
+  background-position: center;
+  animation: coalDrift 46s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes coalDrift {
+  from { transform: scale(1.03); }
+  to { transform: scale(1.11) translateX(-1.2%); }
+}
+@media (prefers-reduced-motion: reduce) { .coal-page-bg { animation: none; } }
+/* Keep the page above the coal layer */
+body.page-home > main, body.page-home > .footer { position: relative; z-index: 1; }
+/* Day mode: the coal glows warmer and lighter under the ivory veils */
+html[data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(240, 236, 226, .58), rgba(240, 236, 226, .74)),
+    url('media/coal-texture-bg.webp');
+}
+html[data-skin="obsidian"][data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(238, 240, 243, .62), rgba(238, 240, 243, .76)),
+    url('media/coal-texture-bg.webp');
+}
+
+/* The landing hero becomes the HD coal scene itself */
+.page-home .hero-photo {
+  background-image: url('media/coal-hero.jpg');
+  background-position: center;
+}
+
+/* Home sections become translucent veils so the living coal backdrop
+   shows through everywhere while scrolling (per skin × mode). */
+html[data-skin="signature"] body.page-home .section-dark, html:not([data-skin]) body.page-home .section-dark { background: rgba(7, 16, 13, .93); }
+html[data-skin="signature"] body.page-home .section-soft, html:not([data-skin]) body.page-home .section-soft { background: rgba(16, 21, 19, .9); }
+html[data-skin="signature"] body.page-home .section-earth, html:not([data-skin]) body.page-home .section-earth { background: rgba(27, 26, 20, .9); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-dark, html:not([data-skin])[data-theme="day"] body.page-home .section-dark { background: rgba(244, 247, 242, .94); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-soft, html:not([data-skin])[data-theme="day"] body.page-home .section-soft { background: rgba(232, 241, 229, .93); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-earth, html:not([data-skin])[data-theme="day"] body.page-home .section-earth { background: rgba(237, 241, 223, .93); }
+html[data-skin="marble"] body.page-home .section-dark { background: rgba(19, 24, 36, .93); }
+html[data-skin="marble"] body.page-home .section-soft { background: rgba(23, 28, 43, .9); }
+html[data-skin="marble"] body.page-home .section-earth { background: rgba(25, 28, 44, .9); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-dark { background: rgba(247, 243, 232, .94); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-soft { background: rgba(243, 239, 228, .93); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-earth { background: rgba(241, 236, 221, .93); }
+html[data-skin="obsidian"] body.page-home .section-dark { background: rgba(10, 11, 14, .94); }
+html[data-skin="obsidian"] body.page-home .section-soft { background: rgba(14, 16, 19, .92); }
+html[data-skin="obsidian"] body.page-home .section-earth { background: rgba(13, 14, 12, .92); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-dark { background: rgba(242, 244, 247, .94); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-soft { background: rgba(236, 239, 243, .93); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-earth { background: rgba(233, 236, 241, .93); }
+
+/* Cards also lift slightly translucent so the coal depth reads through */
+body.page-home .path-card, body.page-home .spec-card, body.page-home .qom-card { backdrop-filter: blur(6px); }
+body.page-home .qom-card-featured { backdrop-filter: blur(8px); }
+
+/* Frosted-glass cards over the living coal backdrop */
+html[data-skin="signature"] body.page-home .path-card, html[data-skin="signature"] body.page-home .spec-card,
+html[data-skin="signature"] body.page-home .qom-card, html:not([data-skin]) body.page-home .path-card,
+html:not([data-skin]) body.page-home .spec-card, html:not([data-skin]) body.page-home .qom-card { background: rgba(17, 21, 19, .68); }
+html[data-skin="signature"][data-theme="day"] body.page-home .path-card, html[data-skin="signature"][data-theme="day"] body.page-home .spec-card,
+html[data-skin="signature"][data-theme="day"] body.page-home .qom-card, html:not([data-skin])[data-theme="day"] body.page-home .path-card,
+html:not([data-skin])[data-theme="day"] body.page-home .spec-card, html:not([data-skin])[data-theme="day"] body.page-home .qom-card { background: rgba(255, 255, 255, .66); }
+html[data-skin="marble"] body.page-home .path-card, html[data-skin="marble"] body.page-home .spec-card, html[data-skin="marble"] body.page-home .qom-card { background: rgba(26, 32, 48, .68); }
+html[data-skin="marble"][data-theme="day"] body.page-home .path-card, html[data-skin="marble"][data-theme="day"] body.page-home .spec-card, html[data-skin="marble"][data-theme="day"] body.page-home .qom-card { background: rgba(253, 250, 241, .7); }
+html[data-skin="obsidian"] body.page-home .path-card, html[data-skin="obsidian"] body.page-home .spec-card, html[data-skin="obsidian"] body.page-home .qom-card { background: rgba(18, 20, 25, .7); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .path-card, html[data-skin="obsidian"][data-theme="day"] body.page-home .spec-card, html[data-skin="obsidian"][data-theme="day"] body.page-home .qom-card { background: rgba(248, 250, 252, .72); }
+/* Featured qom card keeps its golden aura as frosted glass */
+body.page-home .qom-card-featured {
+  background:
+    radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .18), transparent 44%),
+    linear-gradient(160deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .015) 55%), rgba(17, 21, 19, .62);
+}
+html[data-skin="marble"] body.page-home .qom-card-featured { background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .18), transparent 44%), linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .02) 55%), rgba(26, 32, 48, .62); }
+html[data-skin="obsidian"] body.page-home .qom-card-featured { background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .16), transparent 44%), linear-gradient(180deg, rgba(255, 255, 255, .06), transparent 80%), rgba(18, 20, 25, .66); }
+html[data-theme="day"] body.page-home .qom-card-featured {
+  background: radial-gradient(circle at 88% 10%, rgba(212, 160, 52, .16), transparent 44%), rgba(255, 255, 255, .7);
+}
+
+/* ==================================================================
+   V7 — visible living coal backdrop, cinematic hero, focused reel
+   ================================================================== */
+
+/* --- The coal must be SEEN: brighter layer, lighter veils --- */
+.coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 6, .2), rgba(4, 7, 6, .4)),
+    url('media/coal-texture-bg.webp');
+  filter: brightness(1.14) contrast(1.05);
+}
+.coal-page-bg video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(.6) saturate(.85) contrast(1.06) blur(1.5px);
+  opacity: .55;
+}
+html[data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(240, 236, 226, .3), rgba(240, 236, 226, .5)),
+    url('media/coal-texture-bg.webp');
+}
+html[data-theme="day"] .coal-page-bg video { filter: brightness(1.02) saturate(.9) blur(1.5px); opacity: .38; }
+html[data-skin="obsidian"][data-theme="day"] .coal-page-bg video { opacity: .32; }
+
+/* Night veils let the coal texture read through clearly */
+html[data-skin="signature"] body.page-home .section-dark, html:not([data-skin]) body.page-home .section-dark { background: rgba(7, 16, 13, .78); }
+html[data-skin="signature"] body.page-home .section-soft, html:not([data-skin]) body.page-home .section-soft { background: rgba(16, 21, 19, .74); }
+html[data-skin="signature"] body.page-home .section-earth, html:not([data-skin]) body.page-home .section-earth { background: rgba(27, 26, 20, .75); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-dark, html:not([data-skin])[data-theme="day"] body.page-home .section-dark { background: rgba(244, 247, 242, .85); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-soft, html:not([data-skin])[data-theme="day"] body.page-home .section-soft { background: rgba(232, 241, 229, .83); }
+html[data-skin="signature"][data-theme="day"] body.page-home .section-earth, html:not([data-skin])[data-theme="day"] body.page-home .section-earth { background: rgba(237, 241, 223, .84); }
+html[data-skin="marble"] body.page-home .section-dark { background: rgba(19, 24, 36, .78); }
+html[data-skin="marble"] body.page-home .section-soft { background: rgba(23, 28, 43, .74); }
+html[data-skin="marble"] body.page-home .section-earth { background: rgba(25, 28, 44, .75); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-dark { background: rgba(247, 243, 232, .85); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-soft { background: rgba(243, 239, 228, .83); }
+html[data-skin="marble"][data-theme="day"] body.page-home .section-earth { background: rgba(241, 236, 221, .84); }
+html[data-skin="obsidian"] body.page-home .section-dark { background: rgba(10, 11, 14, .8); }
+html[data-skin="obsidian"] body.page-home .section-soft { background: rgba(14, 16, 19, .76); }
+html[data-skin="obsidian"] body.page-home .section-earth { background: rgba(13, 14, 12, .76); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-dark { background: rgba(242, 244, 247, .85); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-soft { background: rgba(236, 239, 243, .83); }
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-earth { background: rgba(233, 236, 241, .84); }
+
+/* --- Cinematic hero: stronger drift, breathing light, rising embers --- */
+.page-home .hero-photo { animation: heroKenBurns 26s ease-in-out infinite alternate; }
+@keyframes heroKenBurns {
+  from { transform: scale(1.04); }
+  to { transform: scale(1.19) translateX(-2.4%); }
+}
+html:not([data-theme="day"]) .page-home .hero-photo {
+  animation: heroKenBurns 26s ease-in-out infinite alternate, heroBreathe 9s ease-in-out infinite;
+}
+@keyframes heroBreathe {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.12) saturate(1.06); }
+}
+.hero-embers {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255, 202, 92, .9) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(255, 170, 60, .7) 0 1.6px, transparent 2.6px),
+    radial-gradient(circle, rgba(255, 222, 132, .8) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle, rgba(255, 188, 78, .55) 0 1.2px, transparent 2.2px);
+  background-size: 95px 140px, 140px 180px, 75px 115px, 170px 200px;
+  background-position: 8% 105%, 34% 112%, 62% 108%, 88% 114%;
+  background-repeat: repeat;
+  opacity: .5;
+  -webkit-mask-image: linear-gradient(to top, black 15%, transparent 72%);
+  mask-image: linear-gradient(to top, black 15%, transparent 72%);
+  animation: emberRise 13s linear infinite;
+}
+@keyframes emberRise {
+  from { background-position: 8% 105%, 34% 112%, 62% 108%, 88% 114%; }
+  to { background-position: 8% -30%, 34% -22%, 62% -34%, 88% -26%; }
+}
+html[data-theme="day"] .hero-embers { opacity: .2; }
+.hero-embers::after {
+  content: "";
+  position: absolute;
+  inset: -25% -45%;
+  background: linear-gradient(100deg, transparent 42%, rgba(255, 216, 124, .12) 50%, transparent 58%);
+  mix-blend-mode: screen;
+  animation: heroGlint 9s ease-in-out infinite;
+}
+@keyframes heroGlint {
+  0%, 100% { transform: translateX(-45%); }
+  50% { transform: translateX(45%); }
+}
+@media (prefers-reduced-motion: reduce) { .hero-embers { display: none; } }
+
+/* Compact hero copy — heading + intro small and confident */
+.page-home .hero .display { font-size: clamp(2.8rem, 4.5vw, 4.9rem); margin: 20px 0 20px; }
+.page-home .hero .lede { max-width: 470px; font-size: 1rem; line-height: 1.65; }
+.page-home .hero-actions { margin-top: 28px; }
+.page-home .hero-note { margin-top: 30px; }
+
+/* --- Focused reel: photo slides + glass-gold frame synced to design --- */
+.reel-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.reel-slide-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(4, 10, 7, .12) 30%, rgba(4, 10, 7, .38) 62%, rgba(4, 10, 7, .92));
+  pointer-events: none;
+}
+.page-home .home-reel { border-radius: 16px; }
+html[data-skin="obsidian"] .page-home .home-reel { border-radius: 8px; }
+.page-home .home-reel::before { border-color: rgba(212, 160, 52, .38); }
+.reel-footer {
+  background: rgba(7, 9, 11, .55);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(212, 160, 52, .28);
+}
+.reel-slide figcaption { border-left: 2px solid var(--yellow); }
+.reel-slide figcaption span { color: var(--ember-2); }
+.reel-slide figcaption strong { font-family: "Playfair Display", Georgia, serif; letter-spacing: .01em; }
+
+/* ==================================================================
+   V8 — clean separated reel with bottom progress, 3D mining visuals
+   ================================================================== */
+
+/* Compact reel, clearly separated from the coal backdrop */
+.page-home .home-reel {
+  width: 322px;
+  height: 214px;
+  border: 1px solid rgba(212, 160, 52, .45);
+  background: #0a0c0b;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .65), 0 0 0 6px rgba(5, 8, 7, .35);
+}
+.page-home .home-reel::before { border: 0; }
+@media (max-width: 920px) { .page-home .home-reel { width: 288px; height: 192px; } }
+@media (max-width: 680px) { .page-home .home-reel { width: 248px; height: 168px; } }
+
+/* Bottom progress line — synced to the reel interval */
+.reel-progress {
+  position: absolute;
+  z-index: 9;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, .1);
+  overflow: hidden;
+}
+.reel-progress i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #c08e22, #f2c65e);
+  box-shadow: 0 0 8px rgba(242, 198, 94, .55);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.reel-progress.run i { animation: reelProgress var(--reel-duration, 7600ms) linear forwards; }
+.reel-progress.paused i { animation-play-state: paused; }
+@keyframes reelProgress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Clean footer: badge + dots + count only */
+.reel-footer { gap: 10px; }
+.reel-dot { transition: background .3s ease, transform .3s ease; }
+.reel-dot.active { background: var(--yellow); box-shadow: 0 0 8px rgba(242, 198, 94, .6); }
+
+/* ==================================================================
+   V8 — cinematic 3D backdrop (canvas frame engine) replaces the old
+   low-quality background video; day mode keeps the imagery visible.
+   ================================================================== */
+
+/* Canvas sits over the fallback texture; the veil keeps copy readable. */
+.coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 6, .3), rgba(4, 7, 6, .52)),
+    url('media/coal-texture-bg.webp');
+  filter: none;
+}
+.coal-page-bg canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.coal-page-bg img.cine-src { display: none; }
+.cine-veil {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(4, 7, 6, .38) 0%, rgba(4, 7, 6, .44) 55%, rgba(4, 7, 6, .62) 100%);
+}
+/* Day mode: the golden-hour renders stay clearly visible (not washed out). */
+html[data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(238, 236, 224, .42), rgba(238, 236, 224, .58)),
+    url('media/coal-texture-bg.webp');
+}
+html[data-theme="day"] .cine-veil {
+  background: linear-gradient(180deg, rgba(240, 239, 228, .16) 0%, rgba(240, 239, 228, .34) 55%, rgba(240, 239, 228, .52) 100%);
+}
+html[data-skin="obsidian"] .cine-veil {
+  background: linear-gradient(180deg, rgba(5, 6, 8, .4) 0%, rgba(5, 6, 8, .46) 55%, rgba(5, 6, 8, .64) 100%);
+}
+html[data-skin="obsidian"][data-theme="day"] .cine-veil {
+  background: linear-gradient(180deg, rgba(236, 238, 242, .18) 0%, rgba(236, 238, 242, .36) 55%, rgba(236, 238, 242, .55) 100%);
+}
+
+/* The separate hero photo layer is retired — the canvas IS the backdrop. */
+.page-home .hero-photo { display: none; }
+
+/* Day-mode section veils on the home page stay light enough for the
+   golden renders to read through, per the request. */
+html[data-theme="day"] body.page-home .section-dark, html[data-skin="marble"][data-theme="day"] body.page-home .section-dark,
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-dark { background: rgba(244, 247, 242, .82); }
+html[data-theme="day"] body.page-home .section-soft, html[data-skin="marble"][data-theme="day"] body.page-home .section-soft,
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-soft { background: rgba(232, 241, 229, .8); }
+html[data-theme="day"] body.page-home .section-earth, html[data-skin="marble"][data-theme="day"] body.page-home .section-earth,
+html[data-skin="obsidian"][data-theme="day"] body.page-home .section-earth { background: rgba(237, 241, 223, .8); }
+
+/* New components — mode/skin accents */
+html[data-theme="day"] .reel-band-head p, html[data-theme="day"] .cine-wall figcaption strong, html[data-theme="day"] .film-card figcaption strong { color: #f7f6ea; }
+html[data-theme="day"] .film-card, html[data-theme="day"] .cine-wall figure { border-color: rgba(15, 58, 31, .22); }
+html[data-theme="day"] .about-legacy-media { border-color: rgba(15, 58, 31, .22); }
+html[data-theme="day"] .machinery-media figure { border-color: rgba(15, 58, 31, .22); }
+html[data-skin="marble"] .reel-stage, html[data-skin="obsidian"] .reel-stage { border-color: rgba(212, 160, 52, .45); }
+html[data-skin="marble"] .cine-wall figure, html[data-skin="obsidian"] .cine-wall figure,
+html[data-skin="marble"] .film-card, html[data-skin="obsidian"] .film-card { border-color: rgba(212, 160, 52, .2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reel-stage { transform: none !important; transition: none !important; }
+}
+
+/* The canvas engine supplies its own motion — retire the layer drift. */
+.coal-page-bg { animation: none; will-change: auto; }
+
+/* ==================================================================
+   V9 — coal backdrop reads clearly behind the "More than a supplier"
+   section (left-anchored copy stays readable, right side opens up).
+   ================================================================== */
+html[data-skin] body.page-home .coal-visible, html:not([data-skin]) body.page-home .coal-visible {
+  background: linear-gradient(90deg, rgba(6, 10, 8, .86) 0%, rgba(6, 10, 8, .52) 52%, rgba(6, 10, 8, .26) 100%);
+}
+html[data-skin][data-theme="day"] body.page-home .coal-visible, html:not([data-skin])[data-theme="day"] body.page-home .coal-visible {
+  background: linear-gradient(90deg, rgba(243, 247, 240, .93) 0%, rgba(243, 247, 240, .6) 55%, rgba(243, 247, 240, .38) 100%);
+}
+
+/* ==================================================================
+   V10 — restore the classic coal close-up as the home hero backdrop.
+   ================================================================== */
+.page-home .hero-photo { display: block; background-image: url('media/coal-hero.webp'); }
+
+/* ==================================================================
+   V11 — readable green writing by day, compact redesigned reel,
+   and a visible high-quality coal backdrop on EVERY page.
+   ------------------------------------------------------------------
+   1. Day-mode green type pushed to a deep, high-contrast forest
+   2. Reel: smaller 16/10 stage + a chapter rail (new layout)
+   3. The fixed coal layer is lighter-veiled and now runs site-wide
+   4. Supply: archival rail clip replaced by the HD 3D railhead frame
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   1. DAY · the green writing must read instantly, not just pass AA
+   ------------------------------------------------------------------ */
+html[data-skin="signature"][data-theme="day"], html:not([data-skin])[data-theme="day"] {
+  --ink: #06170d;
+  --ink-soft: #24432f;
+  --sand: #2e4f28;
+  --sand-2: #1a3520;
+  --moss: #17632f;
+  --line: rgba(16, 74, 38, .3);
+  --line-strong: rgba(16, 74, 38, .46);
+}
+/* Body copy, ledes and every small green label */
+html[data-skin="signature"][data-theme="day"] p,
+html:not([data-skin])[data-theme="day"] p { color: #21402d; }
+html[data-skin="signature"][data-theme="day"] .lede,
+html[data-skin="signature"][data-theme="day"] .section-head p,
+html:not([data-skin])[data-theme="day"] .lede,
+html:not([data-skin])[data-theme="day"] .section-head p { color: #1d3c29; }
+html[data-skin="signature"][data-theme="day"] .eyebrow,
+html:not([data-skin])[data-theme="day"] .eyebrow { color: #17421f; }
+html[data-skin="signature"][data-theme="day"] .hero .eyebrow,
+html[data-skin="signature"][data-theme="day"] .page-hero .eyebrow,
+html:not([data-skin])[data-theme="day"] .hero .eyebrow,
+html:not([data-skin])[data-theme="day"] .page-hero .eyebrow {
+  color: #123a1b;
+  background: rgba(255, 255, 255, .74);
+  border-color: rgba(24, 74, 40, .34);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .6);
+}
+html[data-skin="signature"][data-theme="day"] .brand-sub,
+html:not([data-skin])[data-theme="day"] .brand-sub { color: #2b4a35; }
+html[data-skin="signature"][data-theme="day"] .main-nav a,
+html:not([data-skin])[data-theme="day"] .main-nav a { color: #1e3f2a; }
+html[data-skin="signature"][data-theme="day"] .main-nav a:hover,
+html[data-skin="signature"][data-theme="day"] .main-nav a.active,
+html:not([data-skin])[data-theme="day"] .main-nav a:hover,
+html:not([data-skin])[data-theme="day"] .main-nav a.active { color: #08240f; }
+html[data-skin="signature"][data-theme="day"] .text-link,
+html:not([data-skin])[data-theme="day"] .text-link { color: #14502c; text-decoration-thickness: 1px; }
+html[data-skin="signature"][data-theme="day"] .footer h4,
+html:not([data-skin])[data-theme="day"] .footer h4 { color: #21481f; }
+html[data-skin="signature"][data-theme="day"] .footer p,
+html[data-skin="signature"][data-theme="day"] .footer-links a,
+html[data-skin="signature"][data-theme="day"] .footer-links span,
+html[data-skin="signature"][data-theme="day"] .footer-bottom,
+html:not([data-skin])[data-theme="day"] .footer p,
+html:not([data-skin])[data-theme="day"] .footer-links a,
+html:not([data-skin])[data-theme="day"] .footer-links span,
+html:not([data-skin])[data-theme="day"] .footer-bottom { color: #24462c; }
+html[data-skin="signature"][data-theme="day"] .footer-links a:hover,
+html:not([data-skin])[data-theme="day"] .footer-links a:hover { color: #06200d; }
+html[data-skin="signature"][data-theme="day"] .marquee-item,
+html:not([data-skin])[data-theme="day"] .marquee-item { color: #1c4222; }
+html[data-skin="signature"][data-theme="day"] .ticker-note,
+html:not([data-skin])[data-theme="day"] .ticker-note { color: #1d4522; }
+html[data-skin="signature"][data-theme="day"] .ticker-item em,
+html:not([data-skin])[data-theme="day"] .ticker-item em { color: #24512b; }
+html[data-skin="signature"][data-theme="day"] .ticker-item b,
+html:not([data-skin])[data-theme="day"] .ticker-item b { color: #0f2c17; }
+html[data-skin="signature"][data-theme="day"] .field label,
+html[data-skin="signature"][data-theme="day"] .contact-form label,
+html:not([data-skin])[data-theme="day"] .field label,
+html:not([data-skin])[data-theme="day"] .contact-form label { color: #1e4526; font-size: .76rem; }
+html[data-skin="signature"][data-theme="day"] .signature,
+html:not([data-skin])[data-theme="day"] .signature { color: #1f4227; }
+html[data-skin="signature"][data-theme="day"] .process-list li,
+html[data-skin="signature"][data-theme="day"] .numbered-item p,
+html[data-skin="signature"][data-theme="day"] .spec-card p,
+html[data-skin="signature"][data-theme="day"] .path-card p,
+html[data-skin="signature"][data-theme="day"] .journey-copy p,
+html:not([data-skin])[data-theme="day"] .process-list li,
+html:not([data-skin])[data-theme="day"] .numbered-item p,
+html:not([data-skin])[data-theme="day"] .spec-card p,
+html:not([data-skin])[data-theme="day"] .path-card p,
+html:not([data-skin])[data-theme="day"] .journey-copy p { color: #21422e; }
+html[data-skin="signature"][data-theme="day"] .performance-note,
+html[data-skin="signature"][data-theme="day"] .image-note p,
+html[data-skin="signature"][data-theme="day"] .faq-list details p,
+html[data-skin="signature"][data-theme="day"] .mini-stat span,
+html:not([data-skin])[data-theme="day"] .performance-note,
+html:not([data-skin])[data-theme="day"] .image-note p,
+html:not([data-skin])[data-theme="day"] .faq-list details p,
+html:not([data-skin])[data-theme="day"] .mini-stat span { color: #22432f; }
+/* White type that sits on a dark photo scrim has to stay light by day too */
+html[data-theme="day"] .media-tile figcaption span,
+html[data-theme="day"] .media-card figcaption span,
+html[data-theme="day"] .distribution-card figcaption span,
+html[data-theme="day"] .transport-card figcaption span,
+html[data-theme="day"] .cine-wall figcaption span,
+html[data-theme="day"] .film-card figcaption span,
+html[data-theme="day"] .reel-slide figcaption span { color: #ffcd9a; }
+html[data-theme="day"] .media-tile figcaption strong,
+html[data-theme="day"] .media-card figcaption strong,
+html[data-theme="day"] .distribution-card figcaption strong,
+html[data-theme="day"] .transport-card figcaption strong { color: #fff8e6; }
+/* Gold numerals on light cards */
+html[data-skin="signature"][data-theme="day"] .feature-number,
+html:not([data-skin])[data-theme="day"] .feature-number { color: #6f4a08; }
+html[data-skin="signature"][data-theme="day"] .qom-rank,
+html[data-skin="signature"][data-theme="day"] .qom-script,
+html[data-skin="signature"][data-theme="day"] .qom-facts strong,
+html:not([data-skin])[data-theme="day"] .qom-rank,
+html:not([data-skin])[data-theme="day"] .qom-script,
+html:not([data-skin])[data-theme="day"] .qom-facts strong { color: #5f4208; }
+/* The export panel keeps light type — deepen its green so it clears AA */
+html[data-theme="day"] .export-panel {
+  background: radial-gradient(circle at 77% 45%, rgba(163, 210, 150, .2), transparent 27%), linear-gradient(130deg, #12401f, #1c5a2d 53%, #2a4a1a);
+  border-color: rgba(255, 240, 200, .22);
+}
+html[data-theme="day"] .export-node { color: rgba(236, 246, 224, .78); }
+html[data-theme="day"] .export-node small { color: #dceccf; }
+html[data-theme="day"] .export-node strong { color: #ffffff; }
+html[data-theme="day"] .export-route .export-line { background: rgba(246, 250, 237, .5); }
+
+/* ------------------------------------------------------------------
+   2. REEL — compact 16/10 stage + a chapter rail of field frames
+      (was a single 1080px-wide slab; now ~two thirds the height)
+   ------------------------------------------------------------------ */
+.reel-band { padding: 52px 0 60px; }
+.reel-band-head { align-items: center; gap: 28px; margin-bottom: 20px; }
+.reel-band-head h2 { font-size: clamp(1.6rem, 2.5vw, 2.3rem); margin: 8px 0 0; }
+.reel-band-head p { max-width: 380px; font-size: .82rem; line-height: 1.6; }
+.reel-deck { display: grid; grid-template-columns: minmax(0, 1.62fr) minmax(0, .5fr); gap: 15px; align-items: stretch; max-width: 1000px; margin: 0 auto; }
+.reel-stage {
+  position: relative; width: 100%; max-width: none; margin: 0; aspect-ratio: 16 / 10; min-height: 226px;
+  overflow: hidden; border: 1px solid rgba(212, 160, 52, .34); border-radius: 16px; background: #060f0a;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .38), 0 0 0 1px rgba(255, 255, 255, .05) inset;
+  transform: none;
+}
+.reel-stage .reel-slides { inset: 0 0 30px; }
+.reel-stage .reel-slide video, .reel-stage .reel-slide > img, .reel-stage .reel-slide picture > img { width: 100%; height: 100%; object-fit: cover; }
+.reel-stage .reel-slide picture { display: block; width: 100%; height: 100%; }
+.reel-stage .reel-slide video, .reel-stage .reel-slide > img, .reel-stage .reel-slide picture > img { filter: saturate(.94) contrast(1.06) brightness(.94); }
+.reel-slide::after { background: linear-gradient(180deg, transparent 34%, rgba(4, 12, 7, .1) 52%, rgba(4, 12, 7, .88) 100%); }
+.reel-slide figcaption { right: 13px; bottom: 11px; left: 13px; padding: 6px 9px; border-left-width: 2px; border-radius: 0 8px 8px 0; background: rgba(4, 12, 8, .58); }
+.reel-slide figcaption span { font-size: .5rem; }
+.reel-slide figcaption strong { font-size: .74rem; letter-spacing: .01em; }
+.reel-glass { position: absolute; z-index: 4; inset: 0; pointer-events: none; background: linear-gradient(126deg, rgba(255, 255, 255, .1) 0%, transparent 26%, transparent 74%, rgba(255, 246, 210, .07) 100%); }
+.reel-foot {
+  position: absolute; z-index: 7; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; height: 30px; padding: 0 11px; background: rgba(4, 11, 7, .9); border-top: 1px solid rgba(212, 160, 52, .2);
+}
+.reel-foot .reel-live { font-size: .48rem; letter-spacing: .13em; text-transform: uppercase; }
+.reel-foot [data-reel-count] { color: #e7dfae; font-size: .52rem; font-weight: 800; letter-spacing: .12em; }
+.reel-progress { height: 2px; }
+/* Chapter rail */
+.reel-rail { display: grid; grid-template-rows: repeat(9, minmax(0, 1fr)); gap: 5px; min-width: 0; }
+.reel-cut {
+  position: relative; display: grid; grid-template-columns: 54px minmax(0, 1fr); align-items: center; gap: 8px;
+  min-height: 0; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 9px;
+  background: rgba(10, 24, 15, .34); color: var(--ink-soft); text-align: left;
+  transition: border-color .3s ease, background .3s ease, transform .3s ease, color .3s ease;
+}
+.reel-cut img { width: 54px; height: 100%; object-fit: cover; display: block; filter: saturate(.8) brightness(.82); transition: filter .35s ease, transform .5s ease; }
+.reel-cut span { padding-right: 6px; font-size: .5rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reel-cut::after { content: ""; position: absolute; z-index: 2; left: 0; top: 0; bottom: 0; width: 2px; background: var(--yellow); opacity: 0; transition: opacity .3s ease; }
+.reel-cut:hover { transform: translateX(-2px); border-color: rgba(212, 160, 52, .5); }
+.reel-cut:hover img { filter: saturate(.95) brightness(1); }
+.reel-cut.active { color: var(--ink); background: rgba(212, 160, 52, .1); border-color: rgba(212, 160, 52, .55); }
+.reel-cut.active::after { opacity: 1; }
+.reel-cut.active img { filter: saturate(1.02) brightness(1.02); }
+.reel-cut:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+/* Day mode: the deck reads as a dark instrument, so the rail inverts to light chrome */
+html[data-theme="day"] .reel-band-head p { color: #21422e; }
+html[data-theme="day"] .reel-stage { border-color: rgba(24, 74, 40, .34); box-shadow: 0 22px 42px rgba(38, 62, 35, .22), 0 0 0 1px rgba(255, 255, 255, .5) inset; }
+html[data-theme="day"] .reel-stage .reel-slide video, html[data-theme="day"] .reel-stage .reel-slide > img, html[data-theme="day"] .reel-stage .reel-slide picture > img { filter: saturate(.98) contrast(1.03) brightness(1.02); }
+html[data-theme="day"] .reel-cut { background: rgba(255, 255, 255, .72); border-color: rgba(16, 74, 38, .22); color: #1d3f2a; }
+html[data-theme="day"] .reel-cut:hover { border-color: rgba(120, 88, 20, .5); }
+html[data-theme="day"] .reel-cut.active { color: #0d2a16; background: rgba(212, 160, 52, .2); border-color: rgba(120, 88, 20, .6); }
+html[data-theme="day"] .reel-cut img { filter: saturate(.9) brightness(1) contrast(1.02); }
+@media (max-width: 900px) {
+  .reel-deck { grid-template-columns: 1fr; }
+  .reel-rail { grid-template-rows: none; grid-template-columns: repeat(9, minmax(120px, 1fr)); overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x proximity; }
+  .reel-cut { scroll-snap-align: center; grid-template-columns: 1fr; height: 74px; align-items: stretch; }
+  .reel-cut img { width: 100%; height: 100%; }
+  .reel-cut span { position: absolute; right: 0; bottom: 0; left: 0; padding: 12px 6px 5px; color: #f4f7e9; background: linear-gradient(transparent, rgba(4, 12, 7, .9)); font-size: .46rem; }
+  .reel-cut::after { width: 100%; height: 2px; top: auto; bottom: 0; }
+  html[data-theme="day"] .reel-cut span { color: #f4f7e9; }
+}
+@media (max-width: 620px) {
+  .reel-band { padding: 40px 0 46px; }
+  .reel-stage { aspect-ratio: 16 / 11; min-height: 210px; border-radius: 13px; }
+  .reel-rail { grid-template-columns: repeat(9, minmax(104px, 1fr)); }
+  .reel-slide figcaption strong { font-size: .66rem; }
+}
+@media (prefers-reduced-motion: reduce) { .reel-cut, .reel-cut img { transition: none; } }
+
+/* ------------------------------------------------------------------
+   3. COAL BACKDROP — the home page's living 3D backdrop now runs on
+      every page, with its own frame set, and it is clearly visible in
+      both modes (lighter veils, translucent sections over it).
+   ------------------------------------------------------------------ */
+body > main, body > .footer { position: relative; z-index: 1; }
+/* The ivory/scrim veils are pulled back so the coal actually reads */
+html[data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(238, 236, 224, .14), rgba(238, 236, 224, .26)),
+    var(--page-bg-img, url('media/coal-texture-bg.webp'));
+}
+html:not([data-theme="day"]) .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 6, .16), rgba(4, 7, 6, .34)),
+    var(--page-bg-img, url('media/coal-texture-bg.webp'));
+}
+html[data-theme="day"] .cine-veil {
+  background: linear-gradient(180deg, rgba(240, 239, 228, .02) 0%, rgba(240, 239, 228, .2) 54%, rgba(240, 239, 228, .4) 100%);
+}
+html:not([data-theme="day"]) .cine-veil {
+  background: linear-gradient(180deg, rgba(4, 7, 6, .18) 0%, rgba(4, 7, 6, .3) 54%, rgba(4, 7, 6, .5) 100%);
+}
+html[data-skin="obsidian"][data-theme="day"] .cine-veil {
+  background: linear-gradient(180deg, rgba(236, 238, 242, .04) 0%, rgba(236, 238, 242, .22) 54%, rgba(236, 238, 242, .42) 100%);
+}
+html[data-skin="marble"][data-theme="day"] .cine-veil {
+  background: linear-gradient(180deg, rgba(247, 244, 236, .04) 0%, rgba(247, 244, 236, .22) 54%, rgba(247, 244, 236, .42) 100%);
+}
+/* The canvas frames get a touch more presence, day and night */
+.coal-page-bg canvas { filter: saturate(1.06) contrast(1.04); }
+html[data-theme="day"] .coal-page-bg canvas { filter: brightness(1.08) saturate(1.1) contrast(1.02); }
+
+/* Sections let the backdrop through — night */
+body.page-about .section-dark, body.page-community .section-dark { background: rgba(7, 17, 13, .66); }
+body.page-about .section-soft, body.page-community .section-soft { background: rgba(13, 26, 19, .62); }
+body.page-about .section-earth, body.page-community .section-earth { background: rgba(24, 30, 20, .66); }
+body.page-operations .section-dark { background: rgba(6, 16, 12, .68); }
+body.page-operations .section-soft { background: rgba(12, 25, 18, .64); }
+body.page-operations .section-earth { background: rgba(23, 29, 20, .68); }
+body.page-supply .section-dark { background: rgba(6, 16, 12, .68); }
+body.page-supply .section-soft { background: rgba(13, 26, 19, .64); }
+body.page-supply .section-earth { background: rgba(24, 30, 20, .68); }
+body.page-gallery .section-dark { background: rgba(5, 13, 10, .5); }
+body.page-gallery .section-earth { background: rgba(22, 28, 19, .6); }
+body.page-gallery .section-soft { background: rgba(11, 23, 16, .56); }
+body.page-contact .section-dark { background: rgba(6, 16, 12, .66); }
+body.page-contact .section-earth { background: rgba(23, 29, 20, .66); }
+body.page-contact .faq-section { background: rgba(9, 20, 14, .62); }
+/* Sections let the backdrop through — day */
+html[data-theme="day"] body.page-about .section-dark, html[data-theme="day"] body.page-community .section-dark,
+html[data-theme="day"] body.page-operations .section-dark, html[data-theme="day"] body.page-supply .section-dark,
+html[data-theme="day"] body.page-gallery .section-dark, html[data-theme="day"] body.page-contact .section-dark { background: rgba(243, 247, 241, .66); }
+html[data-theme="day"] body.page-about .section-soft, html[data-theme="day"] body.page-community .section-soft,
+html[data-theme="day"] body.page-operations .section-soft, html[data-theme="day"] body.page-supply .section-soft,
+html[data-theme="day"] body.page-gallery .section-soft, html[data-theme="day"] body.page-contact .section-soft { background: rgba(233, 242, 230, .6); }
+html[data-theme="day"] body.page-about .section-earth, html[data-theme="day"] body.page-community .section-earth,
+html[data-theme="day"] body.page-operations .section-earth, html[data-theme="day"] body.page-supply .section-earth,
+html[data-theme="day"] body.page-gallery .section-earth, html[data-theme="day"] body.page-contact .section-earth { background: rgba(238, 242, 224, .62); }
+html[data-theme="day"] body.page-contact .faq-section { background: rgba(231, 240, 228, .64); }
+html[data-skin="marble"][data-theme="day"] body:not(.page-home) .section-dark { background: rgba(247, 244, 236, .68); }
+html[data-skin="marble"][data-theme="day"] body:not(.page-home) .section-soft { background: rgba(243, 239, 228, .64); }
+html[data-skin="marble"][data-theme="day"] body:not(.page-home) .section-earth { background: rgba(241, 236, 221, .66); }
+html[data-skin="obsidian"][data-theme="day"] body:not(.page-home) .section-dark { background: rgba(242, 244, 247, .68); }
+html[data-skin="obsidian"][data-theme="day"] body:not(.page-home) .section-soft { background: rgba(236, 239, 243, .64); }
+html[data-skin="obsidian"][data-theme="day"] body:not(.page-home) .section-earth { background: rgba(233, 236, 241, .66); }
+/* The inner-page hero photos also read stronger now */
+html[data-theme="day"] .page-about .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/mine-3d-terraces.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-operations .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-underground.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-supply .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-rail.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-gallery .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-aerial.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-community .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/valley-dawn.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-contact .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-stockpile.webp') center / cover no-repeat; }
+
+/* Per-page fallback still-frame (used before the canvas engine paints,
+   and forever if JS is off) — each page gets its own coal scene. */
+body.page-home .coal-page-bg { --page-bg-img: url('media/cine/hero-01.webp'); }
+body.page-about .coal-page-bg { --page-bg-img: url('media/cine/reel-haulroad.webp'); }
+body.page-operations .coal-page-bg { --page-bg-img: url('media/cine/reel-underground.webp'); }
+body.page-supply .coal-page-bg { --page-bg-img: url('media/cine/reel-rail.webp'); }
+body.page-gallery .coal-page-bg { --page-bg-img: url('media/cine/reel-coalfaces.webp'); }
+body.page-community .coal-page-bg { --page-bg-img: url('media/darra-photo-1.webp'); }
+body.page-contact .coal-page-bg { --page-bg-img: url('media/cine/reel-stockpile.webp'); }
+/* The still frames only feed the canvas engine — they never paint themselves */
+.coal-page-bg img.cine-src { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+/* Night: keep the scene present but never louder than the copy */
+html:not([data-theme="day"]) .coal-page-bg { filter: brightness(1.1) contrast(1.05) saturate(1.02); }
+html[data-theme="day"] .coal-page-bg { filter: brightness(1.05) contrast(1.02); }
+/* The hero keeps its own art; the shared layer shows through underneath */
+body.page-home .hero { background: transparent; }
+body.page-home .hero::after { background: linear-gradient(transparent, rgba(244, 247, 242, .72) 92%); }
+html:not([data-theme="day"]) body.page-home .hero::after { background: linear-gradient(transparent, rgba(7, 15, 11, .6)); }
+
+/* Supply: the archival clip is gone — the railhead frame gets the same
+   treatment as the other HD cards, with a slow reveal of the render. */
+.transport-card-hd img { transition: transform 1.4s cubic-bezier(.2, .8, .2, 1), filter .5s ease; }
+.transport-card-hd:hover img { transform: scale(1.045); }
+.transport-card-glitch { position: absolute; z-index: 1; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s ease; background: repeating-linear-gradient(180deg, rgba(255, 236, 190, .05) 0 1px, transparent 1px 4px); }
+.transport-card-hd:hover .transport-card-glitch { opacity: 1; }
+.transport-card-hd figcaption span { color: var(--ember-2); }
+html[data-theme="day"] .transport-card-hd { border-color: rgba(15, 58, 31, .26); }
+
+/* ------------------------------------------------------------------
+   4. Calming the copy zones — the coal stays clearly visible, but the
+      text columns get a soft, breathing scrim instead of a flat wash.
+   ------------------------------------------------------------------ */
+html[data-theme="day"] .cine-veil {
+  background:
+    linear-gradient(90deg, rgba(243, 246, 240, .5) 0%, rgba(243, 246, 240, .2) 34%, transparent 62%),
+    linear-gradient(180deg, rgba(240, 239, 228, .12) 0%, rgba(240, 239, 228, .3) 55%, rgba(240, 239, 228, .46) 100%);
+}
+html[data-theme="day"] body:not(.page-home) > main > .section-dark { background: rgba(243, 247, 241, .7); }
+html[data-theme="day"] body:not(.page-home) > main > .section-soft { background: rgba(233, 242, 230, .66); }
+html[data-theme="day"] body:not(.page-home) > main > .section-earth { background: rgba(238, 242, 224, .68); }
+html[data-theme="day"] body.page-home > main > .section-dark { background: rgba(244, 247, 242, .76); }
+html[data-theme="day"] body.page-home > main > .section-soft { background: rgba(232, 241, 229, .74); }
+html[data-theme="day"] body.page-home > main > .section-earth { background: rgba(237, 241, 223, .74); }
+/* Headline blocks carry a light glow so type never fights the render */
+html[data-theme="day"] .section-head > div:first-child,
+html[data-theme="day"] .reel-band-head > div:first-child,
+html[data-theme="day"] .sticky-label,
+html[data-theme="day"] .intro-copy,
+html[data-theme="day"] .story-block {
+  /* closest-side fades the wash exactly at the box edge, so it reads as
+     atmosphere rather than a pasted rectangle over the render */
+  background: radial-gradient(closest-side at 34% 50%, rgba(247, 250, 245, .74), rgba(247, 250, 245, .3) 58%, rgba(247, 250, 245, 0) 100%);
+  padding: 20px 30px 20px 24px;
+  margin: -12px -30px -12px -24px;
+}
+/* Night mode: same idea, dark glow */
+html:not([data-theme="day"]) .cine-veil {
+  background:
+    linear-gradient(90deg, rgba(4, 10, 7, .52) 0%, rgba(4, 10, 7, .18) 38%, transparent 66%),
+    linear-gradient(180deg, rgba(4, 7, 6, .3) 0%, rgba(4, 7, 6, .42) 55%, rgba(4, 7, 6, .6) 100%);
+}
+html:not([data-theme="day"]) .section-head > div:first-child,
+html:not([data-theme="day"]) .reel-band-head > div:first-child,
+html:not([data-theme="day"]) .sticky-label,
+html:not([data-theme="day"]) .intro-copy,
+html:not([data-theme="day"]) .story-block {
+  background: radial-gradient(closest-side at 34% 50%, rgba(6, 14, 10, .62), rgba(6, 14, 10, .24) 58%, rgba(6, 14, 10, 0) 100%);
+  padding: 20px 30px 20px 24px;
+  margin: -12px -30px -12px -24px;
+}
+@media (max-width: 900px) {
+  .section-head > div:first-child, .reel-band-head > div:first-child, .sticky-label, .intro-copy, .story-block { padding: 14px 16px; margin: -8px -16px; }
+  html[data-theme="day"] .cine-veil, html:not([data-theme="day"]) .cine-veil { background: linear-gradient(180deg, rgba(243, 246, 240, .3), rgba(243, 246, 240, .58)); }
+  html:not([data-theme="day"]) .cine-veil { background: linear-gradient(180deg, rgba(4, 8, 6, .42), rgba(4, 8, 6, .68)); }
+}
+/* Panels that sit on the backdrop get a touch more body so they stay crisp */
+html[data-theme="day"] .spec-card, html[data-theme="day"] .path-card, html[data-theme="day"] .journey-card,
+html[data-theme="day"] .qom-card, html[data-theme="day"] .community-card, html[data-theme="day"] .feature-card,
+html[data-theme="day"] .image-note, html[data-theme="day"] .proof-strip article, html[data-theme="day"] .mini-stats {
+  backdrop-filter: blur(4px);
+}
+html[data-theme="day"] .spec-card, html[data-theme="day"] .path-card, html[data-theme="day"] .journey-card { background: linear-gradient(145deg, rgba(255, 255, 255, .82), rgba(226, 240, 224, .9)); }
+/* Supply board keeps its dark instrument look — labels stay light in daylight */
+html[data-theme="day"] .supply-board-top, html[data-theme="day"] .supply-board-note span { color: #d9e6cd; }
+html[data-theme="day"] .supply-board-top strong { color: #a9e08f; }
+html[data-theme="day"] .supply-board-note strong { color: #f4f1d8; }
+html[data-theme="day"] .route-node:not(.active) b { color: #cfd8c6; border-color: rgba(212, 160, 52, .45); background: rgba(8, 22, 12, .5); }
+html[data-theme="day"] .route-node span, html[data-theme="day"] .route-node em { color: #d7e2cd; }
+
+html[data-theme="day"] .supply-board { background: radial-gradient(circle at 74% 38%, rgba(242, 197, 107, .2), transparent 25%), linear-gradient(150deg, #14301f, #0a1a10 62%, #122a19); border-color: rgba(212, 160, 52, .4); }
+html[data-theme="day"] .route-node { color: #d3ddca; }
+html[data-theme="day"] .route-node.active { color: #ffe89a; }
+html[data-theme="day"] .supply-board-note { color: #c3cfba; border-top-color: rgba(246, 242, 232, .18); }
+
+/* ------------------------------------------------------------------
+   5. Remaining low-contrast micro-labels found in the daylight audit
+   ------------------------------------------------------------------ */
+html[data-theme="day"] .identity-kicker,
+html[data-theme="day"] .feature-number,
+html[data-theme="day"] .client-grid article span { color: #6a4407; }
+html[data-theme="day"] .mini-stat strong, html[data-theme="day"] .big-num { color: #17421f; }
+/* Anything that lives on a video/photo shade stays light in both modes */
+html[data-theme="day"] .video-window-copy span, html[data-theme="day"] .video-window-copy strong,
+html[data-theme="day"] .video-window-copy p, html[data-theme="day"] .operations-video-window figcaption span,
+html[data-theme="day"] .operations-video-window figcaption strong { color: #fdf8e6; }
+html[data-theme="day"] .video-window-copy span { color: #ffd7a6; }
+html[data-theme="day"] .machinery-media figcaption span, html[data-theme="day"] .media-section figcaption span { color: #ffcd9a; }
+html[data-theme="day"] .machinery-media figcaption strong, html[data-theme="day"] .media-section figcaption strong { color: #fff8e6; }
+
+/* ------------------------------------------------------------------
+   6. Balance fixes after the daylight / night / skin screenshots
+   ------------------------------------------------------------------ */
+/* Home hero: keep the shared backdrop behind it, restore the night mood */
+html[data-theme="day"] body.page-home .hero { background: transparent; }
+html:not([data-theme="day"]) body.page-home .hero { background: radial-gradient(circle at 72% 26%, rgba(216, 138, 45, .14), transparent 42%), linear-gradient(180deg, rgba(7, 15, 11, .08), rgba(7, 15, 11, .66)); }
+html:not([data-theme="day"]) body.page-home .hero::before { background: linear-gradient(100deg, rgba(4, 10, 7, .9), rgba(4, 10, 7, .52) 46%, rgba(4, 10, 7, .12) 76%); }
+/* Inner-page heroes: a firm but not flat scrim so the render still reads */
+html[data-theme="day"] .page-hero::after { background: linear-gradient(90deg, rgba(243, 246, 239, .97) 0%, rgba(243, 246, 239, .74) 46%, rgba(243, 246, 239, .3) 74%, rgba(243, 246, 239, .12) 100%); }
+html[data-theme="day"] .page-hero .eyebrow, html[data-theme="day"] .page-hero .lede { text-shadow: 0 1px 0 rgba(255, 255, 255, .7); }
+html[data-skin="marble"][data-theme="day"] .page-hero::after, html[data-skin="obsidian"][data-theme="day"] .page-hero::after { background: linear-gradient(90deg, rgba(255, 250, 240, .96) 0%, rgba(255, 250, 240, .72) 48%, rgba(255, 250, 240, .26) 78%, transparent 100%) !important; }
+/* Marble / obsidian daylight keep their calm pages, but the hero now shows the coal */
+@media (min-width: 901px) {
+  html[data-skin="marble"][data-theme="day"] body > main, html[data-skin="obsidian"][data-theme="day"] body > main { background: transparent; }
+}
+
+/* The lift belongs to the imagery, not to the whole layer (the veil must
+   stay where it was authored) — so the filters live on the canvas. */
+html:not([data-theme="day"]) .coal-page-bg { filter: none; }
+html:not([data-theme="day"]) .coal-page-bg canvas { filter: brightness(1.14) saturate(1.08) contrast(1.05); }
+html[data-theme="day"] .coal-page-bg { filter: none; }
+html[data-theme="day"] .coal-page-bg canvas { filter: brightness(1.04) saturate(1.12) contrast(1.04); }
+/* A very soft edge keeps the fixed layer from competing with the page chrome */
+.coal-page-bg::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 42%, rgba(8, 18, 12, .1) 100%);
+}
+html[data-theme="day"] .coal-page-bg::after { background: radial-gradient(120% 90% at 50% 45%, transparent 45%, rgba(243, 246, 239, .22) 100%); }
+
+/* ==================================================================
+   V12 — HEADER 2.0, cache & scroll performance
+   1. Header: fixed bar, measured grid, pill nav with a gliding
+      indicator, condense + hide-on-scroll-down, hairline progress.
+   2. Perf: no full-screen CSS filters on the animated canvas, no
+      backdrop blur on large panels, content-visibility on sections.
+   3. Cache: preconnect + offline/prefetch hooks (see sw.js).
+   ================================================================== */
+
+:root { --header-h: 74px; --header-h-tight: 60px; --header-pad: clamp(16px, 3vw, 34px); }
+html { scroll-padding-top: calc(var(--header-h) + 18px); }
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  padding: 0;
+  background: linear-gradient(180deg, rgba(5, 13, 10, .6) 0%, rgba(5, 13, 10, .18) 58%, transparent 100%);
+  border-bottom: 1px solid transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: transform .5s cubic-bezier(.22, .8, .22, 1), background-color .4s ease, border-color .4s ease, box-shadow .4s ease, backdrop-filter .4s ease;
+  /* no `will-change: transform` here on purpose: a transform hint on the bar
+     would make it the containing block for the fixed drawer inside it */
+}
+html[data-theme="day"] .site-header { background: linear-gradient(180deg, rgba(243, 246, 239, .82) 0%, rgba(243, 246, 239, .34) 62%, transparent 100%); }
+.site-header.is-scrolled {
+  background: rgba(7, 16, 12, .8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.35);
+  backdrop-filter: blur(16px) saturate(1.35);
+  border-bottom-color: rgba(164, 196, 166, .16);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .22);
+}
+html[data-theme="day"] .site-header.is-scrolled { background: rgba(246, 248, 241, .84); border-bottom-color: rgba(16, 74, 38, .16); box-shadow: 0 12px 30px rgba(28, 77, 41, .1); }
+.site-header.is-hidden { transform: translateY(-104%); }
+
+/* One measured grid: brand · nav · tools. Everything shares one centre line. */
+.header-bar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: clamp(10px, 2vw, 34px);
+  width: min(100% - clamp(24px, 5vw, 72px), 1340px);
+  height: var(--header-h);
+  margin-inline: auto;
+  transition: height .4s cubic-bezier(.22, .8, .22, 1);
+}
+.site-header.is-scrolled .header-bar { height: var(--header-h-tight); }
+.header-bar > * { min-width: 0; }
+
+.brand { display: inline-flex; align-items: center; gap: clamp(8px, .9vw, 13px); flex: 0 0 auto; }
+.site-header .brand-logo { height: clamp(34px, 3vw, 44px); }
+.brand-logo img { display: block; height: 100%; width: auto; }
+.brand-name { display: grid; gap: 2px; font-size: clamp(1.02rem, 1.15vw, 1.24rem); line-height: .96; letter-spacing: -.04em; color: var(--ink); }
+.brand-sub { margin-top: 1px; font-size: clamp(.44rem, .5vw, .51rem); letter-spacing: .2em; font-weight: 850; text-transform: uppercase; color: var(--ink-soft); }
+.site-header.is-scrolled .brand-sub { opacity: 0; transition: opacity .3s ease; }
+.brand-sub { transition: opacity .3s ease; }
+
+/* Nav: a segmented pill. The dot that used to sit under the active item
+   grew that item by 20px and pulled the whole row off-centre — removed. */
+.main-nav {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-self: center;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;
+  transition: background-color .35s ease, border-color .35s ease;
+}
+.site-header.is-scrolled .main-nav, .main-nav:hover { background: rgba(255, 255, 255, .05); border-color: rgba(195, 218, 198, .14); }
+html[data-theme="day"] .site-header.is-scrolled .main-nav, html[data-theme="day"] .main-nav:hover { background: rgba(255, 255, 255, .62); border-color: rgba(16, 74, 38, .14); }
+.main-nav a {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  color: #b7c6ba;
+  font-size: .79rem;
+  font-weight: 700;
+  letter-spacing: .005em;
+  line-height: 1;
+  transition: color .22s ease;
+}
+.main-nav a:hover, .main-nav a:focus-visible { color: #f4f7ee; }
+.main-nav a.active { color: #f7f9f2; }
+html[data-theme="day"] .main-nav a { color: #4d6a53; }
+html[data-theme="day"] .main-nav a:hover, html[data-theme="day"] .main-nav a.active { color: #0a2413; }
+.main-nav a.active::after { display: none; }
+
+/* Gliding highlight — JS parks it over the active link and slides it on hover */
+.nav-glide {
+  position: absolute;
+  z-index: 0;
+  top: 5px;
+  left: 0;
+  width: 0;
+  height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(246, 242, 232, .16), rgba(212, 160, 52, .22));
+  border: 1px solid rgba(246, 242, 232, .16);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .1);
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  transition: transform .42s cubic-bezier(.22, .8, .22, 1), width .42s cubic-bezier(.22, .8, .22, 1), opacity .25s ease;
+  pointer-events: none;
+}
+.main-nav.has-glide .nav-glide { opacity: 1; }
+html[data-theme="day"] .nav-glide { background: linear-gradient(120deg, rgba(23, 99, 47, .12), rgba(242, 197, 107, .5)); border-color: rgba(23, 72, 39, .2); box-shadow: 0 6px 16px rgba(31, 78, 44, .12), inset 0 1px 0 rgba(255, 255, 255, .7); }
+@media (prefers-reduced-motion: reduce) { .nav-glide { transition: opacity .2s ease; } .site-header, .header-bar { transition: none; } }
+
+/* Right-hand tools */
+.header-tools { display: inline-flex; align-items: center; gap: 8px; justify-self: end; }
+.nav-actions { display: inline-flex; align-items: center; gap: 7px; }
+.theme-toggle, .skin-toggle { height: 38px; padding: 0 13px; align-items: center; border-radius: 999px; }
+.theme-toggle { gap: 7px; }
+.nav-cta { height: 38px; padding: 0 15px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.nav-cta, .nav-cta::after { line-height: 1; }
+.theme-toggle-label, .skin-toggle-label { line-height: 1; }
+
+/* Scroll progress hairline, glued to the bottom edge of the bar */
+.nav-progress { position: absolute; inset: auto 0 -1px 0; height: 2px; pointer-events: none; opacity: 0; transition: opacity .4s ease; }
+.site-header.is-scrolled .nav-progress { opacity: 1; }
+.nav-progress span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(var(--progress, 0));
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--ember-2), var(--yellow) 62%, var(--sand-2));
+  box-shadow: 0 0 12px rgba(212, 160, 52, .35);
+}
+
+/* The menu button, only in drawer mode */
+.menu-toggle { display: none; }
+.nav-burger { position: relative; display: block; width: 20px; height: 12px; }
+.nav-burger i { position: absolute; left: 0; width: 100%; height: 2px; border-radius: 2px; background: currentColor; transition: transform .32s cubic-bezier(.2, .8, .2, 1), opacity .2s ease; }
+.nav-burger i:nth-child(1) { top: 0; }
+.nav-burger i:nth-child(2) { top: 5px; }
+.nav-burger i:nth-child(3) { top: 10px; }
+.menu-toggle[aria-expanded="true"] .nav-burger i:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+.menu-toggle[aria-expanded="true"] .nav-burger i:nth-child(2) { opacity: 0; }
+.menu-toggle[aria-expanded="true"] .nav-burger i:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+.menu-toggle-text { display: none; }
+.skip-link {
+  position: fixed; z-index: 90; top: 12px; left: 12px;
+  padding: 11px 16px; border-radius: 999px;
+  color: #08150f; background: var(--yellow); font-size: .78rem; font-weight: 800;
+  transform: translateY(-160%);
+  transition: transform .3s cubic-bezier(.2, .8, .2, 1);
+}
+.skip-link:focus { transform: none; }
+.main-nav a:focus-visible, .nav-cta:focus-visible, .menu-toggle:focus-visible, .theme-toggle:focus-visible, .skin-toggle:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+
+/* Tablet: the tools stay, the CTA moves into the drawer */
+@media (max-width: 1180px) { .nav-cta { display: none; } }
+@media (max-width: 1340px) { .main-nav a { padding: 0 10px; font-size: .76rem; } }
+
+/* Drawer mode */
+@media (max-width: 1023px) {
+  .header-bar { grid-template-columns: minmax(0, 1fr) auto; }
+  .menu-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 14px; border: 1px solid var(--line-strong); border-radius: 999px; background: rgba(255, 255, 255, .05); color: var(--ink); font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  html[data-theme="day"] .menu-toggle { background: rgba(255, 255, 255, .6); border-color: rgba(16, 74, 38, .22); }
+  .nav-actions { display: none; }
+  .main-nav {
+    position: fixed;
+    inset: var(--header-h) 0 0 auto;
+    z-index: 55;
+    width: min(420px, 100vw);
+    height: calc(100vh - var(--header-h));
+    height: calc(100dvh - var(--header-h));
+    justify-self: stretch;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: 18px 18px calc(28px + env(safe-area-inset-bottom));
+    border: 1px solid var(--line);
+    border-right: 0;
+    border-radius: 22px 0 0 0;
+    background: rgba(8, 18, 13, .97);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    box-shadow: -30px 30px 70px rgba(0, 0, 0, .35);
+    transform: translateX(102%);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform .46s cubic-bezier(.22, .85, .2, 1), opacity .3s ease, visibility .46s;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  html[data-theme="day"] .main-nav { background: rgba(248, 250, 244, .97); border-color: rgba(16, 74, 38, .16); box-shadow: -24px 24px 60px rgba(28, 77, 41, .14); }
+  .main-nav.is-open { transform: none; opacity: 1; visibility: visible; }
+  .main-nav a { height: auto; padding: 14px 14px; font-size: .95rem; border-radius: 12px; }
+  .main-nav a + a { border-top: 1px solid rgba(195, 218, 198, .1); }
+  html[data-theme="day"] .main-nav a + a { border-top-color: rgba(16, 74, 38, .1); }
+  .main-nav a.active { background: rgba(212, 160, 52, .12); }
+  .nav-glide { display: none; }
+  .nav-cta { display: none !important; }
+  .nav-drawer-cta { display: inline-flex; margin-top: 14px; width: 100%; justify-content: center; height: 46px; }
+  .nav-scrim { position: fixed; inset: 0; z-index: 54; background: rgba(3, 9, 6, .5); opacity: 0; pointer-events: none; transition: opacity .4s ease; -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+  .nav-scrim.is-open { opacity: 1; pointer-events: auto; }
+  body.nav-locked { overflow: hidden; }
+  @keyframes navItemIn { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+  .main-nav.is-open a { animation: navItemIn .42s cubic-bezier(.2, .8, .2, 1) both; }
+  .main-nav.is-open a:nth-child(2) { animation-delay: .02s; }
+  .main-nav.is-open a:nth-child(3) { animation-delay: .06s; }
+  .main-nav.is-open a:nth-child(4) { animation-delay: .1s; }
+  .main-nav.is-open a:nth-child(5) { animation-delay: .14s; }
+  .main-nav.is-open a:nth-child(6) { animation-delay: .18s; }
+  .main-nav.is-open a:nth-child(7) { animation-delay: .22s; }
+  .main-nav.is-open a:nth-child(8) { animation-delay: .26s; }
+  .main-nav.is-open a:nth-child(9) { animation-delay: .3s; }
+  .main-nav.is-open a:nth-child(10) { animation-delay: .34s; }
+}
+@media (min-width: 1024px) { .nav-scrim { display: none; } .nav-drawer-cta { display: none; } }
+@media (max-width: 1023px) { .nav-drawer-cta { display: inline-flex; } }
+@media (max-width: 420px) {
+  :root { --header-h: 66px; --header-h-tight: 56px; }
+  .brand-sub { display: none; }
+  .site-header .brand-logo { height: 32px; }
+  .menu-toggle { padding: 0 11px; }
+  .menu-toggle .menu-toggle-text { display: none; }
+}
+
+/* CRM header shares the new bar geometry but keeps its own two-column shape */
+.crm-header .header-bar { display: flex; align-items: center; justify-content: space-between; height: var(--header-h); width: min(100% - clamp(24px, 5vw, 72px), 1340px); }
+.crm-header .brand-name { font-size: clamp(1rem, 1.1vw, 1.16rem); }
+
+/* ------------------------------------------------------------------
+   2. SCROLL PERFORMANCE
+   The fixed backdrop is a live canvas: every full-screen CSS filter on
+   it is re-run for every painted frame, and every backdrop-filter on a
+   large panel costs the same while the page moves. Those are removed and
+   replaced by static veils, and the purely decorative loops are paused
+   while the reader is actually scrolling (html.is-scrolling).
+   ------------------------------------------------------------------ */
+html.is-scrolling .page-home .hero-photo,
+html.is-scrolling .hero-photo::before,
+html.is-scrolling .section::before,
+html.is-scrolling .hero-embers i,
+html.is-scrolling .qom-rank i,
+html.is-scrolling .supply-board-top i,
+html.is-scrolling .brand-logo,
+html.is-scrolling .brand-logo img,
+html.is-scrolling .emblem-card .emblem-picture,
+html.is-scrolling .emblem-ring,
+html.is-scrolling .scroll-cue i,
+html.is-scrolling body::after,
+html.is-scrolling .coal-page-bg::after { animation-play-state: paused; }
+html.is-scrolling .reel-glass, html.is-scrolling .reel-stage::after { filter: none; }
+
+/* No per-frame filters on the animated layer any more — the grade lives in
+   the veil, which is painted once. */
+.coal-page-bg, .coal-page-bg canvas, .coal-page-bg::after { filter: none !important; }
+html[data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(243, 242, 232, .04), rgba(243, 242, 232, .2)),
+    var(--page-bg-img, url('media/coal-texture-bg.webp'));
+}
+html:not([data-theme="day"]) .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 6, .04), rgba(4, 7, 6, .22)),
+    var(--page-bg-img, url('media/coal-texture-bg.webp'));
+}
+/* Extra presence for the frames themselves, paid for once at draw time */
+.coal-page-bg canvas { opacity: .96; }
+
+/* Big translucent panels used to blur the moving canvas behind them. */
+html[data-theme="day"] .spec-card, html[data-theme="day"] .path-card, html[data-theme="day"] .qom-card,
+html[data-theme="day"] .community-card, html[data-theme="day"] .feature-card, html[data-theme="day"] .image-note,
+html[data-theme="day"] .proof-strip article, html[data-theme="day"] .mini-stats { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+/* Only paint what the viewport can actually see. Sections are far down the
+   page, so skipping their layout/paint is the single biggest scroll win. */
+@supports (content-visibility: auto) {
+  main > .section:not(.hero):not(.page-hero) { content-visibility: auto; contain-intrinsic-size: auto 720px; }
+  .reel-band, .cine-wall, .media-wall { content-visibility: auto; contain-intrinsic-size: auto 560px; }
+}
+
+/* The backdrop no longer needs its own composited layer when it is static */
+.coal-page-bg { will-change: auto; transform: none; }
+
+/* Scrolling should feel immediate: keep the reveals short and cheap */
+.reveal { transition: opacity .5s cubic-bezier(.2, .8, .2, 1), transform .5s cubic-bezier(.2, .8, .2, 1); will-change: opacity, transform; }
+.reveal.visible { will-change: auto; }
+.delay-1 { transition-delay: .05s; } .delay-2 { transition-delay: .1s; } .delay-3 { transition-delay: .15s; }
+
+/* Corrections after the first header screenshots: the drawer CTA must not
+   win against `.main-nav a`, and the nav is centred on the page axis, not on
+   whatever is left over between brand and tools. */
+@media (min-width: 1024px) { .main-nav .nav-drawer-cta { display: none !important; } }
+.header-bar { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+.header-bar > .brand { justify-self: start; }
+.header-bar > .header-tools { justify-self: end; }
+/* At mid widths the wordmark steps back before the nav can feel crowded */
+@media (max-width: 1339px) and (min-width: 1024px) {
+  .brand-sub { display: none; }
+  .site-header .brand-logo { height: 34px; }
+  .main-nav { gap: 0; }
+  .main-nav a { padding: 0 11px; }
+}
+
+/* The legacy collapse rules (680 / 920 / 1020 / 1180 breakpoints) are all
+   superseded by the drawer above; pin the desktop row back on in one place so
+   no old block can flip it to a stacked menu between 1024 and 1180. */
+@media (min-width: 1024px) {
+  .main-nav { display: flex !important; flex-direction: row !important; position: relative !important; top: auto !important; left: auto !important; right: auto !important; width: auto !important; background: transparent; box-shadow: none; padding: 5px; border-radius: 999px; }
+  .site-header.is-scrolled .main-nav, .main-nav:hover { background: rgba(255, 255, 255, .05); }
+  .main-nav.open { display: flex !important; }
+  .header-bar .nav-cta { display: inline-flex; }
+  .menu-toggle { display: none !important; }
+}
+@media (min-width: 1024px) and (max-width: 1180px) { .header-bar .nav-cta { display: none !important; } }
+
+/* Drawer mode keeps the essentials reachable: the day/night switch stays in
+   the bar as an icon, the theme picker joins it above 560px. */
+@media (max-width: 1023px) {
+  .header-tools { gap: 6px; }
+  .nav-actions { display: inline-flex; align-items: center; }
+  .theme-toggle { width: 38px; padding: 0; justify-content: center; }
+  .theme-toggle-label { display: none; }
+  .skin-toggle { width: 38px; padding: 0; justify-content: center; }
+  .header-bar .nav-cta { display: none; }
+}
+@media (max-width: 560px) {
+  .skin-switch { display: none; }
+  .nav-burger { width: 18px; }
+}
+
+/* 1180–1440 the side tracks were narrower than their content, so the tools
+   slid under the last nav item. Tracks may now shrink and the nav centres in
+   the space that is left, which cannot overlap by construction. */
+.header-bar { grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto); }
+.header-bar > .brand { flex: 0 1 auto; min-width: 0; }
+.header-bar > .header-tools { flex: 0 0 auto; }
+.main-nav { justify-self: center; }
+.main-nav a.active { font-weight: 800; }
+.main-nav a.active::before {
+  content: ""; position: absolute; left: 13px; right: 13px; bottom: 5px; height: 2px;
+  border-radius: 2px; background: var(--yellow); opacity: .85;
+}
+html[data-theme="day"] .main-nav a.active::before { background: #17632f; opacity: .7; }
+@media (min-width: 1024px) and (max-width: 1259px) { .header-bar .nav-cta { display: none; } }
+@media (min-width: 1260px) and (max-width: 1339px) { .main-nav a { padding: 0 9px; font-size: .74rem; } .theme-toggle-label, .skin-toggle-label { display: none; } .theme-toggle, .skin-toggle { width: 38px; padding: 0; justify-content: center; } }
+
+/* ---------------------------------------------------------------------------
+   V14 — narrow phones: nothing may stick out past the viewport. At 320px the
+   featured QOM card and the footer wordmark were 11px too wide because their
+   intrinsic min-width fought the grid tracks. `overflow: clip` (not `hidden`)
+   also stops the old body scroller from trapping `position: sticky` children.
+--------------------------------------------------------------------------- */
+@supports (overflow: clip) { html { overflow-x: clip; } }
+@media (max-width: 379px) {
+  :root { --container-pad: 14px; }
+  .container { padding-inline: 14px; }
+  .grid, .grid-2, .grid-3, .grid-4, .split-2, .section, .hero, .hero-inner { min-width: 0; }
+  .grid > *, [class*="grid"] > *, .split-2 > * { min-width: 0; }
+  .brand-mark, .brand-logo { flex: 0 1 auto; min-width: 0; }
+  .brand-name { min-width: 0; overflow: hidden; }
+  .brand-name strong { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+@media (max-width: 359px) {
+  .hero h1 { font-size: clamp(1.75rem, 7.6vw, 2.4rem); }
+  .btn { padding-inline: 16px; }
+}
+@media (max-width: 379px) {
+  .footer .brand { min-width: 0; max-width: 100%; }
+  .footer .brand-name { min-width: 0; }
+  .footer .brand-name > span:first-child { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .footer .brand-sub { display: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   V15 — data grids on tiny phones. Every multi-`fr` grid sized itself from the
+   min-content of its cells (a `535,121.35` figure is 128px wide), so at 320px
+   the track pushed past the viewport and `overflow-x: clip` silently ate the
+   copy. Below 480px these grids stack in one shrinkable column and their
+   `grid-column: span 2` mosaic children are released, which cannot overflow.
+--------------------------------------------------------------------------- */
+@media (max-width: 479px) {
+  .about-legacy, .about-legacy-facts, .client-grid, .contact-grid, .distribution-grid, .editorial-grid, .export-panel, .faq-grid, .footer-top, .form-grid, .intro-grid, .machinery-layout, .mini-stats, .performance-layout, .person-card, .process-grid, .profile-meta, .profile-overview, .qom-facts, .qom-grid, .spec-grid, .story-grid, .transport-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .about-legacy, .about-legacy-facts, .client-grid, .contact-grid, .distribution-grid, .editorial-grid, .export-panel, .faq-grid, .footer-top, .form-grid, .intro-grid, .machinery-layout, .mini-stats, .performance-layout, .person-card, .process-grid, .profile-meta, .profile-overview, .qom-facts, .qom-grid, .spec-grid, .story-grid, .transport-grid > * { grid-column: auto !important; }
+}
+
+/* ---------------------------------------------------------------------------
+   V16 — the bar is the one element that re-blurs its backdrop on every scroll
+   frame, so it is the one place worth spending a solid fill on. Day mode never
+   asked for a blur at all (it only inherited one through the cascade).
+--------------------------------------------------------------------------- */
+html[data-theme="day"] .site-header.is-scrolled { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(246, 248, 241, .93); }
+@media (max-width: 767px) {
+  .site-header.is-scrolled { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(7, 16, 12, .95); }
+  html[data-theme="day"] .site-header.is-scrolled { background: rgba(246, 248, 241, .96); }
+}
+
+/* ---------------------------------------------------------------------------
+   V17 — phone header weight. The logo mark already carries the wordmark, so
+   the repeated "Khaqan" was stealing width the drawer button needs, and two
+   full-opacity pills read heavier than the mark itself.
+--------------------------------------------------------------------------- */
+@media (max-width: 420px) {
+  .header-bar .brand-name { display: none; }
+  .header-bar .brand { gap: 0; }
+}
+@media (max-width: 1023px) {
+  .theme-toggle, .skin-toggle { width: 40px; height: 40px; background: rgba(255, 255, 255, .55); border-color: rgba(16, 74, 38, .16); }
+  .menu-toggle { min-width: 44px; height: 44px; padding: 0 12px; background: rgba(255, 255, 255, .72); border-color: rgba(16, 74, 38, .18); }
+  html:not([data-theme="day"]) .theme-toggle, html:not([data-theme="day"]) .skin-toggle { background: rgba(255, 255, 255, .07); border-color: rgba(195, 218, 198, .2); }
+  html:not([data-theme="day"]) .menu-toggle { background: rgba(255, 255, 255, .1); }
+}
+
+/* V18 — the phone rail scrolls sideways, and only ~3 of the 9 cuts fit at
+   390px, so it gets an explicit affordance: a slim gold scrollbar, a little
+   breathing room on both ends, and thumbs that are never half-cut at the left
+   edge. Cheap on purpose — a mask or an overlay here would cost more paint
+   than it saves. */
+@media (max-width: 900px) {
+  .reel-rail {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(212, 160, 52, .6) transparent;
+    scroll-padding-inline: 8px;
+    padding-inline: 8px 22px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .reel-rail::-webkit-scrollbar { height: 4px; }
+  .reel-rail::-webkit-scrollbar-thumb { border-radius: 4px; background: rgba(212, 160, 52, .6); }
+  .reel-rail::-webkit-scrollbar-track { background: transparent; }
+  .reel-cut { min-width: 104px; }
+}
+
+/* ---------------------------------------------------------------------------
+   V19 — phones only, day mode. The hero veils fade left-to-right so the coal
+   stays visible beside the headline on a laptop, but at 390px the copy runs the
+   full width and its right-hand words were landing on bare imagery. Below
+   560px the same veil runs top-to-bottom: legible headline block, imagery still
+   visible under the buttons.
+--------------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  html[data-theme="day"] .page-hero::after,
+  html[data-theme="day"] body.page-home .hero::after,
+  html[data-skin="marble"][data-theme="day"] .page-hero::after,
+  html[data-skin="marble"][data-theme="day"] body.page-home .hero::after,
+  html[data-skin="obsidian"][data-theme="day"] .page-hero::after,
+  html[data-skin="obsidian"][data-theme="day"] body.page-home .hero::after {
+    background: linear-gradient(180deg,
+      rgba(243, 246, 239, .97) 0%,
+      rgba(243, 246, 239, .93) 42%,
+      rgba(243, 246, 239, .8) 64%,
+      rgba(243, 246, 239, .52) 84%,
+      rgba(243, 246, 239, .26) 100%);
+  }
+  html[data-skin="marble"][data-theme="day"] .page-hero::after,
+  html[data-skin="marble"][data-theme="day"] body.page-home .hero::after {
+    background: linear-gradient(180deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .93) 42%, rgba(247, 244, 236, .8) 64%, rgba(247, 244, 236, .52) 84%, rgba(247, 244, 236, .26) 100%);
+  }
+  html[data-skin="obsidian"][data-theme="day"] .page-hero::after,
+  html[data-skin="obsidian"][data-theme="day"] body.page-home .hero::after {
+    background: linear-gradient(180deg, rgba(242, 241, 239, .97) 0%, rgba(242, 241, 239, .93) 42%, rgba(242, 241, 239, .8) 64%, rgba(242, 241, 239, .52) 84%, rgba(242, 241, 239, .26) 100%);
+  }
+  html:not([data-theme="day"]) .page-hero::after {
+    background: linear-gradient(180deg, rgba(4, 10, 7, .84) 0%, rgba(4, 10, 7, .6) 46%, rgba(4, 10, 7, .28) 100%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   V20 — the home hero's day scrim lives on `.hero::before` (it has to, the
+   coal photo paints at z-index 0 and the veil at 1), so the phone fix belongs
+   there too, not on ::after which only covers the bottom strip. Same three
+   skins, same grid texture, veil turned from left-right to top-bottom.
+--------------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  html[data-theme="day"] .page-home .hero::before {
+    background-image:
+      linear-gradient(180deg, rgba(244, 249, 241, .97) 0%, rgba(244, 249, 241, .94) 44%, rgba(244, 249, 241, .78) 66%, rgba(244, 249, 241, .46) 86%, rgba(244, 249, 241, .2) 100%),
+      linear-gradient(rgba(30, 81, 52, .05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 81, 52, .05) 1px, transparent 1px);
+  }
+  html[data-skin="marble"][data-theme="day"] .page-home .hero::before {
+    background-image:
+      linear-gradient(180deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .94) 44%, rgba(247, 244, 236, .78) 66%, rgba(247, 244, 236, .46) 86%, rgba(247, 244, 236, .2) 100%),
+      linear-gradient(rgba(90, 74, 35, .05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(90, 74, 35, .05) 1px, transparent 1px);
+  }
+  html[data-skin="obsidian"][data-theme="day"] .page-home .hero::before {
+    background-image:
+      linear-gradient(180deg, rgba(242, 241, 239, .97) 0%, rgba(242, 241, 239, .94) 44%, rgba(242, 241, 239, .78) 66%, rgba(242, 241, 239, .46) 86%, rgba(242, 241, 239, .2) 100%),
+      linear-gradient(rgba(45, 42, 35, .05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45, 42, 35, .05) 1px, transparent 1px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   V21 — the hero photograph should be the file the page already preloads.
+   Three day-mode heroes pointed at a second image, so the browser had to
+   discover and fetch it after CSS parsing even though a 1376px frame was
+   already in flight from the <link rel=preload>; the LCP element then waited
+   on a cold request. Same bytes, one fetch, and the canvas reuses them.
+--------------------------------------------------------------------------- */
+html[data-theme="day"] .page-about .page-hero { background-image: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-haulroad.webp'); }
+html[data-theme="day"] .page-gallery .page-hero { background-image: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-coalfaces.webp'); }
+html[data-theme="day"] .page-community .page-hero { background-image: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/darra-photo-1.webp'); }
+
+/* V22 — same plateau for the `.page-hero::after` scrim, so the lede never
+   finishes its last line on bare imagery between 46% and 74% of the width. */
+html[data-theme="day"] .page-hero::after {
+  background: linear-gradient(90deg,
+    rgba(243, 246, 239, .97) 0%,
+    rgba(243, 246, 239, .93) 40%,
+    rgba(243, 246, 239, .76) 62%,
+    rgba(243, 246, 239, .4) 82%,
+    rgba(243, 246, 239, .14) 100%);
+}
+
+/* V23 — the theme picker's footnote carries one inline accent; on the cream
+   panel the gold-on-cream glyph was the only unreadable thing in the menu. */
+html[data-theme="day"] .skin-menu-note b { color: #6a4407; }
+html[data-skin="marble"][data-theme="day"] .skin-menu-note b,
+html[data-skin="obsidian"][data-theme="day"] .skin-menu-note b { color: #7a5a12; }
+
+/* V24 — night is the default theme, and on five inner pages its hero photograph was
+   the one image nothing else on the page needed: mine-3d-underground (97KB),
+   coal-rail-transport (367KB), coal-haul-truck (225KB), darra-coal-mines-max (252KB)
+   and mine-3d-trucks (220KB) were fetched only to paint the top of the viewport,
+   competing with the backdrop frame the page already preloads for the same LCP window.
+   Night now paints that already-loaded frame and the dark veil - not a second file -
+   is what makes it night. Same subject per page (rail for supply, coal faces for the
+   gallery, the valley for community, the stockpile for contact), one download instead
+   of two, and the pair of themes stays legible because the veils differ, not the photo.
+   Kept verbatim from the computed cascade so the gradient overlay does not move:
+   background-image only, so center / cover / no-repeat from the base shorthand stand. */
+html[data-theme="night"] .page-operations .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .8) 46%, rgba(7, 19, 12, .25) 100%), url('media/cine/reel-underground.webp'); }
+html[data-theme="night"] .page-supply .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .82) 48%, rgba(7, 19, 12, .25) 100%), url('media/cine/reel-rail.webp'); }
+html[data-theme="night"] .page-gallery .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .82) 48%, rgba(7, 19, 12, .22) 100%), url('media/cine/reel-coalfaces.webp'); }
+html[data-theme="night"] .page-community .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .84) 48%, rgba(7, 19, 12, .22) 100%), url('media/darra-photo-1.webp'); }
+html[data-theme="night"] .page-contact .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .84) 48%, rgba(7, 19, 12, .24) 100%), url('media/cine/reel-stockpile.webp'); }
+
+/* V25 — the skip link is only useful if focus actually lands somewhere. #main now
+   carries tabindex="-1", so activating the link moves focus into the content instead
+   of leaving it on <body> (which restarts the tab order at the header). The container
+   must not paint a ring around the whole page when it takes that focus. */
+#main:focus, #main:focus-visible { outline: none; }

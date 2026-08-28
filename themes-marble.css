@@ -1,0 +1,262 @@
+/* Khaqan Coal theme system — Marble skin.
+   Loaded between themes.css and themes-shared.css when Marble is selected. */
+
+/* ------------------------------------------------------------------
+   3. SKIN: MARBLE — gold & white marble (day) / black marble (night)
+   ------------------------------------------------------------------ */
+html[data-skin="marble"] {
+  --ink: #f6f2e8;
+  --ink-soft: #b7b1a1;
+  --coal: #121218;
+  --coal-2: #181820;
+  --coal-3: #1f1f28;
+  --line: rgba(246, 242, 232, .14);
+  --line-strong: rgba(246, 242, 232, .27);
+  --sand: #d8c9a5;
+  --sand-2: #efe1bd;
+  --ember: #c59a3a;
+  --ember-2: #e3bd63;
+  --moss: #a3987a;
+  --yellow: #d4a034;
+  --forest: #6e581c;
+  --mist: #cfc3a0;
+  --shadow: 0 25px 80px rgba(0, 0, 0, .5);
+}
+html[data-skin="marble"] body {
+  background-color: var(--coal);
+  background-image:
+    radial-gradient(circle at 14% -6%, rgba(212, 160, 52, .13), transparent 30%),
+    radial-gradient(circle at 96% 12%, rgba(246, 242, 232, .05), transparent 26%),
+    linear-gradient(160deg, #14141a 0%, #101016 55%, #17171f 100%);
+}
+/* Marble veining — organic turbulence veins with a slow drifting glint */
+html[data-skin="marble"] body::after {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  opacity: .32;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560' viewBox='0 0 560 560'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011 0.021' numOctaves='5' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.78 0 0 0 0 0.74 0 0 0 0 0.64 0 0 0 0.5 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.55'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='560' height='560' filter='url(%23v)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='380' viewBox='0 0 380 380'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.017' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.85 0 0 0 0 0.78 0 0 0 0 0.6 0 0 0 0.34 0'/%3E%3C/filter%3E%3Crect width='380' height='380' filter='url(%23w)'/%3E%3C/svg%3E");
+  background-size: 560px 560px, 380px 380px;
+  mix-blend-mode: soft-light;
+  animation: marbleGlint 22s ease-in-out infinite alternate;
+}
+@keyframes marbleGlint {
+  0% { filter: brightness(1) hue-rotate(0deg); opacity: .3; }
+  50% { opacity: .4; }
+  100% { filter: brightness(1.14) hue-rotate(-4deg); opacity: .3; }
+}
+html[data-skin="marble"] .site-header { background: linear-gradient(180deg, rgba(14, 14, 19, .6), transparent); }
+html[data-skin="marble"] .site-header.scrolled { background: rgba(17, 17, 23, .88); border-bottom-color: rgba(246, 242, 232, .14); }
+html[data-skin="marble"] .main-nav a { color: #b3aea0; }
+html[data-skin="marble"] .main-nav a.active::after { background: var(--ember); box-shadow: 0 0 12px rgba(197, 154, 58, .5); }
+html[data-skin="marble"] .eyebrow { color: #cbb98a; }
+html[data-skin="marble"] .hero {
+  background: linear-gradient(90deg, rgba(15, 15, 20, .99) 0%, rgba(18, 18, 24, .95) 30%, rgba(18, 18, 24, .62) 56%, rgba(18, 18, 24, .12) 100%),
+    radial-gradient(circle at 78% 30%, rgba(212, 160, 52, .16), transparent 34%),
+    url('media/coal-haul-truck.jpg') center right / cover no-repeat;
+}
+html[data-skin="marble"] .hero::after { background: linear-gradient(transparent, var(--coal)); }
+html[data-skin="marble"] .section-soft { background: #16161d; }
+html[data-skin="marble"] .section-earth { background: #1a1a15; }
+html[data-skin="marble"] .marquee { background: #14141a; }
+html[data-skin="marble"] .faq-section { background: #16161d; }
+html[data-skin="marble"] .portfolio-ticker { background: #101017; }
+html[data-skin="marble"] .reel-proof-slide { background: #191922; }
+html[data-skin="marble"] .journey-media { background: #15151d; }
+html[data-skin="marble"] .operations-video-window { background: #101017; }
+html[data-skin="marble"] .person-card, html[data-skin="marble"] .visual-card { background: #17171f; }
+html[data-skin="marble"] .visual-art { background: #1d1d26; }
+html[data-skin="marble"] .process-panel { background: #15151d; }
+html[data-skin="marble"] .image-note { background: linear-gradient(100deg, #1c1c25, #14141b); }
+html[data-skin="marble"] .callout { background: linear-gradient(100deg, #23221a, #14151b); border-color: rgba(212, 160, 52, .24); }
+html[data-skin="marble"] .supply-board { background: radial-gradient(circle at 74% 38%, rgba(212, 160, 52, .16), transparent 25%), linear-gradient(150deg, #22221c, #131318 65%); }
+html[data-skin="marble"] .route-node b { background: #1a1a22; color: #a99f8a; border-color: #4b483f; }
+html[data-skin="marble"] .performance-table-card, html[data-skin="marble"] .performance-chart { background: linear-gradient(145deg, #1a1a22, #121218); }
+html[data-skin="marble"] .proof-strip { background: rgba(28, 28, 36, .6); }
+html[data-skin="marble"] .client-grid article { background: #171720; }
+html[data-skin="marble"] .client-grid article:hover { background: #1f1f2a; }
+html[data-skin="marble"] .export-profile-callout { background: linear-gradient(118deg, #232117, #3a2f14 60%, #2a2618); }
+html[data-skin="marble"] .quote-card { background: linear-gradient(145deg, #26231a, #17161c); }
+html[data-skin="marble"] .community-card { background: linear-gradient(150deg, #1b1b24, #14141a); }
+html[data-skin="marble"] .contact-form { background: linear-gradient(145deg, #1a1a22, #121218); }
+html[data-skin="marble"] .location-card { background: linear-gradient(145deg, #2a2415, #191920); }
+html[data-skin="marble"] .path-card { background: linear-gradient(160deg, #191922, #121218); }
+html[data-skin="marble"] .spec-card { background: linear-gradient(160deg, #191922, #131319); }
+/* CRM surfaces */
+html[data-skin="marble"] .crm-body { background-color: #101016; background-image: radial-gradient(circle at 80% -10%, rgba(212, 160, 52, .12), transparent 30%); }
+html[data-skin="marble"] .crm-header { background: rgba(17, 17, 23, .92); border-bottom-color: rgba(246, 242, 232, .13); }
+html[data-skin="marble"] .crm-metrics { background: rgba(24, 24, 32, .55); border-color: rgba(246, 242, 232, .12); }
+html[data-skin="marble"] .crm-card { background: linear-gradient(145deg, #1a1a23, #121219); border-color: rgba(246, 242, 232, .12); }
+html[data-skin="marble"] .crm-sidebar { background: rgba(20, 20, 27, .72); }
+html[data-skin="marble"] .crm-form-grid input, html[data-skin="marble"] .crm-form-grid textarea, html[data-skin="marble"] .crm-lead-actions input { background: #0e0e14; color: #f0ecdf; border-color: rgba(246, 242, 232, .14); }
+html[data-skin="marble"] .crm-form-grid input::placeholder { color: #7d7869; }
+html[data-skin="marble"] .crm-form-grid label > span { color: #c3b78e; }
+html[data-skin="marble"] .crm-table .lead-status { background: #15151d; }
+html[data-skin="marble"] .crm-media-grid article { background: #12121a; }
+html[data-skin="marble"] .crm-tools-card { background: rgba(30, 28, 20, .6); }
+html[data-skin="marble"] .crm-note-card { background: rgba(24, 23, 16, .56); }
+html[data-skin="marble"] .crm-cloud-card { background: linear-gradient(120deg, rgba(52, 42, 18, .85), rgba(16, 16, 22, .92)); border-color: rgba(212, 160, 52, .3); }
+/* Floating gold dust in the hero */
+html[data-skin="marble"] .hero .hero-content::after {
+  content: "";
+  position: absolute;
+  inset: -8% -4% -20% -8%;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(227, 189, 99, .8) 0 1.6px, transparent 2.4px),
+    radial-gradient(circle, rgba(212, 160, 52, .6) 0 1.3px, transparent 2.1px),
+    radial-gradient(circle, rgba(246, 242, 232, .5) 0 1.1px, transparent 1.9px);
+  background-size: 240px 190px, 320px 260px, 190px 170px;
+  background-position: 12% 18%, 62% 66%, 34% 82%;
+  opacity: .5;
+  animation: marbleDust 14s ease-in-out infinite alternate;
+}
+@keyframes marbleDust {
+  from { transform: translate3d(0, 0, 0) rotate(.4deg); }
+  to { transform: translate3d(-26px, -38px, 0) rotate(-.6deg); opacity: .3; }
+}
+
+/* --- MARBLE · DAY — white marble & gold --- */
+html[data-skin="marble"][data-theme="day"] {
+  --ink: #221e15;
+  --ink-soft: #57503e;
+  --coal: #f7f4ec;
+  --coal-2: #fdfbf5;
+  --coal-3: #efe9da;
+  --line: rgba(56, 48, 28, .16);
+  --line-strong: rgba(56, 48, 28, .3);
+  --sand: #7c651f;
+  --sand-2: #5f4c16;
+  --ember: #a97a17;
+  --ember-2: #8f6410;
+  --moss: #8a7a52;
+  --yellow: #c08e22;
+  --forest: #6e581c;
+  --mist: #6b6148;
+  --shadow: 0 25px 70px rgba(90, 74, 35, .16);
+}
+html[data-skin="marble"][data-theme="day"] body {
+  background-color: #f7f4ec;
+  background-image:
+    radial-gradient(circle at 12% -4%, rgba(212, 160, 52, .16), transparent 30%),
+    radial-gradient(circle at 94% 10%, rgba(184, 168, 128, .18), transparent 26%);
+}
+html[data-skin="marble"][data-theme="day"] body::after {
+  opacity: .4;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560' viewBox='0 0 560 560'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011 0.021' numOctaves='5' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.62 0 0 0 0 0.56 0 0 0 0 0.44 0 0 0 0.4 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='560' height='560' filter='url(%23v)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='380' viewBox='0 0 380 380'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.017' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.72 0 0 0 0 0.62 0 0 0 0 0.42 0 0 0 0.26 0'/%3E%3C/filter%3E%3Crect width='380' height='380' filter='url(%23w)'/%3E%3C/svg%3E");
+}
+html[data-skin="marble"][data-theme="day"] .site-header { background: linear-gradient(180deg, rgba(250, 247, 240, .86), transparent); }
+html[data-skin="marble"][data-theme="day"] .site-header.scrolled { background: rgba(250, 247, 240, .92); border-bottom-color: rgba(56, 48, 28, .18); }
+html[data-skin="marble"][data-theme="day"] .brand-name, html[data-skin="marble"][data-theme="day"] .main-nav a, html[data-skin="marble"][data-theme="day"] .nav-cta { color: #2a2416; }
+html[data-skin="marble"][data-theme="day"] .brand-sub { color: #6b5f45; }
+html[data-skin="marble"][data-theme="day"] .main-nav a:hover, html[data-skin="marble"][data-theme="day"] .main-nav a.active { color: #141007; }
+html[data-skin="marble"][data-theme="day"] .theme-toggle { color: #2a2416; background: rgba(255, 255, 255, .55); border-color: rgba(56, 48, 28, .26); }
+html[data-skin="marble"][data-theme="day"] .theme-toggle-icon { color: #a97a17; }
+html[data-skin="marble"][data-theme="day"] .eyebrow { color: #8a6d1c; }
+html[data-skin="marble"][data-theme="day"] .hero {
+  background: linear-gradient(90deg, rgba(247, 244, 236, .99) 0%, rgba(247, 244, 236, .93) 34%, rgba(247, 244, 236, .42) 66%, rgba(247, 244, 236, .06) 100%),
+    radial-gradient(circle at 76% 30%, rgba(212, 160, 52, .22), transparent 36%),
+    url('media/coal-haul-truck.jpg') center right / cover no-repeat;
+}
+html[data-skin="marble"][data-theme="day"] .hero::after { background: linear-gradient(transparent, #f7f4ec); }
+html[data-skin="marble"][data-theme="day"] .hero h1, html[data-skin="marble"][data-theme="day"] .hero .lede { color: #221c10; }
+html[data-skin="marble"][data-theme="day"] .hero h1 span { color: #8f6410; text-shadow: none; }
+html[data-skin="marble"][data-theme="day"] .hero-note { color: #4d4430; border-top-color: rgba(56, 48, 28, .2); }
+html[data-skin="marble"][data-theme="day"] .page-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .88) 42%, rgba(247, 244, 236, .18) 100%);
+  pointer-events: none;
+}
+html[data-skin="marble"][data-theme="day"] .page-hero h1, html[data-skin="marble"][data-theme="day"] .page-hero .lede { color: #241e10; }
+html[data-skin="marble"][data-theme="day"] .section-dark { background: #f7f4ec; }
+html[data-skin="marble"][data-theme="day"] .section-soft { background: linear-gradient(135deg, #f1ecdf, #f9f6ee 60%, #ece5d3); }
+html[data-skin="marble"][data-theme="day"] .section-earth { background: radial-gradient(circle at 84% 14%, rgba(212, 160, 52, .12), transparent 28%), linear-gradient(135deg, #efe9d9, #f6f1e4 56%, #e9e1cd); }
+html[data-skin="marble"][data-theme="day"] .marquee { background: #efe9da; border-color: rgba(56, 48, 28, .16); }
+html[data-skin="marble"][data-theme="day"] .marquee-item { color: #5f5233; }
+html[data-skin="marble"][data-theme="day"] .portfolio-ticker { background: #efe9da; border-color: rgba(56, 48, 28, .2); }
+html[data-skin="marble"][data-theme="day"] .ticker-note { color: #5f5233; }
+html[data-skin="marble"][data-theme="day"] .ticker-item b { color: #2c2410; }
+html[data-skin="marble"][data-theme="day"] .ticker-item em { color: #6b5c39; }
+html[data-skin="marble"][data-theme="day"] .ticker-item strong { color: #8f6410; }
+html[data-skin="marble"][data-theme="day"] .path-card, html[data-skin="marble"][data-theme="day"] .spec-card { background: linear-gradient(145deg, rgba(255, 253, 247, .8), rgba(239, 233, 218, .96)); border-color: rgba(56, 48, 28, .2); }
+html[data-skin="marble"][data-theme="day"] .path-card:hover, html[data-skin="marble"][data-theme="day"] .spec-card:hover { background: linear-gradient(145deg, #fdfaf2, #eae2cc); }
+html[data-skin="marble"][data-theme="day"] .path-card::after { color: rgba(56, 48, 28, .12); }
+html[data-skin="marble"][data-theme="day"] .callout { background: linear-gradient(115deg, #6e581c, #4c3d10 58%, #5d4c15); border-color: rgba(140, 116, 43, .35); }
+html[data-skin="marble"][data-theme="day"] .callout h2, html[data-skin="marble"][data-theme="day"] .callout p, html[data-skin="marble"][data-theme="day"] .callout .eyebrow { color: #faf6ea; }
+html[data-skin="marble"][data-theme="day"] .person-card, html[data-skin="marble"][data-theme="day"] .process-panel, html[data-skin="marble"][data-theme="day"] .contact-form { background: linear-gradient(145deg, #fdfbf5, #ece5d3); border-color: rgba(56, 48, 28, .2); }
+html[data-skin="marble"][data-theme="day"] .person-info h2, html[data-skin="marble"][data-theme="day"] .process-panel h3 { color: #2a2416; }
+html[data-skin="marble"][data-theme="day"] .person-info p, html[data-skin="marble"][data-theme="day"] .process-panel p { color: #57503e; }
+html[data-skin="marble"][data-theme="day"] .quote-card { background: linear-gradient(145deg, #7a6220, #544214 62%, #46380f); }
+html[data-skin="marble"][data-theme="day"] .community-card { background: linear-gradient(150deg, #f9f5ea, #ece4cf); border-color: rgba(56, 48, 28, .18); }
+html[data-skin="marble"][data-theme="day"] .community-card:nth-child(2) { background: linear-gradient(150deg, #f4eedd, #e7ddc2); }
+html[data-skin="marble"][data-theme="day"] .image-note { background: linear-gradient(100deg, #f2ecdd, #faf7ef); border-color: rgba(56, 48, 28, .18); }
+html[data-skin="marble"][data-theme="day"] .image-note p { color: #57503e; }
+html[data-skin="marble"][data-theme="day"] .faq-list summary { color: #2a2416; }
+html[data-skin="marble"][data-theme="day"] .faq-list details p { color: #57503e; }
+html[data-skin="marble"][data-theme="day"] .text-link { color: #6b5410; }
+html[data-skin="marble"][data-theme="day"] .text-link::after { color: #a97a17; }
+html[data-skin="marble"][data-theme="day"] .footer { background: #ece5d3; border-top-color: rgba(56, 48, 28, .22); }
+html[data-skin="marble"][data-theme="day"] .footer h4 { color: #6e581c; }
+html[data-skin="marble"][data-theme="day"] .footer-links a, html[data-skin="marble"][data-theme="day"] .footer-links span, html[data-skin="marble"][data-theme="day"] .footer p, html[data-skin="marble"][data-theme="day"] .footer-bottom { color: #5d5237; }
+html[data-skin="marble"][data-theme="day"] .footer-links a:hover { color: #241e10; }
+html[data-skin="marble"][data-theme="day"] .media-credit { color: #5d5237; }
+html[data-skin="marble"][data-theme="day"] .media-credit a { color: #6b5410; }
+html[data-skin="marble"][data-theme="day"] .journey-card { border-color: rgba(56, 48, 28, .22); background: #fdfbf5; }
+html[data-skin="marble"][data-theme="day"] .journey-copy h3 { color: #2a2416; }
+html[data-skin="marble"][data-theme="day"] .journey-copy p { color: #57503e; }
+html[data-skin="marble"][data-theme="day"] .proof-strip, html[data-skin="marble"][data-theme="day"] .performance-table-card, html[data-skin="marble"][data-theme="day"] .performance-chart { background: #fdfbf5; border-color: rgba(56, 48, 28, .22); box-shadow: 0 12px 32px rgba(90, 74, 35, .08); }
+html[data-skin="marble"][data-theme="day"] .proof-strip span, html[data-skin="marble"][data-theme="day"] .performance-table thead th { color: #7c651f; }
+html[data-skin="marble"][data-theme="day"] .proof-strip strong, html[data-skin="marble"][data-theme="day"] .performance-table tfoot th, html[data-skin="marble"][data-theme="day"] .performance-table tfoot td { color: #8f6410; }
+html[data-skin="marble"][data-theme="day"] .proof-strip small, html[data-skin="marble"][data-theme="day"] .performance-note, html[data-skin="marble"][data-theme="day"] .chart-head small, html[data-skin="marble"][data-theme="day"] .bar-list label { color: #57503e; }
+html[data-skin="marble"][data-theme="day"] .performance-table tbody th { color: #2a2416; }
+html[data-skin="marble"][data-theme="day"] .performance-table tbody td { color: #4c4534; }
+html[data-skin="marble"][data-theme="day"] .performance-table .performance-highlight { background: rgba(212, 160, 52, .08); }
+html[data-skin="marble"][data-theme="day"] .performance-table .performance-highlight th, html[data-skin="marble"][data-theme="day"] .performance-table .performance-highlight td { color: #5f4c16; }
+html[data-skin="marble"][data-theme="day"] .profile-meta span { color: #7c651f; }
+html[data-skin="marble"][data-theme="day"] .profile-meta strong { color: #2a2416; }
+html[data-skin="marble"][data-theme="day"] .client-grid article { background: #fdfbf5; }
+html[data-skin="marble"][data-theme="day"] .client-grid article:hover { background: #f4eedd; }
+html[data-skin="marble"][data-theme="day"] .client-grid article span { color: #8f6410; }
+html[data-skin="marble"][data-theme="day"] .client-grid article strong { color: #2a2416; }
+html[data-skin="marble"][data-theme="day"] .export-profile-callout { background: linear-gradient(118deg, #4c3d10, #6e581c 60%, #574713); border-color: rgba(140, 116, 43, .3); }
+html[data-skin="marble"][data-theme="day"] .bar-track { background: rgba(56, 48, 28, .14); }
+html[data-skin="marble"][data-theme="day"] .contact-form input, html[data-skin="marble"][data-theme="day"] .contact-form select, html[data-skin="marble"][data-theme="day"] .contact-form textarea { background: rgba(255, 253, 248, .85); border-color: rgba(56, 48, 28, .26); color: #2a2416; }
+html[data-skin="marble"][data-theme="day"] .contact-form input:focus, html[data-skin="marble"][data-theme="day"] .contact-form select:focus, html[data-skin="marble"][data-theme="day"] .contact-form textarea:focus { border-color: #a97a17; box-shadow: 0 0 0 3px rgba(169, 122, 23, .16); }
+html[data-skin="marble"][data-theme="day"] .btn-primary { color: #241d08; }
+/* CRM day — marble */
+html[data-skin="marble"][data-theme="day"] .crm-body { color: #221e15; background: #f4f0e5; background-image: radial-gradient(circle at 80% -10%, rgba(212, 160, 52, .16), transparent 30%); }
+html[data-skin="marble"][data-theme="day"] .crm-header { background: rgba(250, 247, 240, .96); border-bottom-color: rgba(56, 48, 28, .2); }
+html[data-skin="marble"][data-theme="day"] .crm-metrics, html[data-skin="marble"][data-theme="day"] .crm-card, html[data-skin="marble"][data-theme="day"] .crm-sidebar { background: #fdfbf5; border-color: rgba(56, 48, 28, .22); box-shadow: 0 12px 32px rgba(90, 74, 35, .07); }
+html[data-skin="marble"][data-theme="day"] .crm-metrics article { border-color: rgba(56, 48, 28, .16); }
+html[data-skin="marble"][data-theme="day"] .crm-metrics span, html[data-skin="marble"][data-theme="day"] .crm-sidebar-note p, html[data-skin="marble"][data-theme="day"] .crm-table th, html[data-skin="marble"][data-theme="day"] .crm-media-grid span { color: #57503e; }
+html[data-skin="marble"][data-theme="day"] .crm-tab { color: #5f5233; }
+html[data-skin="marble"][data-theme="day"] .crm-tab:hover, html[data-skin="marble"][data-theme="day"] .crm-tab.active { color: #241e10; background: rgba(212, 160, 52, .13); }
+html[data-skin="marble"][data-theme="day"] .crm-form-grid label > span { color: #7c651f; }
+html[data-skin="marble"][data-theme="day"] .crm-form-grid input, html[data-skin="marble"][data-theme="day"] .crm-form-grid textarea, html[data-skin="marble"][data-theme="day"] .crm-lead-actions input { color: #2a2416; background: #fffdf8; border-color: rgba(56, 48, 28, .24); }
+html[data-skin="marble"][data-theme="day"] .crm-form-grid input::placeholder { color: #9a8f74; }
+html[data-skin="marble"][data-theme="day"] .crm-table td { color: #4c4534; border-color: rgba(56, 48, 28, .16); }
+html[data-skin="marble"][data-theme="day"] .crm-table td strong { color: #241e10; }
+html[data-skin="marble"][data-theme="day"] .crm-table .lead-status { color: #5f4c16; background: #f6f1e3; border-color: rgba(56, 48, 28, .22); }
+html[data-skin="marble"][data-theme="day"] .crm-tools-card, html[data-skin="marble"][data-theme="day"] .crm-note-card, html[data-skin="marble"][data-theme="day"] .crm-media-grid article { background: #f4efe1; border-color: rgba(56, 48, 28, .2); }
+html[data-skin="marble"][data-theme="day"] .crm-empty h3 { color: #2a2416; }
+html[data-skin="marble"][data-theme="day"] .crm-empty p { color: #57503e; }
+html[data-skin="marble"][data-theme="day"] .crm-card-status { color: #6e581c; border-color: rgba(140, 116, 43, .35); }
+html[data-skin="marble"][data-theme="day"] .crm-cloud-card { border-color: rgba(140, 116, 43, .3); background: linear-gradient(120deg, #f2ecd9, #e6dcc0); }
+html[data-skin="marble"][data-theme="day"] .crm-cloud-card h3 { color: #2a2416; }
+html[data-skin="marble"][data-theme="day"] .crm-cloud-card p { color: #57503e; }
+html[data-skin="marble"][data-theme="day"] .crm-cloud-card form input { color: #2a2416; background: #fffdf8; border-color: rgba(56, 48, 28, .24); }
+html[data-skin="marble"][data-theme="day"] .crm-save-status { color: #6e581c; }
+html[data-skin="marble"][data-theme="day"] .skin-menu { background: rgba(252, 249, 241, .96); }
+@media (max-width: 680px) {
+  html[data-skin="marble"][data-theme="day"] .main-nav { background: rgba(252, 249, 241, .98); border-color: rgba(56, 48, 28, .24); }
+  html[data-skin="marble"][data-theme="day"] .main-nav a { color: #5f5233; }
+  html[data-skin="marble"][data-theme="day"] .main-nav a:hover, html[data-skin="marble"][data-theme="day"] .main-nav a.active { color: #241e10; background: rgba(212, 160, 52, .12); }
+}
