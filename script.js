@@ -860,9 +860,11 @@ const khaqanScroll = (function () {
     /* The skip link lives outside the bar, so it never gets that close-on-click - and
        while the drawer is open #main is inert, so the focus it tries to move there
        lands nowhere. Closing first makes the link behave the same in every state. */
+    /* A skip-link click while the drawer is open has to close it first: #main is inert
+       then, so focus would land nowhere. The scroll itself is handled by its own block. */
     const skipLink = document.querySelector('.skip-link');
     if (skipLink) skipLink.addEventListener('click', () => { if (open) setOpen(false); });
-    document.addEventListener('keydown', (event) => {
+        document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && open) { event.preventDefault(); setOpen(false); }
     });
     drawerMode.addEventListener('change', (event) => { if (!event.matches) { if (open) setOpen(false); else setModal(false); } measure(); });
@@ -938,4 +940,24 @@ const khaqanScroll = (function () {
     if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 3000 });
     else setTimeout(go, 1200);
   }, { once: true });
+})();
+
+/* Skip link: focus AND viewport. #main runs the length of the document, so the browser
+   decides the fragment target is already on screen and jumps nowhere - the caret moves,
+   the page does not. Scroll it ourselves, clearing the bar only when the bar is fixed
+   (the CRM's header scrolls with the page, so padding there would just open a gap).
+   Deliberately separate from the header block: it must also work on pages with no
+   .site-header at all. */
+(function () {
+  const link = document.querySelector('.skip-link');
+  const main = document.getElementById('main');
+  if (!link || !main) return;
+  link.addEventListener('click', () => {
+    const bar = document.querySelector('.site-header');
+    const fixed = !!bar && getComputedStyle(bar).position === 'fixed';
+    const pad = fixed ? parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0 : 0;
+    const top = Math.max(0, Math.round(main.getBoundingClientRect().top + window.scrollY - pad));
+    main.focus({ preventScroll: true });
+    if (Math.abs(window.scrollY - top) > 2) window.scrollTo(0, top);
+  });
 })();

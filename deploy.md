@@ -66,6 +66,12 @@ Three layers, all of them safe to deploy without any build step:
    `crm.js`, `cloud.js` or `supabase-config.js`, raise that file's `?v=` number in
    all nine HTML pages and in the `SHELL` list at the top of `sw.js`.** Forgetting
    this is the only way to ship a change nobody can see.
+
+   The same rule applies to media that a script **re-derives in place** - the
+   `logo-mark*` renditions and `media/icons/*` carry `?v=1`, in the markup, in
+   `site.webmanifest`, and in `SHELL` (a shell entry that is not byte-identical to the
+   requested URL precaches nothing). Photographs need no token: replacing one means a new
+   filename, which is already a new key.
 3. **Service worker (`sw.js`).** Precaches the shell, serves pages network-first with
    an offline fallback, serves assets stale-while-revalidate and media cache-first, and
    evicts the oldest half of its entries past 180 so the origin's quota cannot grow
@@ -143,6 +149,11 @@ Two rules to keep:
 - `<video poster>` always points at a `.webp`. The JPEG posters cost 2-5x the same
   picture (142KB vs 89KB on `excavator-poster`) and are painted on every load, poster or
   no poster.
+- CSS background textures point at a `.webp` too. Five older `.coal-page-bg` rules were
+  still naming `media/coal-texture-bg.jpg` (208KB vs 132KB for the same 1376x768 image,
+  mean channel difference 2.2/255); they lost the cascade everywhere except day mode on the
+  obsidian skin, which was quietly paying for the JPEG. After the swap no rule references
+  the `.jpg`, so a future cascade reshuffle cannot resurrect it.
 
 ### Install metadata (theme-color, manifest, icons)
 
@@ -200,13 +211,22 @@ Things that are deliberately true about this codebase, and worth keeping:
   5 -> 1, -811KB) and still paints that frame. If you add frames to a page, the budget
   logic follows automatically because it slices the same `img.cine-src` list.
 
-- Anchored targets get `scroll-padding-top: var(--bar-total)`, so a deep link lands below
-  the bar instead of under it (checked with `#ticker`, which lands ~30px clear).
+- Anchored targets get `scroll-padding-top: calc(var(--header-h) + 18px)` on `html`, so a
+  deep link lands below the bar instead of under it (checked with `#ticker`, which lands
+  17px clear). `#main` measures -74px by the same test and that is not a bug: it is the
+  first element in the document, so no scroll position can put it below the bar.
 - Keyboard behaviour in the bar: the skip link targets `#main`, which carries
   `tabindex="-1"` so focus actually lands in the content instead of bouncing off `<body>`
   (and `#main:focus { outline: none }` stops it drawing a ring around the page). Activating
-  the skip link closes the drawer first, because an inert container cannot take focus. The
-  Opening the drawer focuses the active link, traps Tab inside the bar (the rest of the page is `inert`,
+  the skip link closes the drawer first, because an inert container cannot take focus.
+  It also scrolls by hand: `#main` runs the whole length of the document, so the browser
+  counts it as already on screen and the fragment jump moves the focus but not the
+  viewport. The offset it applies is the page's own resolved `scroll-padding-top`, and
+  only when `.site-header` is `position: fixed` - the CRM's header scrolls with the page,
+  where padding would just open a gap. That scroller deliberately lives in its own IIFE
+  rather than inside the header block, because `crm.html` has no `.site-header` and would
+  otherwise get none of it.
+- Opening the drawer focuses the active link, traps Tab inside the bar (the rest of the page is `inert`,
   with a focus-ring fallback where `inert` is unsupported) and restores focus to the
   toggle on `Esc`; the theme popup is a `role="menu"` with `aria-activedescendant`, so
   ArrowUp/Down/Home/End move the selection and Enter/`Esc` return focus to the toggle.

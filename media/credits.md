@@ -148,3 +148,13 @@ taking the 512px file from 184KB (true-colour, transparent) to ~55KB. The maskab
 uses `frac = .60` so the artwork stays inside the launcher's central 80% safe zone.
 `favicon.png` (128, true alpha) is untouched and still serves the tab and the `any` slot
 at small sizes.
+
+Every URL in that block - the four logo renditions, the master, and each icon - carries
+`?v=1` in the markup, in `site.webmanifest` and in `sw.js`'s `SHELL`, because `/media/*`
+is served `immutable` for a year and a re-derived file is otherwise invisible to returning
+visitors. Re-running the snippet and changing the bytes means bumping that token.
+
+The full-bleed coal texture (`media/coal-texture-bg.webp`, 1376x768) is the fallback
+behind `.coal-page-bg` for any skin that does not set `--page-bg-img`; every CSS reference
+now names the `.webp`, so `coal-texture-bg.jpg` (208KB, the unversioned original) is left
+in place only as a source file and is requested by nothing.
