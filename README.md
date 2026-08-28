@@ -32,7 +32,7 @@ Reference mining photos and open-licensed short videos are in `/media`. Attribut
 
 The site ships with three premium brand skins — **Signature** (forest coal & gold, the original look), **Marble Gold** (white marble by day / black marble by night) and **Obsidian** (metallic black & gold by night / platinum by day). Use the **◈ Theme** button in the header (and in the CRM) to switch; the ☼/☾ toggle keeps day/night mode inside every theme. Choices persist per browser and sync across open tabs.
 
-Official logo artwork lives in `media/brand/`; production versions (`media/logo-mark.png`, `media/logo-official.png`, `favicon.png`) are derived from it.
+Official logo artwork lives in `media/brand/`; production versions (`media/logo-mark.png`, `favicon.png`) are derived from it.
 
 ## Caching, service worker and scroll performance
 
