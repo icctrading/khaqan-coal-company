@@ -182,7 +182,47 @@ paints, because Chrome tints the browser chrome with the meta and paints
 - `profile.html` is a `<meta http-equiv="refresh">` stub and deliberately carries no
   install metadata: it is thrown away 0ms later.
 
-## 6. Scrolling performance conventions
+## 6. Going live (GitHub Pages, and Vercel)
+
+`deploy.yml` publishes **the repository root as-is** to GitHub Pages on every push to
+`main`, so the site lands at `https://<owner>.github.io/<repo>/` - a *subpath*. Two things
+follow, and both are easy to get wrong:
+
+- **`.nojekyll` must exist at the root.** Without it Pages runs the tree through Jekyll,
+  which rewrites and drops files it does not understand.
+- **Nothing may be origin-rooted.** `site.webmanifest` uses `id`/`start_url`/`scope` of
+  `./`, the speculation-rules block uses `href_matches: "*.html"` (resolved against the
+  document, not the origin), the service worker registers `sw.js` with `scope: './'`, and
+  every asset, link and `url()` in CSS is relative. Introduce a leading `/` anywhere and
+  it works on Vercel and silently breaks on Pages - so test both, e.g. serve the repo from
+  a parent directory (`python3 -m http.server --directory ..`) and load `/khaqan-coal-company/index.html`.
+
+A custom domain changes nothing in the tree: all of it is host-agnostic by design. If one
+is added, `vercel.json`'s clean-URL rewrites still only exist on Vercel - Pages serves
+`about.html` and 404s on `/about`, which is why every internal link names the `.html` file.
+
+### Social cards (`media/og/`)
+
+Each public page carries an `og:` + `twitter:` block and its own 1200x630 card, built from
+that page's hero photograph with its real `<h1>` and `<meta name="description">`, under the
+same bottom-heavy veil the site uses. They are never fetched by a browser - only by
+crawlers - so they cost a page nothing, but they are re-derived in place, so they carry
+`?v=1` like the other generated media (`deploy.md` section 5). Rebuild them with:
+
+```sh
+convert media/mine-3d-underground.webp -resize 1200x630^ -gravity center -extent 1200x630 -modulate 100,106,99 base.png
+convert -size 1200x630 gradient:'rgba(6,11,9,0.20)-rgba(4,8,6,0.88)' veil.png
+convert base.png veil.png -compose over -composite \
+  \( media/logo-mark.png -resize 190x -background none \) -gravity NorthWest -geometry +64+52 -compose over -composite \
+  -fill '#e8b93f' -draw 'rectangle 64,216 120,219' \
+  \( -size 1040x160 -background none -font DejaVuSerif-Bold -pointsize 58 -fill '#ffffff' -gravity West \
+     caption:"Moving coal with precision." \) -gravity SouthWest -geometry +64+186 -compose over -composite \
+  -strip -interlace Plane -quality 82 media/og/operations.jpg
+```
+
+Then bump `?v=1` to `?v=2` in that page's `og:image`/`twitter:image` so crawlers re-fetch.
+
+## 7. Scrolling performance conventions
 
 Things that are deliberately true about this codebase, and worth keeping:
 

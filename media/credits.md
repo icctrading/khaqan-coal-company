@@ -42,7 +42,8 @@ Please review each license and attribution requirement before deploying the site
 
 - `media/brand/logo-official-black.png`, `media/brand/logo-official-ivory.png`, `media/brand/logo-official-ivory-2.png` — official Khaqan Coal Company logo artwork, supplied by the company. All rights reserved.
 - `media/logo-official.png`, `media/logo-mark.png` — transparent production versions derived from the official logo for headers, footers, and the CRM.
-- `media/logo-official-black.jpg` — presentation lockup used for social sharing (og:image).
+- `media/logo-official-black.jpg` — presentation lockup, retained as brand artwork (the social
+  sharing image is now the generated `media/og/` card set described above).
 - `favicon.png` — favicon derived from the official emblem.
 - `media/darra-photo-1.jpg` … `media/darra-photo-4.jpg` — photographs of Darra Adam Khel supplied by the company; used on the Gallery, Community, and About pages.
 
@@ -158,3 +159,16 @@ The full-bleed coal texture (`media/coal-texture-bg.webp`, 1376x768) is the fall
 behind `.coal-page-bg` for any skin that does not set `--page-bg-img`; every CSS reference
 now names the `.webp`, so `coal-texture-bg.jpg` (208KB, the unversioned original) is left
 in place only as a source file and is requested by nothing.
+
+## Social cards (`media/og/`)
+
+`index.jpg`, `about.jpg`, `operations.jpg`, `supply.jpg`, `gallery.jpg`, `community.jpg`,
+`contact.jpg` — 1200x630 previews generated in-house from this site's own hero photographs
+plus `media/logo-mark.png`; no third-party artwork, no external fonts (DejaVu is the
+render-time font). Each is 88-160KB, interlaced JPEG at quality 82. Regeneration and the
+`?v=` bump that goes with it are documented in `deploy.md` section 6.
+
+Removed as unreferenced (still recoverable from git history if a design ever wants them
+back): `mining-pit.webp` (the Pexels 38643910 derivative above), `logo-official.webp`,
+`logo-official-light.webp` (the true masters are in `media/brand/`), and
+`coal-texture-bg.jpg` (superseded in every rule by `coal-texture-bg.webp`).
