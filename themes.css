@@ -2329,7 +2329,7 @@ html[data-skin="obsidian"][data-theme="day"] .qom-facts strong { color: #8a620c;
   z-index: 0;
   background-image:
     linear-gradient(180deg, rgba(4, 7, 6, .5), rgba(4, 7, 6, .68)),
-    url('media/coal-texture-bg.jpg');
+    url('media/coal-texture-bg.webp');
   background-size: cover;
   background-position: center;
   animation: coalDrift 46s ease-in-out infinite alternate;
@@ -2346,12 +2346,12 @@ body.page-home > main, body.page-home > .footer { position: relative; z-index: 1
 html[data-theme="day"] .coal-page-bg {
   background-image:
     linear-gradient(180deg, rgba(240, 236, 226, .58), rgba(240, 236, 226, .74)),
-    url('media/coal-texture-bg.jpg');
+    url('media/coal-texture-bg.webp');
 }
 html[data-skin="obsidian"][data-theme="day"] .coal-page-bg {
   background-image:
     linear-gradient(180deg, rgba(238, 240, 243, .62), rgba(238, 240, 243, .76)),
-    url('media/coal-texture-bg.jpg');
+    url('media/coal-texture-bg.webp');
 }
 
 /* The landing hero becomes the HD coal scene itself */
@@ -2416,7 +2416,7 @@ html[data-theme="day"] body.page-home .qom-card-featured {
 .coal-page-bg {
   background-image:
     linear-gradient(180deg, rgba(4, 7, 6, .2), rgba(4, 7, 6, .4)),
-    url('media/coal-texture-bg.jpg');
+    url('media/coal-texture-bg.webp');
   filter: brightness(1.14) contrast(1.05);
 }
 .coal-page-bg video {
@@ -2431,7 +2431,7 @@ html[data-theme="day"] body.page-home .qom-card-featured {
 html[data-theme="day"] .coal-page-bg {
   background-image:
     linear-gradient(180deg, rgba(240, 236, 226, .3), rgba(240, 236, 226, .5)),
-    url('media/coal-texture-bg.jpg');
+    url('media/coal-texture-bg.webp');
 }
 html[data-theme="day"] .coal-page-bg video { filter: brightness(1.02) saturate(.9) blur(1.5px); opacity: .38; }
 html[data-skin="obsidian"][data-theme="day"] .coal-page-bg video { opacity: .32; }
@@ -2657,3 +2657,963 @@ html[data-skin][data-theme="day"] body.page-home .coal-visible, html:not([data-s
    V10 — restore the classic coal close-up as the home hero backdrop.
    ================================================================== */
 .page-home .hero-photo { display: block; background-image: url('media/coal-hero.webp'); }
+
+/* ==================================================================
+   V11 — readable green writing by day, compact redesigned reel,
+   and a visible high-quality coal backdrop on EVERY page.
+   ------------------------------------------------------------------
+   1. Day-mode green type pushed to a deep, high-contrast forest
+   2. Reel: smaller 16/10 stage + a chapter rail (new layout)
+   3. The fixed coal layer is lighter-veiled and now runs site-wide
+   4. Supply: archival rail clip replaced by the HD 3D railhead frame
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   1. DAY · the green writing must read instantly, not just pass AA
+   ------------------------------------------------------------------ */
+html[data-skin="signature"][data-theme="day"], html:not([data-skin])[data-theme="day"] {
+  --ink: #06170d;
+  --ink-soft: #24432f;
+  --sand: #2e4f28;
+  --sand-2: #1a3520;
+  --moss: #17632f;
+  --line: rgba(16, 74, 38, .3);
+  --line-strong: rgba(16, 74, 38, .46);
+}
+/* Body copy, ledes and every small green label */
+html[data-skin="signature"][data-theme="day"] p,
+html:not([data-skin])[data-theme="day"] p { color: #21402d; }
+html[data-skin="signature"][data-theme="day"] .lede,
+html[data-skin="signature"][data-theme="day"] .section-head p,
+html:not([data-skin])[data-theme="day"] .lede,
+html:not([data-skin])[data-theme="day"] .section-head p { color: #1d3c29; }
+html[data-skin="signature"][data-theme="day"] .eyebrow,
+html:not([data-skin])[data-theme="day"] .eyebrow { color: #17421f; }
+html[data-skin="signature"][data-theme="day"] .hero .eyebrow,
+html[data-skin="signature"][data-theme="day"] .page-hero .eyebrow,
+html:not([data-skin])[data-theme="day"] .hero .eyebrow,
+html:not([data-skin])[data-theme="day"] .page-hero .eyebrow {
+  color: #123a1b;
+  background: rgba(255, 255, 255, .74);
+  border-color: rgba(24, 74, 40, .34);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .6);
+}
+html[data-skin="signature"][data-theme="day"] .brand-sub,
+html:not([data-skin])[data-theme="day"] .brand-sub { color: #2b4a35; }
+html[data-skin="signature"][data-theme="day"] .main-nav a,
+html:not([data-skin])[data-theme="day"] .main-nav a { color: #1e3f2a; }
+html[data-skin="signature"][data-theme="day"] .main-nav a:hover,
+html[data-skin="signature"][data-theme="day"] .main-nav a.active,
+html:not([data-skin])[data-theme="day"] .main-nav a:hover,
+html:not([data-skin])[data-theme="day"] .main-nav a.active { color: #08240f; }
+html[data-skin="signature"][data-theme="day"] .text-link,
+html:not([data-skin])[data-theme="day"] .text-link { color: #14502c; text-decoration-thickness: 1px; }
+html[data-skin="signature"][data-theme="day"] .footer h4,
+html:not([data-skin])[data-theme="day"] .footer h4 { color: #21481f; }
+html[data-skin="signature"][data-theme="day"] .footer p,
+html[data-skin="signature"][data-theme="day"] .footer-links a,
+html[data-skin="signature"][data-theme="day"] .footer-links span,
+html[data-skin="signature"][data-theme="day"] .footer-bottom,
+html:not([data-skin])[data-theme="day"] .footer p,
+html:not([data-skin])[data-theme="day"] .footer-links a,
+html:not([data-skin])[data-theme="day"] .footer-links span,
+html:not([data-skin])[data-theme="day"] .footer-bottom { color: #24462c; }
+html[data-skin="signature"][data-theme="day"] .footer-links a:hover,
+html:not([data-skin])[data-theme="day"] .footer-links a:hover { color: #06200d; }
+html[data-skin="signature"][data-theme="day"] .marquee-item,
+html:not([data-skin])[data-theme="day"] .marquee-item { color: #1c4222; }
+html[data-skin="signature"][data-theme="day"] .ticker-note,
+html:not([data-skin])[data-theme="day"] .ticker-note { color: #1d4522; }
+html[data-skin="signature"][data-theme="day"] .ticker-item em,
+html:not([data-skin])[data-theme="day"] .ticker-item em { color: #24512b; }
+html[data-skin="signature"][data-theme="day"] .ticker-item b,
+html:not([data-skin])[data-theme="day"] .ticker-item b { color: #0f2c17; }
+html[data-skin="signature"][data-theme="day"] .field label,
+html[data-skin="signature"][data-theme="day"] .contact-form label,
+html:not([data-skin])[data-theme="day"] .field label,
+html:not([data-skin])[data-theme="day"] .contact-form label { color: #1e4526; font-size: .76rem; }
+html[data-skin="signature"][data-theme="day"] .signature,
+html:not([data-skin])[data-theme="day"] .signature { color: #1f4227; }
+html[data-skin="signature"][data-theme="day"] .process-list li,
+html[data-skin="signature"][data-theme="day"] .numbered-item p,
+html[data-skin="signature"][data-theme="day"] .spec-card p,
+html[data-skin="signature"][data-theme="day"] .path-card p,
+html[data-skin="signature"][data-theme="day"] .journey-copy p,
+html:not([data-skin])[data-theme="day"] .process-list li,
+html:not([data-skin])[data-theme="day"] .numbered-item p,
+html:not([data-skin])[data-theme="day"] .spec-card p,
+html:not([data-skin])[data-theme="day"] .path-card p,
+html:not([data-skin])[data-theme="day"] .journey-copy p { color: #21422e; }
+html[data-skin="signature"][data-theme="day"] .performance-note,
+html[data-skin="signature"][data-theme="day"] .image-note p,
+html[data-skin="signature"][data-theme="day"] .faq-list details p,
+html[data-skin="signature"][data-theme="day"] .mini-stat span,
+html:not([data-skin])[data-theme="day"] .performance-note,
+html:not([data-skin])[data-theme="day"] .image-note p,
+html:not([data-skin])[data-theme="day"] .faq-list details p,
+html:not([data-skin])[data-theme="day"] .mini-stat span { color: #22432f; }
+/* White type that sits on a dark photo scrim has to stay light by day too */
+html[data-theme="day"] .media-tile figcaption span,
+html[data-theme="day"] .media-card figcaption span,
+html[data-theme="day"] .distribution-card figcaption span,
+html[data-theme="day"] .transport-card figcaption span,
+html[data-theme="day"] .cine-wall figcaption span,
+html[data-theme="day"] .film-card figcaption span,
+html[data-theme="day"] .reel-slide figcaption span { color: #ffcd9a; }
+html[data-theme="day"] .media-tile figcaption strong,
+html[data-theme="day"] .media-card figcaption strong,
+html[data-theme="day"] .distribution-card figcaption strong,
+html[data-theme="day"] .transport-card figcaption strong { color: #fff8e6; }
+/* Gold numerals on light cards */
+html[data-skin="signature"][data-theme="day"] .feature-number,
+html:not([data-skin])[data-theme="day"] .feature-number { color: #6f4a08; }
+html[data-skin="signature"][data-theme="day"] .qom-rank,
+html[data-skin="signature"][data-theme="day"] .qom-script,
+html[data-skin="signature"][data-theme="day"] .qom-facts strong,
+html:not([data-skin])[data-theme="day"] .qom-rank,
+html:not([data-skin])[data-theme="day"] .qom-script,
+html:not([data-skin])[data-theme="day"] .qom-facts strong { color: #5f4208; }
+/* The export panel keeps light type — deepen its green so it clears AA */
+html[data-theme="day"] .export-panel {
+  background: radial-gradient(circle at 77% 45%, rgba(163, 210, 150, .2), transparent 27%), linear-gradient(130deg, #12401f, #1c5a2d 53%, #2a4a1a);
+  border-color: rgba(255, 240, 200, .22);
+}
+html[data-theme="day"] .export-node { color: rgba(236, 246, 224, .78); }
+html[data-theme="day"] .export-node small { color: #dceccf; }
+html[data-theme="day"] .export-node strong { color: #ffffff; }
+html[data-theme="day"] .export-route .export-line { background: rgba(246, 250, 237, .5); }
+
+/* ------------------------------------------------------------------
+   2. REEL — compact 16/10 stage + a chapter rail of field frames
+      (was a single 1080px-wide slab; now ~two thirds the height)
+   ------------------------------------------------------------------ */
+.reel-band { padding: 52px 0 60px; }
+.reel-band-head { align-items: center; gap: 28px; margin-bottom: 20px; }
+.reel-band-head h2 { font-size: clamp(1.6rem, 2.5vw, 2.3rem); margin: 8px 0 0; }
+.reel-band-head p { max-width: 380px; font-size: .82rem; line-height: 1.6; }
+.reel-deck { display: grid; grid-template-columns: minmax(0, 1.62fr) minmax(0, .5fr); gap: 15px; align-items: stretch; max-width: 1000px; margin: 0 auto; }
+.reel-stage {
+  position: relative; width: 100%; max-width: none; margin: 0; aspect-ratio: 16 / 10; min-height: 226px;
+  overflow: hidden; border: 1px solid rgba(212, 160, 52, .34); border-radius: 16px; background: #060f0a;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .38), 0 0 0 1px rgba(255, 255, 255, .05) inset;
+  transform: none;
+}
+.reel-stage .reel-slides { inset: 0 0 30px; }
+.reel-stage .reel-slide video, .reel-stage .reel-slide > img, .reel-stage .reel-slide picture > img { width: 100%; height: 100%; object-fit: cover; }
+.reel-stage .reel-slide picture { display: block; width: 100%; height: 100%; }
+.reel-stage .reel-slide video, .reel-stage .reel-slide > img, .reel-stage .reel-slide picture > img { filter: saturate(.94) contrast(1.06) brightness(.94); }
+.reel-slide::after { background: linear-gradient(180deg, transparent 34%, rgba(4, 12, 7, .1) 52%, rgba(4, 12, 7, .88) 100%); }
+.reel-slide figcaption { right: 13px; bottom: 11px; left: 13px; padding: 6px 9px; border-left-width: 2px; border-radius: 0 8px 8px 0; background: rgba(4, 12, 8, .58); }
+.reel-slide figcaption span { font-size: .5rem; }
+.reel-slide figcaption strong { font-size: .74rem; letter-spacing: .01em; }
+.reel-glass { position: absolute; z-index: 4; inset: 0; pointer-events: none; background: linear-gradient(126deg, rgba(255, 255, 255, .1) 0%, transparent 26%, transparent 74%, rgba(255, 246, 210, .07) 100%); }
+.reel-foot {
+  position: absolute; z-index: 7; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; height: 30px; padding: 0 11px; background: rgba(4, 11, 7, .9); border-top: 1px solid rgba(212, 160, 52, .2);
+}
+.reel-foot .reel-live { font-size: .48rem; letter-spacing: .13em; text-transform: uppercase; }
+.reel-foot [data-reel-count] { color: #e7dfae; font-size: .52rem; font-weight: 800; letter-spacing: .12em; }
+.reel-progress { height: 2px; }
+/* Chapter rail */
+.reel-rail { display: grid; grid-template-rows: repeat(9, minmax(0, 1fr)); gap: 5px; min-width: 0; }
+.reel-cut {
+  position: relative; display: grid; grid-template-columns: 54px minmax(0, 1fr); align-items: center; gap: 8px;
+  min-height: 0; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 9px;
+  background: rgba(10, 24, 15, .34); color: var(--ink-soft); text-align: left;
+  transition: border-color .3s ease, background .3s ease, transform .3s ease, color .3s ease;
+}
+.reel-cut img { width: 54px; height: 100%; object-fit: cover; display: block; filter: saturate(.8) brightness(.82); transition: filter .35s ease, transform .5s ease; }
+.reel-cut span { padding-right: 6px; font-size: .5rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reel-cut::after { content: ""; position: absolute; z-index: 2; left: 0; top: 0; bottom: 0; width: 2px; background: var(--yellow); opacity: 0; transition: opacity .3s ease; }
+.reel-cut:hover { transform: translateX(-2px); border-color: rgba(212, 160, 52, .5); }
+.reel-cut:hover img { filter: saturate(.95) brightness(1); }
+.reel-cut.active { color: var(--ink); background: rgba(212, 160, 52, .1); border-color: rgba(212, 160, 52, .55); }
+.reel-cut.active::after { opacity: 1; }
+.reel-cut.active img { filter: saturate(1.02) brightness(1.02); }
+.reel-cut:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+/* Day mode: the deck reads as a dark instrument, so the rail inverts to light chrome */
+html[data-theme="day"] .reel-band-head p { color: #21422e; }
+html[data-theme="day"] .reel-stage { border-color: rgba(24, 74, 40, .34); box-shadow: 0 22px 42px rgba(38, 62, 35, .22), 0 0 0 1px rgba(255, 255, 255, .5) inset; }
+html[data-theme="day"] .reel-stage .reel-slide video, html[data-theme="day"] .reel-stage .reel-slide > img, html[data-theme="day"] .reel-stage .reel-slide picture > img { filter: saturate(.98) contrast(1.03) brightness(1.02); }
+html[data-theme="day"] .reel-cut { background: rgba(255, 255, 255, .72); border-color: rgba(16, 74, 38, .22); color: #1d3f2a; }
+html[data-theme="day"] .reel-cut:hover { border-color: rgba(120, 88, 20, .5); }
+html[data-theme="day"] .reel-cut.active { color: #0d2a16; background: rgba(212, 160, 52, .2); border-color: rgba(120, 88, 20, .6); }
+html[data-theme="day"] .reel-cut img { filter: saturate(.9) brightness(1) contrast(1.02); }
+@media (max-width: 900px) {
+  .reel-deck { grid-template-columns: 1fr; }
+  .reel-rail { grid-template-rows: none; grid-template-columns: repeat(9, minmax(120px, 1fr)); overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x proximity; }
+  .reel-cut { scroll-snap-align: center; grid-template-columns: 1fr; height: 74px; align-items: stretch; }
+  .reel-cut img { width: 100%; height: 100%; }
+  .reel-cut span { position: absolute; right: 0; bottom: 0; left: 0; padding: 12px 6px 5px; color: #f4f7e9; background: linear-gradient(transparent, rgba(4, 12, 7, .9)); font-size: .46rem; }
+  .reel-cut::after { width: 100%; height: 2px; top: auto; bottom: 0; }
+  html[data-theme="day"] .reel-cut span { color: #f4f7e9; }
+}
+@media (max-width: 620px) {
+  .reel-band { padding: 40px 0 46px; }
+  .reel-stage { aspect-ratio: 16 / 11; min-height: 210px; border-radius: 13px; }
+  .reel-rail { grid-template-columns: repeat(9, minmax(104px, 1fr)); }
+  .reel-slide figcaption strong { font-size: .66rem; }
+}
+@media (prefers-reduced-motion: reduce) { .reel-cut, .reel-cut img { transition: none; } }
+
+/* ------------------------------------------------------------------
+   3. COAL BACKDROP — the home page's living 3D backdrop now runs on
+      every page, with its own frame set, and it is clearly visible in
+      both modes (lighter veils, translucent sections over it).
+   ------------------------------------------------------------------ */
+body > main, body > .footer { position: relative; z-index: 1; }
+/* The ivory/scrim veils are pulled back so the coal actually reads */
+html[data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(238, 236, 224, .14), rgba(238, 236, 224, .26)),
+    var(--page-bg-img, url('media/coal-texture-bg.webp'));
+}
+html:not([data-theme="day"]) .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 6, .16), rgba(4, 7, 6, .34)),
+    var(--page-bg-img, url('media/coal-texture-bg.webp'));
+}
+html[data-theme="day"] .cine-veil {
+  background: linear-gradient(180deg, rgba(240, 239, 228, .02) 0%, rgba(240, 239, 228, .2) 54%, rgba(240, 239, 228, .4) 100%);
+}
+html:not([data-theme="day"]) .cine-veil {
+  background: linear-gradient(180deg, rgba(4, 7, 6, .18) 0%, rgba(4, 7, 6, .3) 54%, rgba(4, 7, 6, .5) 100%);
+}
+html[data-skin="obsidian"][data-theme="day"] .cine-veil {
+  background: linear-gradient(180deg, rgba(236, 238, 242, .04) 0%, rgba(236, 238, 242, .22) 54%, rgba(236, 238, 242, .42) 100%);
+}
+html[data-skin="marble"][data-theme="day"] .cine-veil {
+  background: linear-gradient(180deg, rgba(247, 244, 236, .04) 0%, rgba(247, 244, 236, .22) 54%, rgba(247, 244, 236, .42) 100%);
+}
+/* The canvas frames get a touch more presence, day and night */
+.coal-page-bg canvas { filter: saturate(1.06) contrast(1.04); }
+html[data-theme="day"] .coal-page-bg canvas { filter: brightness(1.08) saturate(1.1) contrast(1.02); }
+
+/* Sections let the backdrop through — night */
+body.page-about .section-dark, body.page-community .section-dark { background: rgba(7, 17, 13, .66); }
+body.page-about .section-soft, body.page-community .section-soft { background: rgba(13, 26, 19, .62); }
+body.page-about .section-earth, body.page-community .section-earth { background: rgba(24, 30, 20, .66); }
+body.page-operations .section-dark { background: rgba(6, 16, 12, .68); }
+body.page-operations .section-soft { background: rgba(12, 25, 18, .64); }
+body.page-operations .section-earth { background: rgba(23, 29, 20, .68); }
+body.page-supply .section-dark { background: rgba(6, 16, 12, .68); }
+body.page-supply .section-soft { background: rgba(13, 26, 19, .64); }
+body.page-supply .section-earth { background: rgba(24, 30, 20, .68); }
+body.page-gallery .section-dark { background: rgba(5, 13, 10, .5); }
+body.page-gallery .section-earth { background: rgba(22, 28, 19, .6); }
+body.page-gallery .section-soft { background: rgba(11, 23, 16, .56); }
+body.page-contact .section-dark { background: rgba(6, 16, 12, .66); }
+body.page-contact .section-earth { background: rgba(23, 29, 20, .66); }
+body.page-contact .faq-section { background: rgba(9, 20, 14, .62); }
+/* Sections let the backdrop through — day */
+html[data-theme="day"] body.page-about .section-dark, html[data-theme="day"] body.page-community .section-dark,
+html[data-theme="day"] body.page-operations .section-dark, html[data-theme="day"] body.page-supply .section-dark,
+html[data-theme="day"] body.page-gallery .section-dark, html[data-theme="day"] body.page-contact .section-dark { background: rgba(243, 247, 241, .66); }
+html[data-theme="day"] body.page-about .section-soft, html[data-theme="day"] body.page-community .section-soft,
+html[data-theme="day"] body.page-operations .section-soft, html[data-theme="day"] body.page-supply .section-soft,
+html[data-theme="day"] body.page-gallery .section-soft, html[data-theme="day"] body.page-contact .section-soft { background: rgba(233, 242, 230, .6); }
+html[data-theme="day"] body.page-about .section-earth, html[data-theme="day"] body.page-community .section-earth,
+html[data-theme="day"] body.page-operations .section-earth, html[data-theme="day"] body.page-supply .section-earth,
+html[data-theme="day"] body.page-gallery .section-earth, html[data-theme="day"] body.page-contact .section-earth { background: rgba(238, 242, 224, .62); }
+html[data-theme="day"] body.page-contact .faq-section { background: rgba(231, 240, 228, .64); }
+html[data-skin="marble"][data-theme="day"] body:not(.page-home) .section-dark { background: rgba(247, 244, 236, .68); }
+html[data-skin="marble"][data-theme="day"] body:not(.page-home) .section-soft { background: rgba(243, 239, 228, .64); }
+html[data-skin="marble"][data-theme="day"] body:not(.page-home) .section-earth { background: rgba(241, 236, 221, .66); }
+html[data-skin="obsidian"][data-theme="day"] body:not(.page-home) .section-dark { background: rgba(242, 244, 247, .68); }
+html[data-skin="obsidian"][data-theme="day"] body:not(.page-home) .section-soft { background: rgba(236, 239, 243, .64); }
+html[data-skin="obsidian"][data-theme="day"] body:not(.page-home) .section-earth { background: rgba(233, 236, 241, .66); }
+/* The inner-page hero photos also read stronger now */
+html[data-theme="day"] .page-about .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/mine-3d-terraces.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-operations .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-underground.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-supply .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-rail.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-gallery .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-aerial.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-community .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/valley-dawn.webp') center / cover no-repeat; }
+html[data-theme="day"] .page-contact .page-hero { background: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-stockpile.webp') center / cover no-repeat; }
+
+/* Per-page fallback still-frame (used before the canvas engine paints,
+   and forever if JS is off) — each page gets its own coal scene. */
+body.page-home .coal-page-bg { --page-bg-img: url('media/cine/hero-01.webp'); }
+body.page-about .coal-page-bg { --page-bg-img: url('media/cine/reel-haulroad.webp'); }
+body.page-operations .coal-page-bg { --page-bg-img: url('media/cine/reel-underground.webp'); }
+body.page-supply .coal-page-bg { --page-bg-img: url('media/cine/reel-rail.webp'); }
+body.page-gallery .coal-page-bg { --page-bg-img: url('media/cine/reel-coalfaces.webp'); }
+body.page-community .coal-page-bg { --page-bg-img: url('media/darra-photo-1.webp'); }
+body.page-contact .coal-page-bg { --page-bg-img: url('media/cine/reel-stockpile.webp'); }
+/* The still frames only feed the canvas engine — they never paint themselves */
+.coal-page-bg img.cine-src { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+/* Night: keep the scene present but never louder than the copy */
+html:not([data-theme="day"]) .coal-page-bg { filter: brightness(1.1) contrast(1.05) saturate(1.02); }
+html[data-theme="day"] .coal-page-bg { filter: brightness(1.05) contrast(1.02); }
+/* The hero keeps its own art; the shared layer shows through underneath */
+body.page-home .hero { background: transparent; }
+body.page-home .hero::after { background: linear-gradient(transparent, rgba(244, 247, 242, .72) 92%); }
+html:not([data-theme="day"]) body.page-home .hero::after { background: linear-gradient(transparent, rgba(7, 15, 11, .6)); }
+
+/* Supply: the archival clip is gone — the railhead frame gets the same
+   treatment as the other HD cards, with a slow reveal of the render. */
+.transport-card-hd img { transition: transform 1.4s cubic-bezier(.2, .8, .2, 1), filter .5s ease; }
+.transport-card-hd:hover img { transform: scale(1.045); }
+.transport-card-glitch { position: absolute; z-index: 1; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s ease; background: repeating-linear-gradient(180deg, rgba(255, 236, 190, .05) 0 1px, transparent 1px 4px); }
+.transport-card-hd:hover .transport-card-glitch { opacity: 1; }
+.transport-card-hd figcaption span { color: var(--ember-2); }
+html[data-theme="day"] .transport-card-hd { border-color: rgba(15, 58, 31, .26); }
+
+/* ------------------------------------------------------------------
+   4. Calming the copy zones — the coal stays clearly visible, but the
+      text columns get a soft, breathing scrim instead of a flat wash.
+   ------------------------------------------------------------------ */
+html[data-theme="day"] .cine-veil {
+  background:
+    linear-gradient(90deg, rgba(243, 246, 240, .5) 0%, rgba(243, 246, 240, .2) 34%, transparent 62%),
+    linear-gradient(180deg, rgba(240, 239, 228, .12) 0%, rgba(240, 239, 228, .3) 55%, rgba(240, 239, 228, .46) 100%);
+}
+html[data-theme="day"] body:not(.page-home) > main > .section-dark { background: rgba(243, 247, 241, .7); }
+html[data-theme="day"] body:not(.page-home) > main > .section-soft { background: rgba(233, 242, 230, .66); }
+html[data-theme="day"] body:not(.page-home) > main > .section-earth { background: rgba(238, 242, 224, .68); }
+html[data-theme="day"] body.page-home > main > .section-dark { background: rgba(244, 247, 242, .76); }
+html[data-theme="day"] body.page-home > main > .section-soft { background: rgba(232, 241, 229, .74); }
+html[data-theme="day"] body.page-home > main > .section-earth { background: rgba(237, 241, 223, .74); }
+/* Headline blocks carry a light glow so type never fights the render */
+html[data-theme="day"] .section-head > div:first-child,
+html[data-theme="day"] .reel-band-head > div:first-child,
+html[data-theme="day"] .sticky-label,
+html[data-theme="day"] .intro-copy,
+html[data-theme="day"] .story-block {
+  /* closest-side fades the wash exactly at the box edge, so it reads as
+     atmosphere rather than a pasted rectangle over the render */
+  background: radial-gradient(closest-side at 34% 50%, rgba(247, 250, 245, .74), rgba(247, 250, 245, .3) 58%, rgba(247, 250, 245, 0) 100%);
+  padding: 20px 30px 20px 24px;
+  margin: -12px -30px -12px -24px;
+}
+/* Night mode: same idea, dark glow */
+html:not([data-theme="day"]) .cine-veil {
+  background:
+    linear-gradient(90deg, rgba(4, 10, 7, .52) 0%, rgba(4, 10, 7, .18) 38%, transparent 66%),
+    linear-gradient(180deg, rgba(4, 7, 6, .3) 0%, rgba(4, 7, 6, .42) 55%, rgba(4, 7, 6, .6) 100%);
+}
+html:not([data-theme="day"]) .section-head > div:first-child,
+html:not([data-theme="day"]) .reel-band-head > div:first-child,
+html:not([data-theme="day"]) .sticky-label,
+html:not([data-theme="day"]) .intro-copy,
+html:not([data-theme="day"]) .story-block {
+  background: radial-gradient(closest-side at 34% 50%, rgba(6, 14, 10, .62), rgba(6, 14, 10, .24) 58%, rgba(6, 14, 10, 0) 100%);
+  padding: 20px 30px 20px 24px;
+  margin: -12px -30px -12px -24px;
+}
+@media (max-width: 900px) {
+  .section-head > div:first-child, .reel-band-head > div:first-child, .sticky-label, .intro-copy, .story-block { padding: 14px 16px; margin: -8px -16px; }
+  html[data-theme="day"] .cine-veil, html:not([data-theme="day"]) .cine-veil { background: linear-gradient(180deg, rgba(243, 246, 240, .3), rgba(243, 246, 240, .58)); }
+  html:not([data-theme="day"]) .cine-veil { background: linear-gradient(180deg, rgba(4, 8, 6, .42), rgba(4, 8, 6, .68)); }
+}
+/* Panels that sit on the backdrop get a touch more body so they stay crisp */
+html[data-theme="day"] .spec-card, html[data-theme="day"] .path-card, html[data-theme="day"] .journey-card,
+html[data-theme="day"] .qom-card, html[data-theme="day"] .community-card, html[data-theme="day"] .feature-card,
+html[data-theme="day"] .image-note, html[data-theme="day"] .proof-strip article, html[data-theme="day"] .mini-stats {
+  backdrop-filter: blur(4px);
+}
+html[data-theme="day"] .spec-card, html[data-theme="day"] .path-card, html[data-theme="day"] .journey-card { background: linear-gradient(145deg, rgba(255, 255, 255, .82), rgba(226, 240, 224, .9)); }
+/* Supply board keeps its dark instrument look — labels stay light in daylight */
+html[data-theme="day"] .supply-board-top, html[data-theme="day"] .supply-board-note span { color: #d9e6cd; }
+html[data-theme="day"] .supply-board-top strong { color: #a9e08f; }
+html[data-theme="day"] .supply-board-note strong { color: #f4f1d8; }
+html[data-theme="day"] .route-node:not(.active) b { color: #cfd8c6; border-color: rgba(212, 160, 52, .45); background: rgba(8, 22, 12, .5); }
+html[data-theme="day"] .route-node span, html[data-theme="day"] .route-node em { color: #d7e2cd; }
+
+html[data-theme="day"] .supply-board { background: radial-gradient(circle at 74% 38%, rgba(242, 197, 107, .2), transparent 25%), linear-gradient(150deg, #14301f, #0a1a10 62%, #122a19); border-color: rgba(212, 160, 52, .4); }
+html[data-theme="day"] .route-node { color: #d3ddca; }
+html[data-theme="day"] .route-node.active { color: #ffe89a; }
+html[data-theme="day"] .supply-board-note { color: #c3cfba; border-top-color: rgba(246, 242, 232, .18); }
+
+/* ------------------------------------------------------------------
+   5. Remaining low-contrast micro-labels found in the daylight audit
+   ------------------------------------------------------------------ */
+html[data-theme="day"] .identity-kicker,
+html[data-theme="day"] .feature-number,
+html[data-theme="day"] .client-grid article span { color: #6a4407; }
+html[data-theme="day"] .mini-stat strong, html[data-theme="day"] .big-num { color: #17421f; }
+/* Anything that lives on a video/photo shade stays light in both modes */
+html[data-theme="day"] .video-window-copy span, html[data-theme="day"] .video-window-copy strong,
+html[data-theme="day"] .video-window-copy p, html[data-theme="day"] .operations-video-window figcaption span,
+html[data-theme="day"] .operations-video-window figcaption strong { color: #fdf8e6; }
+html[data-theme="day"] .video-window-copy span { color: #ffd7a6; }
+html[data-theme="day"] .machinery-media figcaption span, html[data-theme="day"] .media-section figcaption span { color: #ffcd9a; }
+html[data-theme="day"] .machinery-media figcaption strong, html[data-theme="day"] .media-section figcaption strong { color: #fff8e6; }
+
+/* ------------------------------------------------------------------
+   6. Balance fixes after the daylight / night / skin screenshots
+   ------------------------------------------------------------------ */
+/* Home hero: keep the shared backdrop behind it, restore the night mood */
+html[data-theme="day"] body.page-home .hero { background: transparent; }
+html:not([data-theme="day"]) body.page-home .hero { background: radial-gradient(circle at 72% 26%, rgba(216, 138, 45, .14), transparent 42%), linear-gradient(180deg, rgba(7, 15, 11, .08), rgba(7, 15, 11, .66)); }
+html:not([data-theme="day"]) body.page-home .hero::before { background: linear-gradient(100deg, rgba(4, 10, 7, .9), rgba(4, 10, 7, .52) 46%, rgba(4, 10, 7, .12) 76%); }
+/* Inner-page heroes: a firm but not flat scrim so the render still reads */
+html[data-theme="day"] .page-hero::after { background: linear-gradient(90deg, rgba(243, 246, 239, .97) 0%, rgba(243, 246, 239, .74) 46%, rgba(243, 246, 239, .3) 74%, rgba(243, 246, 239, .12) 100%); }
+html[data-theme="day"] .page-hero .eyebrow, html[data-theme="day"] .page-hero .lede { text-shadow: 0 1px 0 rgba(255, 255, 255, .7); }
+html[data-skin="marble"][data-theme="day"] .page-hero::after, html[data-skin="obsidian"][data-theme="day"] .page-hero::after { background: linear-gradient(90deg, rgba(255, 250, 240, .96) 0%, rgba(255, 250, 240, .72) 48%, rgba(255, 250, 240, .26) 78%, transparent 100%) !important; }
+/* Marble / obsidian daylight keep their calm pages, but the hero now shows the coal */
+@media (min-width: 901px) {
+  html[data-skin="marble"][data-theme="day"] body > main, html[data-skin="obsidian"][data-theme="day"] body > main { background: transparent; }
+}
+
+/* The lift belongs to the imagery, not to the whole layer (the veil must
+   stay where it was authored) — so the filters live on the canvas. */
+html:not([data-theme="day"]) .coal-page-bg { filter: none; }
+html:not([data-theme="day"]) .coal-page-bg canvas { filter: brightness(1.14) saturate(1.08) contrast(1.05); }
+html[data-theme="day"] .coal-page-bg { filter: none; }
+html[data-theme="day"] .coal-page-bg canvas { filter: brightness(1.04) saturate(1.12) contrast(1.04); }
+/* A very soft edge keeps the fixed layer from competing with the page chrome */
+.coal-page-bg::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 42%, rgba(8, 18, 12, .1) 100%);
+}
+html[data-theme="day"] .coal-page-bg::after { background: radial-gradient(120% 90% at 50% 45%, transparent 45%, rgba(243, 246, 239, .22) 100%); }
+
+/* ==================================================================
+   V12 — HEADER 2.0, cache & scroll performance
+   1. Header: fixed bar, measured grid, pill nav with a gliding
+      indicator, condense + hide-on-scroll-down, hairline progress.
+   2. Perf: no full-screen CSS filters on the animated canvas, no
+      backdrop blur on large panels, content-visibility on sections.
+   3. Cache: preconnect + offline/prefetch hooks (see sw.js).
+   ================================================================== */
+
+:root { --header-h: 74px; --header-h-tight: 60px; --header-pad: clamp(16px, 3vw, 34px); }
+html { scroll-padding-top: calc(var(--header-h) + 18px); }
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  padding: 0;
+  background: linear-gradient(180deg, rgba(5, 13, 10, .6) 0%, rgba(5, 13, 10, .18) 58%, transparent 100%);
+  border-bottom: 1px solid transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: transform .5s cubic-bezier(.22, .8, .22, 1), background-color .4s ease, border-color .4s ease, box-shadow .4s ease, backdrop-filter .4s ease;
+  /* no `will-change: transform` here on purpose: a transform hint on the bar
+     would make it the containing block for the fixed drawer inside it */
+}
+html[data-theme="day"] .site-header { background: linear-gradient(180deg, rgba(243, 246, 239, .82) 0%, rgba(243, 246, 239, .34) 62%, transparent 100%); }
+.site-header.is-scrolled {
+  background: rgba(7, 16, 12, .8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.35);
+  backdrop-filter: blur(16px) saturate(1.35);
+  border-bottom-color: rgba(164, 196, 166, .16);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .22);
+}
+html[data-theme="day"] .site-header.is-scrolled { background: rgba(246, 248, 241, .84); border-bottom-color: rgba(16, 74, 38, .16); box-shadow: 0 12px 30px rgba(28, 77, 41, .1); }
+.site-header.is-hidden { transform: translateY(-104%); }
+
+/* One measured grid: brand · nav · tools. Everything shares one centre line. */
+.header-bar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: clamp(10px, 2vw, 34px);
+  width: min(100% - clamp(24px, 5vw, 72px), 1340px);
+  height: var(--header-h);
+  margin-inline: auto;
+  transition: height .4s cubic-bezier(.22, .8, .22, 1);
+}
+.site-header.is-scrolled .header-bar { height: var(--header-h-tight); }
+.header-bar > * { min-width: 0; }
+
+.brand { display: inline-flex; align-items: center; gap: clamp(8px, .9vw, 13px); flex: 0 0 auto; }
+.site-header .brand-logo { height: clamp(34px, 3vw, 44px); }
+.brand-logo img { display: block; height: 100%; width: auto; }
+.brand-name { display: grid; gap: 2px; font-size: clamp(1.02rem, 1.15vw, 1.24rem); line-height: .96; letter-spacing: -.04em; color: var(--ink); }
+.brand-sub { margin-top: 1px; font-size: clamp(.44rem, .5vw, .51rem); letter-spacing: .2em; font-weight: 850; text-transform: uppercase; color: var(--ink-soft); }
+.site-header.is-scrolled .brand-sub { opacity: 0; transition: opacity .3s ease; }
+.brand-sub { transition: opacity .3s ease; }
+
+/* Nav: a segmented pill. The dot that used to sit under the active item
+   grew that item by 20px and pulled the whole row off-centre — removed. */
+.main-nav {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-self: center;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;
+  transition: background-color .35s ease, border-color .35s ease;
+}
+.site-header.is-scrolled .main-nav, .main-nav:hover { background: rgba(255, 255, 255, .05); border-color: rgba(195, 218, 198, .14); }
+html[data-theme="day"] .site-header.is-scrolled .main-nav, html[data-theme="day"] .main-nav:hover { background: rgba(255, 255, 255, .62); border-color: rgba(16, 74, 38, .14); }
+.main-nav a {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  color: #b7c6ba;
+  font-size: .79rem;
+  font-weight: 700;
+  letter-spacing: .005em;
+  line-height: 1;
+  transition: color .22s ease;
+}
+.main-nav a:hover, .main-nav a:focus-visible { color: #f4f7ee; }
+.main-nav a.active { color: #f7f9f2; }
+html[data-theme="day"] .main-nav a { color: #4d6a53; }
+html[data-theme="day"] .main-nav a:hover, html[data-theme="day"] .main-nav a.active { color: #0a2413; }
+.main-nav a.active::after { display: none; }
+
+/* Gliding highlight — JS parks it over the active link and slides it on hover */
+.nav-glide {
+  position: absolute;
+  z-index: 0;
+  top: 5px;
+  left: 0;
+  width: 0;
+  height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(246, 242, 232, .16), rgba(212, 160, 52, .22));
+  border: 1px solid rgba(246, 242, 232, .16);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .1);
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  transition: transform .42s cubic-bezier(.22, .8, .22, 1), width .42s cubic-bezier(.22, .8, .22, 1), opacity .25s ease;
+  pointer-events: none;
+}
+.main-nav.has-glide .nav-glide { opacity: 1; }
+html[data-theme="day"] .nav-glide { background: linear-gradient(120deg, rgba(23, 99, 47, .12), rgba(242, 197, 107, .5)); border-color: rgba(23, 72, 39, .2); box-shadow: 0 6px 16px rgba(31, 78, 44, .12), inset 0 1px 0 rgba(255, 255, 255, .7); }
+@media (prefers-reduced-motion: reduce) { .nav-glide { transition: opacity .2s ease; } .site-header, .header-bar { transition: none; } }
+
+/* Right-hand tools */
+.header-tools { display: inline-flex; align-items: center; gap: 8px; justify-self: end; }
+.nav-actions { display: inline-flex; align-items: center; gap: 7px; }
+.theme-toggle, .skin-toggle { height: 38px; padding: 0 13px; align-items: center; border-radius: 999px; }
+.theme-toggle { gap: 7px; }
+.nav-cta { height: 38px; padding: 0 15px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.nav-cta, .nav-cta::after { line-height: 1; }
+.theme-toggle-label, .skin-toggle-label { line-height: 1; }
+
+/* Scroll progress hairline, glued to the bottom edge of the bar */
+.nav-progress { position: absolute; inset: auto 0 -1px 0; height: 2px; pointer-events: none; opacity: 0; transition: opacity .4s ease; }
+.site-header.is-scrolled .nav-progress { opacity: 1; }
+.nav-progress span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(var(--progress, 0));
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--ember-2), var(--yellow) 62%, var(--sand-2));
+  box-shadow: 0 0 12px rgba(212, 160, 52, .35);
+}
+
+/* The menu button, only in drawer mode */
+.menu-toggle { display: none; }
+.nav-burger { position: relative; display: block; width: 20px; height: 12px; }
+.nav-burger i { position: absolute; left: 0; width: 100%; height: 2px; border-radius: 2px; background: currentColor; transition: transform .32s cubic-bezier(.2, .8, .2, 1), opacity .2s ease; }
+.nav-burger i:nth-child(1) { top: 0; }
+.nav-burger i:nth-child(2) { top: 5px; }
+.nav-burger i:nth-child(3) { top: 10px; }
+.menu-toggle[aria-expanded="true"] .nav-burger i:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+.menu-toggle[aria-expanded="true"] .nav-burger i:nth-child(2) { opacity: 0; }
+.menu-toggle[aria-expanded="true"] .nav-burger i:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+.menu-toggle-text { display: none; }
+.skip-link {
+  position: fixed; z-index: 90; top: 12px; left: 12px;
+  padding: 11px 16px; border-radius: 999px;
+  color: #08150f; background: var(--yellow); font-size: .78rem; font-weight: 800;
+  transform: translateY(-160%);
+  transition: transform .3s cubic-bezier(.2, .8, .2, 1);
+}
+.skip-link:focus { transform: none; }
+.main-nav a:focus-visible, .nav-cta:focus-visible, .menu-toggle:focus-visible, .theme-toggle:focus-visible, .skin-toggle:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+
+/* Tablet: the tools stay, the CTA moves into the drawer */
+@media (max-width: 1180px) { .nav-cta { display: none; } }
+@media (max-width: 1340px) { .main-nav a { padding: 0 10px; font-size: .76rem; } }
+
+/* Drawer mode */
+@media (max-width: 1023px) {
+  .header-bar { grid-template-columns: minmax(0, 1fr) auto; }
+  .menu-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 14px; border: 1px solid var(--line-strong); border-radius: 999px; background: rgba(255, 255, 255, .05); color: var(--ink); font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  html[data-theme="day"] .menu-toggle { background: rgba(255, 255, 255, .6); border-color: rgba(16, 74, 38, .22); }
+  .nav-actions { display: none; }
+  .main-nav {
+    position: fixed;
+    inset: var(--header-h) 0 0 auto;
+    z-index: 55;
+    width: min(420px, 100vw);
+    height: calc(100vh - var(--header-h));
+    height: calc(100dvh - var(--header-h));
+    justify-self: stretch;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: 18px 18px calc(28px + env(safe-area-inset-bottom));
+    border: 1px solid var(--line);
+    border-right: 0;
+    border-radius: 22px 0 0 0;
+    background: rgba(8, 18, 13, .97);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    box-shadow: -30px 30px 70px rgba(0, 0, 0, .35);
+    transform: translateX(102%);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform .46s cubic-bezier(.22, .85, .2, 1), opacity .3s ease, visibility .46s;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  html[data-theme="day"] .main-nav { background: rgba(248, 250, 244, .97); border-color: rgba(16, 74, 38, .16); box-shadow: -24px 24px 60px rgba(28, 77, 41, .14); }
+  .main-nav.is-open { transform: none; opacity: 1; visibility: visible; }
+  .main-nav a { height: auto; padding: 14px 14px; font-size: .95rem; border-radius: 12px; }
+  .main-nav a + a { border-top: 1px solid rgba(195, 218, 198, .1); }
+  html[data-theme="day"] .main-nav a + a { border-top-color: rgba(16, 74, 38, .1); }
+  .main-nav a.active { background: rgba(212, 160, 52, .12); }
+  .nav-glide { display: none; }
+  .nav-cta { display: none !important; }
+  .nav-drawer-cta { display: inline-flex; margin-top: 14px; width: 100%; justify-content: center; height: 46px; }
+  .nav-scrim { position: fixed; inset: 0; z-index: 54; background: rgba(3, 9, 6, .5); opacity: 0; pointer-events: none; transition: opacity .4s ease; -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+  .nav-scrim.is-open { opacity: 1; pointer-events: auto; }
+  body.nav-locked { overflow: hidden; }
+  @keyframes navItemIn { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+  .main-nav.is-open a { animation: navItemIn .42s cubic-bezier(.2, .8, .2, 1) both; }
+  .main-nav.is-open a:nth-child(2) { animation-delay: .02s; }
+  .main-nav.is-open a:nth-child(3) { animation-delay: .06s; }
+  .main-nav.is-open a:nth-child(4) { animation-delay: .1s; }
+  .main-nav.is-open a:nth-child(5) { animation-delay: .14s; }
+  .main-nav.is-open a:nth-child(6) { animation-delay: .18s; }
+  .main-nav.is-open a:nth-child(7) { animation-delay: .22s; }
+  .main-nav.is-open a:nth-child(8) { animation-delay: .26s; }
+  .main-nav.is-open a:nth-child(9) { animation-delay: .3s; }
+  .main-nav.is-open a:nth-child(10) { animation-delay: .34s; }
+}
+@media (min-width: 1024px) { .nav-scrim { display: none; } .nav-drawer-cta { display: none; } }
+@media (max-width: 1023px) { .nav-drawer-cta { display: inline-flex; } }
+@media (max-width: 420px) {
+  :root { --header-h: 66px; --header-h-tight: 56px; }
+  .brand-sub { display: none; }
+  .site-header .brand-logo { height: 32px; }
+  .menu-toggle { padding: 0 11px; }
+  .menu-toggle .menu-toggle-text { display: none; }
+}
+
+/* CRM header shares the new bar geometry but keeps its own two-column shape */
+.crm-header .header-bar { display: flex; align-items: center; justify-content: space-between; height: var(--header-h); width: min(100% - clamp(24px, 5vw, 72px), 1340px); }
+.crm-header .brand-name { font-size: clamp(1rem, 1.1vw, 1.16rem); }
+
+/* ------------------------------------------------------------------
+   2. SCROLL PERFORMANCE
+   The fixed backdrop is a live canvas: every full-screen CSS filter on
+   it is re-run for every painted frame, and every backdrop-filter on a
+   large panel costs the same while the page moves. Those are removed and
+   replaced by static veils, and the purely decorative loops are paused
+   while the reader is actually scrolling (html.is-scrolling).
+   ------------------------------------------------------------------ */
+html.is-scrolling .page-home .hero-photo,
+html.is-scrolling .hero-photo::before,
+html.is-scrolling .section::before,
+html.is-scrolling .hero-embers i,
+html.is-scrolling .qom-rank i,
+html.is-scrolling .supply-board-top i,
+html.is-scrolling .brand-logo,
+html.is-scrolling .brand-logo img,
+html.is-scrolling .emblem-card .emblem-picture,
+html.is-scrolling .emblem-ring,
+html.is-scrolling .scroll-cue i,
+html.is-scrolling body::after,
+html.is-scrolling .coal-page-bg::after { animation-play-state: paused; }
+html.is-scrolling .reel-glass, html.is-scrolling .reel-stage::after { filter: none; }
+
+/* No per-frame filters on the animated layer any more — the grade lives in
+   the veil, which is painted once. */
+.coal-page-bg, .coal-page-bg canvas, .coal-page-bg::after { filter: none !important; }
+html[data-theme="day"] .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(243, 242, 232, .04), rgba(243, 242, 232, .2)),
+    var(--page-bg-img, url('media/coal-texture-bg.webp'));
+}
+html:not([data-theme="day"]) .coal-page-bg {
+  background-image:
+    linear-gradient(180deg, rgba(4, 7, 6, .04), rgba(4, 7, 6, .22)),
+    var(--page-bg-img, url('media/coal-texture-bg.webp'));
+}
+/* Extra presence for the frames themselves, paid for once at draw time */
+.coal-page-bg canvas { opacity: .96; }
+
+/* Big translucent panels used to blur the moving canvas behind them. */
+html[data-theme="day"] .spec-card, html[data-theme="day"] .path-card, html[data-theme="day"] .qom-card,
+html[data-theme="day"] .community-card, html[data-theme="day"] .feature-card, html[data-theme="day"] .image-note,
+html[data-theme="day"] .proof-strip article, html[data-theme="day"] .mini-stats { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+/* Only paint what the viewport can actually see. Sections are far down the
+   page, so skipping their layout/paint is the single biggest scroll win. */
+@supports (content-visibility: auto) {
+  main > .section:not(.hero):not(.page-hero) { content-visibility: auto; contain-intrinsic-size: auto 720px; }
+  .reel-band, .cine-wall, .media-wall { content-visibility: auto; contain-intrinsic-size: auto 560px; }
+}
+
+/* The backdrop no longer needs its own composited layer when it is static */
+.coal-page-bg { will-change: auto; transform: none; }
+
+/* Scrolling should feel immediate: keep the reveals short and cheap */
+.reveal { transition: opacity .5s cubic-bezier(.2, .8, .2, 1), transform .5s cubic-bezier(.2, .8, .2, 1); will-change: opacity, transform; }
+.reveal.visible { will-change: auto; }
+.delay-1 { transition-delay: .05s; } .delay-2 { transition-delay: .1s; } .delay-3 { transition-delay: .15s; }
+
+/* Corrections after the first header screenshots: the drawer CTA must not
+   win against `.main-nav a`, and the nav is centred on the page axis, not on
+   whatever is left over between brand and tools. */
+@media (min-width: 1024px) { .main-nav .nav-drawer-cta { display: none !important; } }
+.header-bar { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+.header-bar > .brand { justify-self: start; }
+.header-bar > .header-tools { justify-self: end; }
+/* At mid widths the wordmark steps back before the nav can feel crowded */
+@media (max-width: 1339px) and (min-width: 1024px) {
+  .brand-sub { display: none; }
+  .site-header .brand-logo { height: 34px; }
+  .main-nav { gap: 0; }
+  .main-nav a { padding: 0 11px; }
+}
+
+/* The legacy collapse rules (680 / 920 / 1020 / 1180 breakpoints) are all
+   superseded by the drawer above; pin the desktop row back on in one place so
+   no old block can flip it to a stacked menu between 1024 and 1180. */
+@media (min-width: 1024px) {
+  .main-nav { display: flex !important; flex-direction: row !important; position: relative !important; top: auto !important; left: auto !important; right: auto !important; width: auto !important; background: transparent; box-shadow: none; padding: 5px; border-radius: 999px; }
+  .site-header.is-scrolled .main-nav, .main-nav:hover { background: rgba(255, 255, 255, .05); }
+  .main-nav.open { display: flex !important; }
+  .header-bar .nav-cta { display: inline-flex; }
+  .menu-toggle { display: none !important; }
+}
+@media (min-width: 1024px) and (max-width: 1180px) { .header-bar .nav-cta { display: none !important; } }
+
+/* Drawer mode keeps the essentials reachable: the day/night switch stays in
+   the bar as an icon, the theme picker joins it above 560px. */
+@media (max-width: 1023px) {
+  .header-tools { gap: 6px; }
+  .nav-actions { display: inline-flex; align-items: center; }
+  .theme-toggle { width: 38px; padding: 0; justify-content: center; }
+  .theme-toggle-label { display: none; }
+  .skin-toggle { width: 38px; padding: 0; justify-content: center; }
+  .header-bar .nav-cta { display: none; }
+}
+@media (max-width: 560px) {
+  .skin-switch { display: none; }
+  .nav-burger { width: 18px; }
+}
+
+/* 1180–1440 the side tracks were narrower than their content, so the tools
+   slid under the last nav item. Tracks may now shrink and the nav centres in
+   the space that is left, which cannot overlap by construction. */
+.header-bar { grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto); }
+.header-bar > .brand { flex: 0 1 auto; min-width: 0; }
+.header-bar > .header-tools { flex: 0 0 auto; }
+.main-nav { justify-self: center; }
+.main-nav a.active { font-weight: 800; }
+.main-nav a.active::before {
+  content: ""; position: absolute; left: 13px; right: 13px; bottom: 5px; height: 2px;
+  border-radius: 2px; background: var(--yellow); opacity: .85;
+}
+html[data-theme="day"] .main-nav a.active::before { background: #17632f; opacity: .7; }
+@media (min-width: 1024px) and (max-width: 1259px) { .header-bar .nav-cta { display: none; } }
+@media (min-width: 1260px) and (max-width: 1339px) { .main-nav a { padding: 0 9px; font-size: .74rem; } .theme-toggle-label, .skin-toggle-label { display: none; } .theme-toggle, .skin-toggle { width: 38px; padding: 0; justify-content: center; } }
+
+/* ---------------------------------------------------------------------------
+   V14 — narrow phones: nothing may stick out past the viewport. At 320px the
+   featured QOM card and the footer wordmark were 11px too wide because their
+   intrinsic min-width fought the grid tracks. `overflow: clip` (not `hidden`)
+   also stops the old body scroller from trapping `position: sticky` children.
+--------------------------------------------------------------------------- */
+@supports (overflow: clip) { html { overflow-x: clip; } }
+@media (max-width: 379px) {
+  :root { --container-pad: 14px; }
+  .container { padding-inline: 14px; }
+  .grid, .grid-2, .grid-3, .grid-4, .split-2, .section, .hero, .hero-inner { min-width: 0; }
+  .grid > *, [class*="grid"] > *, .split-2 > * { min-width: 0; }
+  .brand-mark, .brand-logo { flex: 0 1 auto; min-width: 0; }
+  .brand-name { min-width: 0; overflow: hidden; }
+  .brand-name strong { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+@media (max-width: 359px) {
+  .hero h1 { font-size: clamp(1.75rem, 7.6vw, 2.4rem); }
+  .btn { padding-inline: 16px; }
+}
+@media (max-width: 379px) {
+  .footer .brand { min-width: 0; max-width: 100%; }
+  .footer .brand-name { min-width: 0; }
+  .footer .brand-name > span:first-child { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .footer .brand-sub { display: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   V15 — data grids on tiny phones. Every multi-`fr` grid sized itself from the
+   min-content of its cells (a `535,121.35` figure is 128px wide), so at 320px
+   the track pushed past the viewport and `overflow-x: clip` silently ate the
+   copy. Below 480px these grids stack in one shrinkable column and their
+   `grid-column: span 2` mosaic children are released, which cannot overflow.
+--------------------------------------------------------------------------- */
+@media (max-width: 479px) {
+  .about-legacy, .about-legacy-facts, .client-grid, .contact-grid, .distribution-grid, .editorial-grid, .export-panel, .faq-grid, .footer-top, .form-grid, .intro-grid, .machinery-layout, .mini-stats, .performance-layout, .person-card, .process-grid, .profile-meta, .profile-overview, .qom-facts, .qom-grid, .spec-grid, .story-grid, .transport-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .about-legacy, .about-legacy-facts, .client-grid, .contact-grid, .distribution-grid, .editorial-grid, .export-panel, .faq-grid, .footer-top, .form-grid, .intro-grid, .machinery-layout, .mini-stats, .performance-layout, .person-card, .process-grid, .profile-meta, .profile-overview, .qom-facts, .qom-grid, .spec-grid, .story-grid, .transport-grid > * { grid-column: auto !important; }
+}
+
+/* ---------------------------------------------------------------------------
+   V16 — the bar is the one element that re-blurs its backdrop on every scroll
+   frame, so it is the one place worth spending a solid fill on. Day mode never
+   asked for a blur at all (it only inherited one through the cascade).
+--------------------------------------------------------------------------- */
+html[data-theme="day"] .site-header.is-scrolled { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(246, 248, 241, .93); }
+@media (max-width: 767px) {
+  .site-header.is-scrolled { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(7, 16, 12, .95); }
+  html[data-theme="day"] .site-header.is-scrolled { background: rgba(246, 248, 241, .96); }
+}
+
+/* ---------------------------------------------------------------------------
+   V17 — phone header weight. The logo mark already carries the wordmark, so
+   the repeated "Khaqan" was stealing width the drawer button needs, and two
+   full-opacity pills read heavier than the mark itself.
+--------------------------------------------------------------------------- */
+@media (max-width: 420px) {
+  .header-bar .brand-name { display: none; }
+  .header-bar .brand { gap: 0; }
+}
+@media (max-width: 1023px) {
+  .theme-toggle, .skin-toggle { width: 40px; height: 40px; background: rgba(255, 255, 255, .55); border-color: rgba(16, 74, 38, .16); }
+  .menu-toggle { min-width: 44px; height: 44px; padding: 0 12px; background: rgba(255, 255, 255, .72); border-color: rgba(16, 74, 38, .18); }
+  html:not([data-theme="day"]) .theme-toggle, html:not([data-theme="day"]) .skin-toggle { background: rgba(255, 255, 255, .07); border-color: rgba(195, 218, 198, .2); }
+  html:not([data-theme="day"]) .menu-toggle { background: rgba(255, 255, 255, .1); }
+}
+
+/* V18 — the phone rail scrolls sideways, and only ~3 of the 9 cuts fit at
+   390px, so it gets an explicit affordance: a slim gold scrollbar, a little
+   breathing room on both ends, and thumbs that are never half-cut at the left
+   edge. Cheap on purpose — a mask or an overlay here would cost more paint
+   than it saves. */
+@media (max-width: 900px) {
+  .reel-rail {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(212, 160, 52, .6) transparent;
+    scroll-padding-inline: 8px;
+    padding-inline: 8px 22px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .reel-rail::-webkit-scrollbar { height: 4px; }
+  .reel-rail::-webkit-scrollbar-thumb { border-radius: 4px; background: rgba(212, 160, 52, .6); }
+  .reel-rail::-webkit-scrollbar-track { background: transparent; }
+  .reel-cut { min-width: 104px; }
+}
+
+/* ---------------------------------------------------------------------------
+   V19 — phones only, day mode. The hero veils fade left-to-right so the coal
+   stays visible beside the headline on a laptop, but at 390px the copy runs the
+   full width and its right-hand words were landing on bare imagery. Below
+   560px the same veil runs top-to-bottom: legible headline block, imagery still
+   visible under the buttons.
+--------------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  html[data-theme="day"] .page-hero::after,
+  html[data-theme="day"] body.page-home .hero::after,
+  html[data-skin="marble"][data-theme="day"] .page-hero::after,
+  html[data-skin="marble"][data-theme="day"] body.page-home .hero::after,
+  html[data-skin="obsidian"][data-theme="day"] .page-hero::after,
+  html[data-skin="obsidian"][data-theme="day"] body.page-home .hero::after {
+    background: linear-gradient(180deg,
+      rgba(243, 246, 239, .97) 0%,
+      rgba(243, 246, 239, .93) 42%,
+      rgba(243, 246, 239, .8) 64%,
+      rgba(243, 246, 239, .52) 84%,
+      rgba(243, 246, 239, .26) 100%);
+  }
+  html[data-skin="marble"][data-theme="day"] .page-hero::after,
+  html[data-skin="marble"][data-theme="day"] body.page-home .hero::after {
+    background: linear-gradient(180deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .93) 42%, rgba(247, 244, 236, .8) 64%, rgba(247, 244, 236, .52) 84%, rgba(247, 244, 236, .26) 100%);
+  }
+  html[data-skin="obsidian"][data-theme="day"] .page-hero::after,
+  html[data-skin="obsidian"][data-theme="day"] body.page-home .hero::after {
+    background: linear-gradient(180deg, rgba(242, 241, 239, .97) 0%, rgba(242, 241, 239, .93) 42%, rgba(242, 241, 239, .8) 64%, rgba(242, 241, 239, .52) 84%, rgba(242, 241, 239, .26) 100%);
+  }
+  html:not([data-theme="day"]) .page-hero::after {
+    background: linear-gradient(180deg, rgba(4, 10, 7, .84) 0%, rgba(4, 10, 7, .6) 46%, rgba(4, 10, 7, .28) 100%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   V20 — the home hero's day scrim lives on `.hero::before` (it has to, the
+   coal photo paints at z-index 0 and the veil at 1), so the phone fix belongs
+   there too, not on ::after which only covers the bottom strip. Same three
+   skins, same grid texture, veil turned from left-right to top-bottom.
+--------------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  html[data-theme="day"] .page-home .hero::before {
+    background-image:
+      linear-gradient(180deg, rgba(244, 249, 241, .97) 0%, rgba(244, 249, 241, .94) 44%, rgba(244, 249, 241, .78) 66%, rgba(244, 249, 241, .46) 86%, rgba(244, 249, 241, .2) 100%),
+      linear-gradient(rgba(30, 81, 52, .05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 81, 52, .05) 1px, transparent 1px);
+  }
+  html[data-skin="marble"][data-theme="day"] .page-home .hero::before {
+    background-image:
+      linear-gradient(180deg, rgba(247, 244, 236, .97) 0%, rgba(247, 244, 236, .94) 44%, rgba(247, 244, 236, .78) 66%, rgba(247, 244, 236, .46) 86%, rgba(247, 244, 236, .2) 100%),
+      linear-gradient(rgba(90, 74, 35, .05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(90, 74, 35, .05) 1px, transparent 1px);
+  }
+  html[data-skin="obsidian"][data-theme="day"] .page-home .hero::before {
+    background-image:
+      linear-gradient(180deg, rgba(242, 241, 239, .97) 0%, rgba(242, 241, 239, .94) 44%, rgba(242, 241, 239, .78) 66%, rgba(242, 241, 239, .46) 86%, rgba(242, 241, 239, .2) 100%),
+      linear-gradient(rgba(45, 42, 35, .05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45, 42, 35, .05) 1px, transparent 1px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   V21 — the hero photograph should be the file the page already preloads.
+   Three day-mode heroes pointed at a second image, so the browser had to
+   discover and fetch it after CSS parsing even though a 1376px frame was
+   already in flight from the <link rel=preload>; the LCP element then waited
+   on a cold request. Same bytes, one fetch, and the canvas reuses them.
+--------------------------------------------------------------------------- */
+html[data-theme="day"] .page-about .page-hero { background-image: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-haulroad.webp'); }
+html[data-theme="day"] .page-gallery .page-hero { background-image: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/cine/reel-coalfaces.webp'); }
+html[data-theme="day"] .page-community .page-hero { background-image: linear-gradient(90deg, rgba(245, 249, 242, .95) 0%, rgba(245, 249, 242, .92) 38%, rgba(245, 249, 242, .74) 58%, rgba(245, 249, 242, .34) 80%, rgba(245, 249, 242, .1) 100%), url('media/darra-photo-1.webp'); }
+
+/* V22 — same plateau for the `.page-hero::after` scrim, so the lede never
+   finishes its last line on bare imagery between 46% and 74% of the width. */
+html[data-theme="day"] .page-hero::after {
+  background: linear-gradient(90deg,
+    rgba(243, 246, 239, .97) 0%,
+    rgba(243, 246, 239, .93) 40%,
+    rgba(243, 246, 239, .76) 62%,
+    rgba(243, 246, 239, .4) 82%,
+    rgba(243, 246, 239, .14) 100%);
+}
+
+/* V23 — the theme picker's footnote carries one inline accent; on the cream
+   panel the gold-on-cream glyph was the only unreadable thing in the menu. */
+html[data-theme="day"] .skin-menu-note b { color: #6a4407; }
+html[data-skin="marble"][data-theme="day"] .skin-menu-note b,
+html[data-skin="obsidian"][data-theme="day"] .skin-menu-note b { color: #7a5a12; }
+
+/* V24 — night is the default theme, and on five inner pages its hero photograph was
+   the one image nothing else on the page needed: mine-3d-underground (97KB),
+   coal-rail-transport (367KB), coal-haul-truck (225KB), darra-coal-mines-max (252KB)
+   and mine-3d-trucks (220KB) were fetched only to paint the top of the viewport,
+   competing with the backdrop frame the page already preloads for the same LCP window.
+   Night now paints that already-loaded frame and the dark veil - not a second file -
+   is what makes it night. Same subject per page (rail for supply, coal faces for the
+   gallery, the valley for community, the stockpile for contact), one download instead
+   of two, and the pair of themes stays legible because the veils differ, not the photo.
+   Kept verbatim from the computed cascade so the gradient overlay does not move:
+   background-image only, so center / cover / no-repeat from the base shorthand stand. */
+html[data-theme="night"] .page-operations .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .8) 46%, rgba(7, 19, 12, .25) 100%), url('media/cine/reel-underground.webp'); }
+html[data-theme="night"] .page-supply .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .82) 48%, rgba(7, 19, 12, .25) 100%), url('media/cine/reel-rail.webp'); }
+html[data-theme="night"] .page-gallery .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .82) 48%, rgba(7, 19, 12, .22) 100%), url('media/cine/reel-coalfaces.webp'); }
+html[data-theme="night"] .page-community .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .84) 48%, rgba(7, 19, 12, .22) 100%), url('media/darra-photo-1.webp'); }
+html[data-theme="night"] .page-contact .page-hero { background-image: linear-gradient(90deg, rgba(6, 17, 11, .98) 0%, rgba(7, 19, 12, .84) 48%, rgba(7, 19, 12, .24) 100%), url('media/cine/reel-stockpile.webp'); }
+
+/* V25 — the skip link is only useful if focus actually lands somewhere. #main now
+   carries tabindex="-1", so activating the link moves focus into the content instead
+   of leaving it on <body> (which restarts the tab order at the header). The container
+   must not paint a ring around the whole page when it takes that focus. */
+#main:focus, #main:focus-visible { outline: none; }

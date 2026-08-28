@@ -32,7 +32,7 @@ The website uses the following reference media until the company’s own Darra A
 
 The Darra references remain linked to their original YouTube uploads rather than copied locally. Please confirm the uploader’s permission before using them in a commercial launch.
 - `hauler-360.webm` / `hauler-poster.jpg` — “Articulated hauler dump truck.webm”, by Wikideas1, dedicated under CC0: https://commons.wikimedia.org/wiki/File:Articulated_hauler_dump_truck.webm
-- `coal-train-240.webm` / `coal-train-poster.jpg` — “Eerste kolentrein uit Duitsland over de Maas bij Roermond-519002.ogv”, historical coal-train transport footage from the Netherlands Institute for Sound and Vision, licensed CC BY-SA 3.0 NL: https://commons.wikimedia.org/wiki/File:Eerste_kolentrein_uit_Duitsland_over_de_Maas_bij_Roermond-519002.ogv
+- `coal-train-240.webm` / `coal-train-poster.jpg` (CRM media library only) — “Eerste kolentrein uit Duitsland over de Maas bij Roermond-519002.ogv”, historical coal-train transport footage from the Netherlands Institute for Sound and Vision, licensed CC BY-SA 3.0 NL: https://commons.wikimedia.org/wiki/File:Eerste_kolentrein_uit_Duitsland_over_de_Maas_bij_Roermond-519002.ogv
 
 Please review each license and attribution requirement before deploying the site commercially. For the strongest brand result, replace these reference assets with original photographs and videos from Khaqan Coal Company’s own operation.
 
@@ -42,7 +42,8 @@ Please review each license and attribution requirement before deploying the site
 
 - `media/brand/logo-official-black.png`, `media/brand/logo-official-ivory.png`, `media/brand/logo-official-ivory-2.png` — official Khaqan Coal Company logo artwork, supplied by the company. All rights reserved.
 - `media/logo-official.png`, `media/logo-mark.png` — transparent production versions derived from the official logo for headers, footers, and the CRM.
-- `media/logo-official-black.jpg` — presentation lockup used for social sharing (og:image).
+- `media/logo-official-black.jpg` — presentation lockup, retained as brand artwork (the social
+  sharing image is now the generated `media/og/` card set described above).
 - `favicon.png` — favicon derived from the official emblem.
 - `media/darra-photo-1.jpg` … `media/darra-photo-4.jpg` — photographs of Darra Adam Khel supplied by the company; used on the Gallery, Community, and About pages.
 
@@ -58,3 +59,116 @@ Please review each license and attribution requirement before deploying the site
 ## WebP optimisation (added 2026-08)
 
 All page imagery now ships as WebP through `<picture>` (with the original JPG as fallback) or as a WebP CSS background. Originals are retained on disk. The landing-page background video (`coal-mining-360.webm` as a fixed full-page loop) was removed; it remains available for the home reel and CRM library.
+
+## Reel and backdrop renders (added 2026-08-27)
+
+- `media/cine/reel-bucketwheel.jpg/.webp` — bucket-wheel excavator cutting a highwall bench at sunrise.
+- `media/cine/reel-underground.jpg/.webp` — lit underground development heading with roof bolts and a shuttle car.
+- `media/cine/reel-aerial.jpg/.webp` — aerial view of a terraced mountain open-pit with haul ramps.
+- `media/cine/reel-rail.jpg/.webp` — wagon-loading gantry at a mountain railhead at dusk.
+- `media/cine/reel-stockpile.jpg/.webp` — reclaimed stockpile domes with stacker/reclaimer at blue hour.
+- `media/cine/reel-haulroad.jpg/.webp` — loaded haul trucks on a switchback mountain haul road.
+- `media/cine/reel-conveyor.jpg/.webp` — covered transfer conveyor crossing a valley between pits.
+- `media/cine/reel-coalfaces.jpg/.webp` — macro study of coal faces, lumps and geology samples.
+
+All eight are original 3D renders generated for this site in the same visual language as the existing
+`media/mine-3d-*` and `media/cine/hero-*` frames. No third-party licensing required; style reference only:
+https://www.vecteezy.com/free-photos/mining-3d (no stock asset was downloaded or rehosted).
+
+- `media/cine/thumb-coal-mining.webp`, `thumb-excavator.webp`, `thumb-hauler.webp`, `thumb-darra-photo-2.webp`,
+  `thumb-reel-*.webp` — 220px derivative thumbnails cut from assets already in this repository, used only by the
+  home-page reel chapter rail so the strip stays under ~10KB per item.
+
+## Usage notes (2026-08-27)
+
+- Every public page now carries the fixed cinematic backdrop (`.coal-page-bg`): the home page cycles
+  `hero-01…hero-05` plus three reel frames, and each inner page cycles its own five-frame set drawn from
+  `media/cine/*`, `media/mine-3d-*`, `media/darra-photo-*` and the transport photos. See `script.js`
+  ("Cinematic 3D backdrop").
+- The archival clip `coal-train-240.webm` is no longer embedded on the Supply page; it was replaced by the
+  `reel-rail` render. The file and its attribution above are kept for the CRM media library.
+
+## Rendered sizes (`-768.webp`)
+
+Every photograph that appears inside a `<picture>` in a figure wall ships in two
+renditions: the master (`media/…webp`, 1376–2048 px wide) and a `…-768.webp`
+derivative for the boxes it is actually painted into (the grids render 298–610 px).
+The markup lists both in one `srcset`, so a 1x display takes the small file and a
+retina display takes the master — nobody gets upscaled, and nobody downloads a
+1376 px file for a 298 px slot.
+
+* The derivative is generated from the master, never the other way round:
+  `PIL.Image.resize(..., LANCZOS)` then `save(..., 'WEBP', quality=80, method=6, exact=True)`.
+* Ship the pair together. If you delete the master the `srcset` breaks; if you delete
+  the derivative the browser just always takes the master (works, heavier).
+* The full-viewport backdrop frames (`<img class="cine-src">`) and each page's
+  `<link rel="preload" as="image">` target deliberately have **no** small rendition —
+  the canvas reads the raw `src` attribute and paints full-bleed, and the preload has to
+  stay the same file the hero paints (see `deploy.md` §5).
+
+The nine home-page reel chapter thumbnails also carry a `…-120.webp` candidate
+(`srcset="X-120.webp 120w, X.webp 220w" sizes="(min-width: 700px) 56px, 104px"`) because
+that strip paints 54px on the desktop and 102px on a phone: 71KB of thumbs becomes 25KB on
+a 1x display, while a 2x phone still takes the 220px master.
+
+The brand mark ships in three renditions - `logo-mark-128.webp` (128 px),
+`logo-mark-260.webp` (260 px) and the `logo-mark.webp` master (286 px), with the
+`-light` variants alongside for day mode - because it is painted into fixed boxes:
+58 px in the site header, 119 px in the footer, and 78 px in the CRM's own top bar
+(which therefore lists only the 260 px tier - see `deploy.md` §5). The originals are the PNGs
+(`logo-mark.png`, kept as the `<picture>` fallback for browsers without WebP); both tiers
+are cut from the master at `quality=90, method=6, exact=True` on an RGBA image, so the
+transparent surround survives. The `-128` pair is what the service worker precaches.
+
+Video posters are `.webp` only. The three `*-poster.jpg` masters are kept because the CRM
+media library lists them as source files, but no page markup references them.
+
+## App icons (`media/icons/`)
+
+`icon-192.png`, `icon-512.png` (purpose `any`) and `icon-maskable-192/-512.png` (purpose
+`maskable`) plus `apple-touch-icon.png` (180) are all composed from `logo-mark.png` on a
+`#07100d` fill - the night signature body colour, which is also the manifest's
+`background_color`, so the splash screen, the icon and the first painted frame are one
+colour. Regenerate with:
+
+```python
+from PIL import Image
+src = Image.open('media/logo-mark.png').convert('RGBA')
+for name, size, frac in (('icon-192', 192, .80), ('icon-512', 512, .80),
+                         ('icon-maskable-192', 192, .60), ('icon-maskable-512', 512, .60),
+                         ('apple-touch-icon', 180, .72)):
+    c = Image.new('RGBA', (size, size), (7, 16, 13, 255))
+    w = int(size * frac); h = round(src.height * w / src.width)
+    c.alpha_composite(src.resize((w, h), Image.LANCZOS), ((size - w) // 2, (size - h) // 2))
+    c.convert('RGB').quantize(colors=255, method=Image.MEDIANCUT,
+                              dither=Image.Dither.FLOYDSTEINBERG).save(f'media/icons/{name}.png', 'PNG', optimize=True)
+```
+
+Quantising with Floyd-Steinberg dithering is what keeps the gold gradients band-free while
+taking the 512px file from 184KB (true-colour, transparent) to ~55KB. The maskable tier
+uses `frac = .60` so the artwork stays inside the launcher's central 80% safe zone.
+`favicon.png` (128, true alpha) is untouched and still serves the tab and the `any` slot
+at small sizes.
+
+Every URL in that block - the four logo renditions, the master, and each icon - carries
+`?v=1` in the markup, in `site.webmanifest` and in `sw.js`'s `SHELL`, because `/media/*`
+is served `immutable` for a year and a re-derived file is otherwise invisible to returning
+visitors. Re-running the snippet and changing the bytes means bumping that token.
+
+The full-bleed coal texture (`media/coal-texture-bg.webp`, 1376x768) is the fallback
+behind `.coal-page-bg` for any skin that does not set `--page-bg-img`; every CSS reference
+now names the `.webp`, so `coal-texture-bg.jpg` (208KB, the unversioned original) is left
+in place only as a source file and is requested by nothing.
+
+## Social cards (`media/og/`)
+
+`index.jpg`, `about.jpg`, `operations.jpg`, `supply.jpg`, `gallery.jpg`, `community.jpg`,
+`contact.jpg` — 1200x630 previews generated in-house from this site's own hero photographs
+plus `media/logo-mark.png`; no third-party artwork, no external fonts (DejaVu is the
+render-time font). Each is 88-160KB, interlaced JPEG at quality 82. Regeneration and the
+`?v=` bump that goes with it are documented in `deploy.md` section 6.
+
+Removed as unreferenced (still recoverable from git history if a design ever wants them
+back): `mining-pit.webp` (the Pexels 38643910 derivative above), `logo-official.webp`,
+`logo-official-light.webp` (the true masters are in `media/brand/`), and
+`coal-texture-bg.jpg` (superseded in every rule by `coal-texture-bg.webp`).

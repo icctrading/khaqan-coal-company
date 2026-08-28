@@ -33,3 +33,10 @@ Reference mining photos and open-licensed short videos are in `/media`. Attribut
 The site ships with three premium brand skins — **Signature** (forest coal & gold, the original look), **Marble Gold** (white marble by day / black marble by night) and **Obsidian** (metallic black & gold by night / platinum by day). Use the **◈ Theme** button in the header (and in the CRM) to switch; the ☼/☾ toggle keeps day/night mode inside every theme. Choices persist per browser and sync across open tabs.
 
 Official logo artwork lives in `media/brand/`; production versions (`media/logo-mark.png`, `media/logo-official.png`, `favicon.png`) are derived from it.
+
+## Caching, service worker and scroll performance
+
+See `deploy.md` → “Caching” and “Scrolling performance conventions”. In short: assets are
+`immutable` and keyed by their `?v=` token, `sw.js` handles offline and repeat visits, and
+decorative work (canvas, animations, filters) pauses while the page is being scrolled.
+When you edit a CSS or JS file, raise its `?v=` number in every HTML page and in `sw.js`.
