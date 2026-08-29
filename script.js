@@ -68,15 +68,24 @@ const mediaWrite = (items) => {
   try { window.localStorage.setItem(MEDIA_KEY, JSON.stringify(items)); } catch (error) { /* no-op */ }
   try { window.dispatchEvent(new CustomEvent('khaqan:media-change')); } catch (error) { /* no-op */ }
 };
-const normalizeMediaItem = (item, i = 0) => ({
-  id: (item && item.id) || `media-${Date.now()}-${i}-${Math.floor(Math.random() * 1e6)}`,
-  type: item && item.type === 'video' ? 'video' : 'image',
-  title: (item && item.title) || 'Untitled',
-  section: (item && item.section) || 'general',
-  url: (item && item.url) || '',
-  storagePath: (item && item.storagePath) || '',
-  addedAt: (item && item.addedAt) || new Date().toISOString()
-});
+const normalizeMediaItem = (item, i = 0) => {
+  const section = (item && item.section) || 'general';
+  const isTeam = /^team-/.test(section);
+  return {
+    id: (item && item.id) || `media-${Date.now()}-${i}-${Math.floor(Math.random() * 1e6)}`,
+    type: item && item.type === 'video' ? 'video' : 'image',
+    title: (item && item.title) || 'Untitled',
+    section,
+    /* Page area + slot: together with `section` they say exactly where on
+       the public site this file appears. Legacy items without an area land
+       in that page's "Fresh from the field" gallery. */
+    area: (item && item.area) || (isTeam ? 'portrait' : 'gallery'),
+    slot: (item && item.slot) || '',
+    url: (item && item.url) || '',
+    storagePath: (item && item.storagePath) || '',
+    addedAt: (item && item.addedAt) || new Date().toISOString()
+  };
+};
 window.KhaqanMedia = {
   get: mediaRead,
   add: (item) => {
@@ -133,6 +142,186 @@ window.KHAQAN_MEDIA_SECTION_LABEL = (value) => {
   const match = window.KHAQAN_MEDIA_SECTIONS.find((s) => s.value === value);
   return match ? match.label : value;
 };
+
+/* Page + page-area map. Every public visual slot the Control Room can
+   replace is listed here so CRM cards can show "Home · Field notes · 01"
+   and the public pages can swap the matching `[data-media-slot]`. */
+const MEDIA_SLOT = (id, label, defaultSrc) => ({ id, label, defaultSrc });
+window.KHAQAN_PAGES = [
+  { id: 'home', label: 'Home', href: 'index.html' },
+  { id: 'about', label: 'About us', href: 'about.html' },
+  { id: 'operations', label: 'Operations', href: 'operations.html' },
+  { id: 'supply', label: 'Supply', href: 'supply.html' },
+  { id: 'gallery', label: 'Gallery', href: 'gallery.html' },
+  { id: 'community', label: 'Community', href: 'community.html' },
+  { id: 'contact', label: 'Contact', href: 'contact.html' },
+  { id: 'general', label: 'Library only', href: '' }
+];
+window.KHAQAN_PAGE_AREAS = {
+  home: [
+    { id: 'gallery', label: 'Fresh from the field', kind: 'gallery' },
+    { id: 'reel', label: 'Highlights reel', kind: 'slots', slots: [
+      MEDIA_SLOT('1', '01 · Open pit', 'media/coal-mining-poster.webp'),
+      MEDIA_SLOT('2', '02 · Cutting face', 'media/cine/reel-bucketwheel.webp'),
+      MEDIA_SLOT('3', '03 · Terraces', 'media/cine/reel-aerial.webp'),
+      MEDIA_SLOT('4', '04 · Coal on the move', 'media/excavator-poster.webp'),
+      MEDIA_SLOT('5', '05 · Longwall', 'media/cine/reel-underground.webp'),
+      MEDIA_SLOT('6', '06 · Hauler', 'media/hauler-poster.webp'),
+      MEDIA_SLOT('7', '07 · Haul road', 'media/cine/reel-haulroad.webp'),
+      MEDIA_SLOT('8', '08 · Our valley', 'media/darra-photo-2.webp'),
+      MEDIA_SLOT('9', '09 · Railhead', 'media/cine/reel-rail.webp')
+    ] },
+    { id: 'journey', label: 'From seam to site', kind: 'slots', slots: [
+      MEDIA_SLOT('1', '01 / Origin', 'media/mine-3d-underground.webp'),
+      MEDIA_SLOT('2', '02 / Align', 'media/mine-3d-stockpile.webp'),
+      MEDIA_SLOT('3', '03 / Destination', 'media/coal-haul-truck.webp')
+    ] },
+    { id: 'field-notes', label: 'Field notes', kind: 'slots', slots: [
+      MEDIA_SLOT('1', '01 · Field reference', 'media/mine-3d-terraces.webp'),
+      MEDIA_SLOT('2', '02 · Heavy equipment', 'media/mine-3d-underground.webp'),
+      MEDIA_SLOT('3', '03 · Motion study', 'media/excavator-poster.webp')
+    ] },
+    { id: 'distribution', label: 'Mine · move · market', kind: 'slots', slots: [
+      MEDIA_SLOT('1', '01 · Mine to road', 'media/coal-haul-truck.webp'),
+      MEDIA_SLOT('2', '02 · Rail movement', 'media/coal-rail-transport.webp'),
+      MEDIA_SLOT('3', '03 · Site logistics', 'media/coal-mine-transport.webp')
+    ] }
+  ],
+  about: [
+    { id: 'gallery', label: 'Fresh from the field', kind: 'gallery' },
+    { id: 'legacy', label: 'Valley story', kind: 'slots', slots: [
+      MEDIA_SLOT('1', 'Where the valley meets the work', 'media/cine/valley-dawn.webp')
+    ] },
+    { id: 'field', label: 'Company in the field', kind: 'slots', slots: [
+      MEDIA_SLOT('1', 'Mining context', 'media/mine-3d-terraces.webp'),
+      MEDIA_SLOT('2', 'Distribution', 'media/coal-haul-truck.webp'),
+      MEDIA_SLOT('3', 'Home ground', 'media/darra-photo-4.webp'),
+      MEDIA_SLOT('4', 'Field footage', 'media/coal-mining-poster.webp')
+    ] }
+  ],
+  operations: [
+    { id: 'gallery', label: 'Fresh from the field', kind: 'gallery' },
+    { id: 'machinery', label: 'Heavy machinery', kind: 'slots', slots: [
+      MEDIA_SLOT('1', 'Conveyor system', 'media/mining-conveyor.webp'),
+      MEDIA_SLOT('2', 'Bucket-wheel excavation', 'media/welzow-bucket-poster.webp')
+    ] },
+    { id: 'field', label: 'Real field references', kind: 'slots', slots: [
+      MEDIA_SLOT('1', 'Aerial view', 'media/mining-site.webp'),
+      MEDIA_SLOT('2', 'Conveyor system', 'media/mining-conveyor.webp'),
+      MEDIA_SLOT('3', 'Open footage', 'media/hauler-poster.webp'),
+      MEDIA_SLOT('4', 'Coal transport', 'media/coal-haul-truck.webp'),
+      MEDIA_SLOT('5', 'Mine layout', 'media/mining-aerial.webp'),
+      MEDIA_SLOT('6', 'Haul road', 'media/coal-mine-transport.webp')
+    ] }
+  ],
+  supply: [
+    { id: 'gallery', label: 'Fresh from the field', kind: 'gallery' },
+    { id: 'transport', label: 'Distribution & export', kind: 'slots', slots: [
+      MEDIA_SLOT('1', 'Mine to road', 'media/coal-haul-truck.webp'),
+      MEDIA_SLOT('2', 'Coal by truck', 'media/coal-mine-transport.webp'),
+      MEDIA_SLOT('3', 'Coal by rail', 'media/cine/reel-rail.webp')
+    ] }
+  ],
+  gallery: [
+    { id: 'gallery', label: 'Fresh from the field', kind: 'gallery' },
+    { id: 'stills', label: 'Place · process · pride', kind: 'slots', slots: [
+      MEDIA_SLOT('1', '01 · The source', 'media/cine/hero-01.webp'),
+      MEDIA_SLOT('2', '02 · Stockpile operations', 'media/cine/hero-04.webp'),
+      MEDIA_SLOT('3', '03 · The material', 'media/cine/coal-rock.webp'),
+      MEDIA_SLOT('4', '04 · Material flow', 'media/cine/gallery-conveyor.webp'),
+      MEDIA_SLOT('5', '05 · Terraced benches', 'media/mine-3d-terraces.webp'),
+      MEDIA_SLOT('6', '06 · Underground', 'media/mine-3d-underground.webp'),
+      MEDIA_SLOT('7', '07 · Haul road', 'media/mine-3d-trucks.webp'),
+      MEDIA_SLOT('8', '08 · The full pit', 'media/cine/hero-05.webp')
+    ] },
+    { id: 'film', label: 'Motion from the field', kind: 'slots', slots: [
+      MEDIA_SLOT('1', 'Excavation', 'media/excavator-poster.webp'),
+      MEDIA_SLOT('2', 'Surface mining', 'media/welzow-bucket-poster.webp'),
+      MEDIA_SLOT('3', 'Haul road', 'media/hauler-poster.webp'),
+      MEDIA_SLOT('4', 'Rail movement', 'media/cine/reel-rail.webp')
+    ] },
+    { id: 'hometown', label: 'Darra Adam Khel · our home', kind: 'slots', slots: [
+      MEDIA_SLOT('1', 'The valley', 'media/darra-photo-1.webp'),
+      MEDIA_SLOT('2', 'Mine country', 'media/darra-photo-2.webp'),
+      MEDIA_SLOT('3', 'The ground that moves the coal', 'media/darra-photo-3.webp'),
+      MEDIA_SLOT('4', 'Local ground', 'media/darra-photo-4.webp')
+    ] }
+  ],
+  community: [
+    { id: 'gallery', label: 'Fresh from the field', kind: 'gallery' },
+    { id: 'field', label: 'Work and landscape', kind: 'slots', slots: [
+      MEDIA_SLOT('1', 'Home ground', 'media/darra-photo-1.webp'),
+      MEDIA_SLOT('2', 'Mine country', 'media/darra-photo-2.webp'),
+      MEDIA_SLOT('3', 'Movement', 'media/darra-photo-3.webp'),
+      MEDIA_SLOT('4', 'Our people', 'media/darra-photo-4.webp')
+    ] }
+  ],
+  contact: [
+    { id: 'gallery', label: 'Fresh from the field', kind: 'gallery' }
+  ],
+  general: [
+    { id: 'library', label: 'Unplaced library', kind: 'gallery' }
+  ]
+};
+
+window.KHAQAN_MEDIA_PLACEMENT = (() => {
+  const pages = () => window.KHAQAN_PAGES || [];
+  const areasOf = (pageId) => (window.KHAQAN_PAGE_AREAS && window.KHAQAN_PAGE_AREAS[pageId]) || [];
+  const isTeam = (item) => !!(item && /^team-/.test(item.section));
+  const pageOf = (item) => {
+    if (!item) return 'general';
+    if (isTeam(item)) return 'about';
+    return item.section || 'general';
+  };
+  const areaOf = (item) => {
+    if (!item) return 'gallery';
+    if (isTeam(item)) return 'portrait';
+    return item.area || 'gallery';
+  };
+  const slotOf = (item) => (item && item.slot) || '';
+  const isGallery = (item) => {
+    if (!item || isTeam(item)) return false;
+    const area = areaOf(item);
+    return area === 'gallery' || area === 'library' || area === '';
+  };
+  const pageMeta = (pageId) => pages().find((p) => p.id === pageId) || { id: pageId, label: pageId, href: '' };
+  const areaMeta = (pageId, areaId) => areasOf(pageId).find((a) => a.id === areaId) || null;
+  const slotMeta = (pageId, areaId, slotId) => {
+    const area = areaMeta(pageId, areaId);
+    if (!area || !area.slots) return null;
+    return area.slots.find((s) => s.id === String(slotId)) || null;
+  };
+  const label = (item) => {
+    if (isTeam(item)) {
+      return {
+        page: 'Home & About',
+        area: window.KHAQAN_MEDIA_SECTION_LABEL ? window.KHAQAN_MEDIA_SECTION_LABEL(item.section) : item.section,
+        slot: '',
+        href: 'about.html',
+        text: `Home & About · ${window.KHAQAN_MEDIA_SECTION_LABEL ? window.KHAQAN_MEDIA_SECTION_LABEL(item.section) : item.section}`
+      };
+    }
+    const pageId = pageOf(item);
+    const areaId = areaOf(item);
+    const slotId = slotOf(item);
+    const page = pageMeta(pageId);
+    const area = areaMeta(pageId, areaId);
+    const slot = slotId ? slotMeta(pageId, areaId, slotId) : null;
+    const areaName = area ? area.label : (areaId || 'Fresh from the field');
+    const slotName = slot ? slot.label : '';
+    const parts = [page.label, areaName].concat(slotName ? [slotName] : []);
+    return { page: page.label, area: areaName, slot: slotName, href: page.href || '', text: parts.join(' · ') };
+  };
+  const occupant = (items, pageId, areaId, slotId) => {
+    const list = Array.isArray(items) ? items : [];
+    const wantSlot = String(slotId || '1');
+    return list.find((m) => pageOf(m) === pageId && areaOf(m) === areaId && (slotOf(m) || '1') === wantSlot && !isGallery(m)) || null;
+  };
+  return {
+    pages, areasOf, pageOf, areaOf, slotOf, isGallery, isTeam,
+    pageMeta, areaMeta, slotMeta, label, occupant
+  };
+})();
 
 function applyCmsData() {
   const data = getCmsData();
@@ -1160,13 +1349,19 @@ document.querySelectorAll('[data-team-hero]').forEach((hero) => {
     return `<video controls muted loop playsinline preload="metadata">${source}</video>`;
   }
 
+  function isGalleryPlacement(item) {
+    const place = window.KHAQAN_MEDIA_PLACEMENT;
+    if (place) return place.isGallery(item);
+    return item && !/^team-/.test(item.section || '') && (!item.area || item.area === 'gallery' || item.area === 'library');
+  }
+
   function renderManagedMedia() {
     const media = window.KhaqanMedia ? window.KhaqanMedia.get() : [];
     document.querySelectorAll('[data-managed-media]').forEach((wrap) => {
       const section = wrap.dataset.managedMedia;
-      // Team portraits are never part of a page gallery — they live in the
-      // rotating hero / leadership cards.
-      const items = media.filter((m) => m.section === section && !/^team-/.test(m.section));
+      // Team portraits and page-area slot replacements are never part of the
+      // "Fresh from the field" gallery — they live in their named slots.
+      const items = media.filter((m) => m.section === section && isGalleryPlacement(m));
       const existing = wrap.querySelector('.managed-media-grid');
       const empty = wrap.querySelector('.managed-media-empty');
       if (!items.length) {
@@ -1234,12 +1429,84 @@ document.querySelectorAll('[data-team-hero]').forEach((hero) => {
     });
   }
 
+  /* Replace a named page-area figure (`data-media-slot="home:field-notes:1"`)
+     with a Control Room upload. Removing the upload restores the original
+     markup that shipped with the page. */
+  const slotOriginals = new WeakMap();
+  function isSlotMediaNode(node) {
+    if (!node || node.nodeType !== 1) return false;
+    const tag = node.tagName;
+    if (tag === 'PICTURE' || tag === 'IMG' || tag === 'VIDEO') return true;
+    return node.classList && node.classList.contains('cine-scene');
+  }
+  function captureSlotDefault(el) {
+    if (slotOriginals.has(el)) return;
+    const snapshot = Array.from(el.children).filter(isSlotMediaNode).map((node) => node.cloneNode(true));
+    slotOriginals.set(el, snapshot);
+  }
+  function insertSlotNode(el, node) {
+    const shade = el.querySelector('.reel-slide-shade, .journey-tag, .journey-glint, .journey-process-dots, .journey-route-line, figcaption');
+    if (shade) el.insertBefore(node, shade);
+    else el.insertBefore(node, el.firstChild);
+  }
+  function restoreSlotDefault(el) {
+    const saved = slotOriginals.get(el);
+    if (!saved) return;
+    Array.from(el.children).filter(isSlotMediaNode).forEach((node) => node.remove());
+    saved.forEach((node) => insertSlotNode(el, node.cloneNode(true)));
+    el.classList.remove('has-media-override');
+  }
+  function paintSlotOverride(el, item) {
+    captureSlotDefault(el);
+    Array.from(el.children).filter(isSlotMediaNode).forEach((node) => node.remove());
+    let node;
+    if (item.type === 'video') {
+      node = document.createElement('video');
+      node.setAttribute('controls', '');
+      node.muted = true;
+      node.loop = true;
+      node.playsInline = true;
+      node.setAttribute('preload', 'metadata');
+      node.setAttribute('aria-label', item.title || 'Field video');
+      const source = document.createElement('source');
+      source.src = item.url;
+      node.appendChild(source);
+      try { node.src = item.url; } catch (error) { /* source tag is enough */ }
+    } else {
+      node = document.createElement('img');
+      node.src = item.url;
+      node.alt = item.title || '';
+      node.loading = 'lazy';
+      node.decoding = 'async';
+    }
+    insertSlotNode(el, node);
+    el.classList.add('has-media-override');
+  }
+  function applyMediaSlots() {
+    const media = window.KhaqanMedia ? window.KhaqanMedia.get() : [];
+    const place = window.KHAQAN_MEDIA_PLACEMENT;
+    document.querySelectorAll('[data-media-slot]').forEach((el) => {
+      const key = el.dataset.mediaSlot || '';
+      const parts = key.split(':');
+      if (parts.length < 2) return;
+      const pageId = parts[0];
+      const areaId = parts[1];
+      const slotId = parts[2] || '1';
+      const item = place
+        ? place.occupant(media, pageId, areaId, slotId)
+        : media.find((m) => m.section === pageId && (m.area || '') === areaId && (m.slot || '1') === slotId);
+      if (item && item.url) paintSlotOverride(el, item);
+      else restoreSlotDefault(el);
+    });
+  }
+
   renderManagedMedia();
   applyTeamPhotos();
+  applyMediaSlots();
 
   // Live-update when the Control Room adds/removes media in another tab,
   // or when the shared Supabase catalogue hydrates in this tab.
-  const refreshPublicMedia = () => { renderManagedMedia(); applyTeamPhotos(); };
+  const refreshPublicMedia = () => { renderManagedMedia(); applyTeamPhotos(); applyMediaSlots(); };
   window.addEventListener('storage', (event) => {
     if (event.key === MEDIA_KEY) refreshPublicMedia();
   });

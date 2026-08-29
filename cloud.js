@@ -133,6 +133,8 @@
     type: row.kind === 'video' ? 'video' : 'image',
     title: row.title || 'Untitled',
     section: row.section || 'general',
+    area: row.area || 'gallery',
+    slot: row.slot || '',
     url: row.public_url || '',
     storagePath: row.storage_path || '',
     mimeType: row.mime_type || '',
@@ -195,7 +197,7 @@
     return (rows || []).map(normalizeMedia);
   }
 
-  async function uploadMedia({ file, title, section, type } = {}) {
+  async function uploadMedia({ file, title, section, type, area, slot } = {}) {
     if (!file) throw new Error('Choose a file first.');
     const uploaded = await uploadObject(file, section);
     const rows = await request('media', {
@@ -204,6 +206,8 @@
       body: JSON.stringify({
         title: title || 'Untitled',
         section: section || 'general',
+        area: area || 'gallery',
+        slot: slot || '',
         kind: type === 'video' ? 'video' : 'image',
         storage_path: uploaded.storagePath,
         public_url: uploaded.publicUrl,
@@ -219,6 +223,8 @@
     const next = {};
     if (patch.title != null) next.title = patch.title;
     if (patch.section != null) next.section = patch.section;
+    if (patch.area != null) next.area = patch.area;
+    if (patch.slot != null) next.slot = patch.slot;
     if (patch.type) next.kind = patch.type === 'video' ? 'video' : 'image';
     if (patch.file) {
       const uploaded = await uploadObject(patch.file, patch.section || 'general');

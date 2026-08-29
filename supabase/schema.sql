@@ -127,6 +127,8 @@ create table if not exists public.media (
   id uuid primary key default gen_random_uuid(),
   title text not null default 'Untitled',
   section text not null default 'general',
+  area text not null default 'gallery',
+  slot text not null default '',
   kind text not null default 'image' check (kind in ('image', 'video')),
   storage_path text not null unique,
   public_url text not null,
@@ -135,6 +137,9 @@ create table if not exists public.media (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.media add column if not exists area text not null default 'gallery';
+alter table public.media add column if not exists slot text not null default '';
 
 alter table public.media enable row level security;
 

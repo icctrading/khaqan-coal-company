@@ -44,7 +44,7 @@ The admin check is read through the `rpc/is_admin` endpoint (the `public.is_admi
 `supabase/schema.sql` also creates:
 
 1. A public **`media` Storage bucket** (50 MB/file) for CRM uploads and leadership portraits.
-2. A **`public.media`** catalogue table (`title`, `section`, `kind`, `storage_path`, `public_url`, …).
+2. A **`public.media`** catalogue table (`title`, `section`, `area`, `slot`, `kind`, `storage_path`, `public_url`, …). `section` is the public page, `area` is the page region (gallery, field notes, reel, …) and `slot` is the named photograph inside that region. Re-run the `alter table public.media add column if not exists` lines if the project already had a `media` table.
 3. RLS on both: **anon/authenticated can read**; **only `public.is_admin()` can insert, update, or delete**.
 
 After running the schema:
