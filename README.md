@@ -10,18 +10,16 @@ Open the live preview for port 8000. The public site is `index.html`, the busine
 
 ## Browser CRM
 
-The CRM is a working local prototype:
+The CRM is locked behind a real login. Opening `crm.html` without an authenticated admin session shows only a **sign-in / sign-up / forgot-password** screen — no metrics, enquiries, media, site-content fields, sidebar tabs, or JSON export/import are rendered or reachable until you pass the gate.
 
-- Edit website identity, director, ownership, location, hero text, and contact channels.
-- Save changes to `localStorage`; the public pages read the same data automatically.
-- Public enquiries submitted from `contact.html` are saved to the local CRM.
-- Update enquiry status, search, delete, clear, export, and import JSON backups (backups include the media library too).
-- **Media library**: upload images and videos, and *manage* anything already added — retitle, move it to another part of the site, swap the file, or remove it. With a signed-in admin session the files go to the shared Supabase `media` bucket; otherwise they stay in this browser (`localStorage`, 12 MB/file).
-- **Leadership portraits**: a dedicated panel uploads/replaces/removes the Director, CEO, MD and CFO photographs that appear in the rotating leadership hero (Home) and the team cards (About). Initials are shown until a portrait is set. Portraits use the same shared storage when the cloud CRM is connected.
-- **Password reset**: once Supabase is connected, the cloud sign-in card offers **Forgot password?** — a reset link is emailed and opens the CRM to set a new password (see `deploy.md` for the Supabase redirect-URL setup).
-- Use the **Open main website** button in the CRM to launch the public site in a new tab.
+- **Sign in**: an Auth user whose UUID is allow-listed in `public.admin_users` (checked via `public.is_admin()`) gets the full Control Room.
+- **Sign up**: `cloud.js` exposes `signUp(email, password)` via `POST /auth/v1/signup`. Signing up creates an account but grants **no** CRM access — the new user sees “account created — wait for an administrator to allow-list your user in `admin_users`”. If Supabase email confirmation is on, the sign-up flow asks them to confirm their email first.
+- **Password reset**: the **Forgot password?** link emails a recovery link that returns to `crm.html` and opens the **Set a new password** form (both implicit `#access_token` and PKCE `?code` links are handled). Recovery lands on the auth screen, never the CRM.
+- **Admin workspace**: after sign-in you can edit website identity/director/ownership/location/hero text/contact channels, manage enquiries (status, search, delete, clear, export/import JSON backups), and manage the media library and leadership portraits. Only an admin session triggers `listEnquiries` / `listMedia` / CRM `getSettings`; public pages stay public and the Contact form still creates enquiries.
+- **Media library**: upload images/videos and *manage* items — retitle, move to another part of the site, swap the file, or remove it. With an admin session files go to the shared Supabase `media` bucket; if a cloud request fails, the same UI falls back to `localStorage` (12 MB/file) — but only after admin login.
+- **Leadership portraits**: upload/replace/remove the Director, CEO, MD and CFO photographs shown in the rotating leadership hero (Home) and team cards (About).
 
-For a real team CRM, connect the same UI to Supabase using `supabase/schema.sql` and `supabase-config.js`. That schema creates the `media` table and the public `media` Storage bucket (anon read, `is_admin()` write/delete). The browser bridge in `cloud.js` keeps the public site and CRM local-first until those values are filled. Use the cloud login in the CRM after adding an Auth user and allow-listing its UUID in `admin_users`.
+Connect the UI to Supabase with `supabase/schema.sql` and `supabase-config.js`. The schema creates the `media` table and the public `media` Storage bucket (anon read, `is_admin()` write/delete) and the `is_admin()` gate. The **first user still needs an explicit `insert into public.admin_users (user_id)`** — signing up or creating the Auth user alone does not grant access (see `deploy.md`).
 
 ## Hosting
 

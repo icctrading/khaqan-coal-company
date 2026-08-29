@@ -256,6 +256,38 @@
     return payload;
   }
 
+  /* Create a new Auth account. This does NOT grant CRM access: only a row in
+     public.admin_users (checked via public.is_admin()) can read or mutate CRM
+     data. With email confirmation ON Supabase returns the new user without a
+     session (access_token) — the caller shows a "confirm your email" notice;
+     with it OFF a session is returned and the account can sign in immediately. */
+  async function signUp(email, password) {
+    if (!enabled) throw new Error('Add the Supabase URL and anon key first.');
+    const response = await fetch(`${url}/auth/v1/signup`, {
+      method: 'POST', headers: { apikey: anonKey, 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password })
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error_description || payload.msg || payload.message || 'Sign up failed.');
+    if (payload && payload.access_token) saveSession(payload);
+    return payload;
+  }
+
+  /* Ask the database whether the signed-in account is allow-listed. The
+     admin_users table is never readable from the browser; public.is_admin()
+     is the only (security-definer) gate that answers the question. */
+  async function isAdmin() {
+    if (!enabled) return false;
+    const session = readSession();
+    if (!session || !session.access_token) return false;
+    const response = await fetch(`${url}/rest/v1/rpc/is_admin`, {
+      headers: { apikey: anonKey, Authorization: `Bearer ${session.access_token}`, Accept: 'application/json' }
+    });
+    if (!response.ok) return false;
+    const text = (await response.text()).trim();
+    if (text === 'true') return true;
+    try { return JSON.parse(text) === true; } catch (error) { return false; }
+  }
+
   /* Step 1 of a password reset: Supabase emails the administrator a link.
      The link's redirect target must be this CRM page — add the CRM's public
      URL under Supabase → Authentication → URL Configuration → Redirect URLs.
@@ -348,7 +380,9 @@
 
   window.KhaqanCloud = {
     enabled, getSettings, saveSettings, createEnquiry, listEnquiries, updateEnquiry, deleteEnquiry,
-    signIn, requestPasswordReset, exchangeRecoveryCode, saveSessionFromHash, resetPassword, getCurrentUser,
+    listMedia, uploadMedia, updateMedia, deleteMedia,
+    signIn, signUp, isAdmin,
+    requestPasswordReset, exchangeRecoveryCode, saveSessionFromHash, resetPassword, getCurrentUser,
     signOut: () => saveSession(null), session: readSession,
     configured: () => enabled,
     getAccessToken: accessToken

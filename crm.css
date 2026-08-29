@@ -198,6 +198,40 @@ html[data-theme="day"] .crm-media-hint { color: #5f7b62; }
 /* Password-reset message line inside the cloud card */
 .cloud-auth-message { margin: 10px 0 0; max-width: 560px; font-size: .72rem; line-height: 1.5; color: #9bc28f; }
 .cloud-auth-message.is-error { color: #ffae80; }
+
+/* ---- Dedicated sign-in / sign-up gate (shown until an admin session) ---- */
+.crm-auth-screen { display: grid; place-items: start center; min-height: 62vh; }
+.crm-auth-card { width: min(520px, 100%); margin: 0 auto; padding: 38px 40px 30px; border: 1px solid rgba(141,175,118,.24); border-radius: 20px; background: linear-gradient(120deg, rgba(26,67,37,.82), rgba(13,31,19,.9)); }
+.crm-auth-head { margin-bottom: 28px; }
+.crm-auth-head h1 { margin: 13px 0 14px; font-size: clamp(2rem, 5vw, 2.9rem); }
+.crm-auth-head .lede { margin: 0; color: #a9c09f; font-size: .85rem; line-height: 1.65; }
+.crm-auth-form { display: grid; gap: 13px; }
+.crm-auth-form label { display: grid; gap: 7px; }
+.crm-auth-form label > span { color: #bccc9a; font-size: .66rem; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+.crm-auth-form input { width: 100%; min-height: 44px; box-sizing: border-box; padding: 0 13px; border: 1px solid rgba(195,218,198,.2); border-radius: 9px; color: #edf5e7; background: rgba(5,16,9,.7); outline: 0; font-size: .8rem; }
+.crm-auth-form input:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(239,209,116,.1); }
+.crm-auth-form .btn { min-height: 44px; font-size: .78rem; }
+.crm-auth-switch { margin: 4px 0 0; color: #9caf9d; font-size: .72rem; }
+.crm-auth-switch-after { margin-top: 13px; }
+.crm-auth-link { padding: 0; border: 0; color: #e8c86a; background: transparent; font-size: .72rem; font-weight: 750; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.crm-auth-link:hover { color: var(--yellow); }
+
+/* ---- "Signed in but not allow-listed" screen ---- */
+.crm-pending-screen { display: grid; place-items: start center; min-height: 62vh; }
+.crm-pending-card { max-width: 640px; width: 100%; margin: 0 auto; text-align: left; }
+.crm-pending-card h1 { margin: 15px 0 14px; font-size: clamp(1.9rem, 4vw, 2.8rem); }
+.crm-pending-card .lede { margin: 0 0 18px; }
+.crm-pending-card code { padding: 1px 6px; border-radius: 5px; color: #f0d9a0; background: rgba(212,160,52,.14); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .82em; }
+.crm-pending-email { margin: 0 0 20px; color: #718a76; font-size: .74rem; }
+.crm-pending-card .btn { padding: 11px 16px; font-size: .72rem; }
+
+html[data-theme="day"] .crm-auth-card { border-color: rgba(30,81,52,.24); background: linear-gradient(120deg, #eef8ea, #dcebd8); }
+html[data-theme="day"] .crm-auth-head .lede, html[data-theme="day"] .crm-auth-switch { color: #4e6f53; }
+html[data-theme="day"] .crm-auth-form label > span { color: #4c704c; }
+html[data-theme="day"] .crm-auth-form input { color: #173420; background: #fff; border-color: rgba(30,81,52,.24); }
+html[data-theme="day"] .crm-auth-link { color: #8a6a1f; }
+html[data-theme="day"] .crm-pending-card { background: linear-gradient(145deg, #f8fbf3, #deedd9); border-color: rgba(30,81,52,.16); }
+html[data-theme="day"] .crm-pending-email { color: #5f7b62; }
 .crm-cloud-card form button.btn-quiet { background: transparent; border: 1px solid rgba(195,218,198,.22); color: #cfdfc6; }
 .crm-cloud-card form button.btn-quiet:hover { border-color: var(--yellow); }
 #cloud-newpassword-form input { width: 200px; }
