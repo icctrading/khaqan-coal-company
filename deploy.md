@@ -29,6 +29,16 @@ Do not commit passwords, service-role keys, or `.env` files.
 
 The website can read public site settings, create contact enquiries, and read the shared media catalogue. Only the allow-listed authenticated CRM user can edit content, view/manage enquiries, or upload/replace/delete media because of Row Level Security.
 
+### CRM authentication gate + sign-up
+
+The CRM is locked behind a login screen. Opening `crm.html` without an admin session shows only a **sign-in / sign-up / forgot-password** screen; the Control Room (metrics, sidebar, site-content form, enquiries table, media library, leadership portraits, JSON export/import) is held in a `<template>` and only mounted after `public.is_admin()` returns true for the signed-in account.
+
+- **Sign in** — an Auth user allow-listed in `public.admin_users` gets the full CRM and a **Sign out** control.
+- **Sign up** — `cloud.js` `signUp(email, password)` calls `POST /auth/v1/signup`. This creates an account but does **not** grant CRM access: the user sees “account created — wait for an administrator to allow-list your user in `admin_users`”. With Supabase **email confirmation** enabled (Authentication → Providers → Email → “Confirm email”), the flow asks the new user to confirm their email before they can sign in.
+- **Allow-listing is manual** — the **first user (and every subsequent admin) still needs an explicit `insert into public.admin_users (user_id) values ('…');`** in the SQL Editor. Signing up alone never reveals CRM data; `crm-cloud.js` does not call `listEnquiries` / `listMedia` / CRM `getSettings` until the `is_admin()` check passes.
+
+The admin check is read through the `rpc/is_admin` endpoint (the `public.is_admin()` security-definer function). `admin_users` itself is never readable from the browser, and no `service_role` key is used client-side.
+
 ### Media library (Storage bucket + RLS)
 
 `supabase/schema.sql` also creates:
@@ -52,7 +62,7 @@ The CRM's **Forgot password?** link sends a Supabase recovery email. For the lin
 1. Open **Authentication → URL Configuration**.
 2. Set **Site URL** to the public CRM address, e.g. `https://YOUR-VERCEL-DOMAIN.vercel.app/crm.html` (or `/crm` with the Vercel clean route).
 3. Add the same address to **Redirect URLs** (include both the local preview, e.g. `http://localhost:8000/crm.html`, and every deployed domain).
-4. The emailed link opens the CRM with a recovery token; the CRM then shows a **Set a new password** form. Both Supabase auth flow types are handled automatically (implicit `#access_token` links and PKCE `?code` links).
+4. The emailed link opens the CRM's auth screen with a recovery token; it shows a **Set a new password** form (never the Control Room) and only mounts the workspace after the recovered session passes `is_admin()`. Both Supabase auth flow types are handled automatically (implicit `#access_token` links and PKCE `?code` links).
 
 Without the redirect allow-list entry, Supabase blocks the redirect and the reset link cannot return to the CRM. Email delivery is handled by Supabase's built-in mail service (or a custom SMTP provider under **Authentication → Emails** for production).
 

@@ -2,6 +2,15 @@
   const cms = window.KhaqanCMS;
   if (!cms) return;
 
+  /* The CRM workspace is only mounted (from crm.html's <template>) after an
+     authenticated admin session exists, so nothing here runs — and no leads,
+     media or site-content fields are rendered — until crm-cloud.js calls
+     window.KhaqanCRMInit() following a successful admin check. */
+  let crmStarted = false;
+  window.KhaqanCRMInit = function initCRM() {
+    if (crmStarted || !document.querySelector('#site-form')) return;
+    crmStarted = true;
+
   const query = (selector) => document.querySelector(selector);
   const queryAll = (selector) => Array.from(document.querySelectorAll(selector));
   const form = query('#site-form');
@@ -525,4 +534,5 @@
   renderPortraits();
   renderMedia();
   updateMediaMetric();
+  };
 })();
