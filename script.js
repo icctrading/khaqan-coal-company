@@ -83,7 +83,55 @@ window.KhaqanMedia = {
     return entry;
   },
   remove: (id) => mediaWrite(mediaRead().filter((m) => m.id !== id)),
+  /* Edit an existing item in place — used by the Control Room "Manage" button
+     for retitling, re-tagging to another website part, or swapping the file. */
+  update: (id, patch) => {
+    let updated = null;
+    const items = mediaRead().map((m) => {
+      if (m.id !== id) return m;
+      updated = { ...m, ...(patch || {}), id: m.id, addedAt: m.addedAt };
+      updated.type = updated.type === 'video' ? 'video' : 'image';
+      return updated;
+    });
+    mediaWrite(items);
+    return updated;
+  },
+  /* Replace the whole library — used when a JSON backup is imported. */
+  setAll: (items) => {
+    const cleaned = (Array.isArray(items) ? items : [])
+      .filter((m) => m && typeof m === 'object' && m.url)
+      .map((m, i) => ({
+        id: m.id || `media-${Date.now()}-${i}-${Math.floor(Math.random() * 1e6)}`,
+        type: m.type === 'video' ? 'video' : 'image',
+        title: m.title || 'Untitled',
+        section: m.section || 'general',
+        url: m.url,
+        addedAt: m.addedAt || new Date().toISOString()
+      }));
+    mediaWrite(cleaned);
+    return cleaned;
+  },
   bySection: (section) => mediaRead().filter((m) => m.section === section)
+};
+
+/* Friendly labels for the website part a media item is tagged to. */
+window.KHAQAN_MEDIA_SECTIONS = [
+  { value: 'home', label: 'Home' },
+  { value: 'about', label: 'About us' },
+  { value: 'operations', label: 'Operations' },
+  { value: 'supply', label: 'Supply' },
+  { value: 'gallery', label: 'Gallery' },
+  { value: 'community', label: 'Community' },
+  { value: 'contact', label: 'Contact' },
+  { value: 'team-director', label: 'Team — Director' },
+  { value: 'team-ceo', label: 'Team — CEO' },
+  { value: 'team-md', label: 'Team — MD' },
+  { value: 'team-cfo', label: 'Team — CFO' },
+  { value: 'general', label: 'General' }
+];
+window.KHAQAN_MEDIA_SECTION_LABEL = (value) => {
+  const match = window.KHAQAN_MEDIA_SECTIONS.find((s) => s.value === value);
+  return match ? match.label : value;
 };
 
 function applyCmsData() {
@@ -1096,49 +1144,86 @@ document.querySelectorAll('[data-team-hero]').forEach((hero) => {
 (function () {
   const escapeMediaHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 
+  function videoMarkup(m) {
+    // Uploads may be .webm/.mov/.mp4 — let the browser pick; also pass the
+    // data-URL directly to <video src> as a fallback for data URLs with
+    // mime types a <source type="video/mp4"> would otherwise reject.
+    const source = /^data:video\//.test(m.url)
+      ? `<source src="${escapeMediaHtml(m.url)}">`
+      : `<source src="${escapeMediaHtml(m.url)}" type="video/mp4"><source src="${escapeMediaHtml(m.url)}" type="video/webm">`;
+    return `<video controls muted loop playsinline preload="metadata">${source}</video>`;
+  }
+
   function renderManagedMedia() {
-    const media = window.KhaanMedia ? window.KhaanMedia.get() : [];
+    const media = window.KhaqanMedia ? window.KhaqanMedia.get() : [];
     document.querySelectorAll('[data-managed-media]').forEach((wrap) => {
       const section = wrap.dataset.managedMedia;
-      const items = media.filter((m) => m.section === section);
-      if (!items.length) return;
-      const grid = document.createElement('div');
-      grid.className = 'managed-media-grid';
+      // Team portraits are never part of a page gallery — they live in the
+      // rotating hero / leadership cards.
+      const items = media.filter((m) => m.section === section && !/^team-/.test(m.section));
+      const existing = wrap.querySelector('.managed-media-grid');
+      const empty = wrap.querySelector('.managed-media-empty');
+      if (!items.length) {
+        if (existing) existing.remove();
+        if (empty) empty.hidden = false;
+        return;
+      }
+      if (empty) empty.hidden = true;
+      let grid = existing;
+      if (!grid) {
+        grid = document.createElement('div');
+        grid.className = 'managed-media-grid';
+        wrap.appendChild(grid);
+      }
+      // Rebuild every time so edits (retitle / re-tag / replace file) and
+      // removals never leave a stale or duplicated tile.
       grid.innerHTML = items.slice(0, 12).map((m) => {
         const mediaEl = m.type === 'video'
-          ? `<video controls muted loop playsinline preload="metadata" poster=""><source src="${escapeMediaHtml(m.url)}" type="video/mp4"></video>`
+          ? videoMarkup(m)
           : `<img src="${escapeMediaHtml(m.url)}" alt="${escapeMediaHtml(m.title)}" loading="lazy" decoding="async">`;
-        return `<figure class="managed-item">${mediaEl}<figcaption><span>${escapeMediaHtml(m.title)}</span><b>${escapeMediaHtml(m.section)}</b></figcaption></figure>`;
+        return `<figure class="managed-item">${mediaEl}<figcaption><span>${escapeMediaHtml(m.title)}</span><b>${escapeMediaHtml((window.KHAQAN_MEDIA_SECTION_LABEL ? window.KHAQAN_MEDIA_SECTION_LABEL(m.section) : m.section))}</b></figcaption></figure>`;
       }).join('');
-      const empty = wrap.querySelector('.managed-media-empty');
-      if (empty) empty.replaceWith(grid);
-      else wrap.appendChild(grid);
     });
   }
 
   function applyTeamPhotos() {
-    const media = window.KhaanMedia ? window.KhaanMedia.get() : [];
+    const media = window.KhaqanMedia ? window.KhaqanMedia.get() : [];
     document.querySelectorAll('[data-member]').forEach((el) => {
       const member = el.dataset.member;
+      // The most recently added portrait for a member wins, so re-uploading a
+      // portrait from the Control Room swaps it everywhere automatically.
       const photo = media.find((m) => m.type === 'image' && m.section === `team-${member}`);
-      if (!photo || !photo.url) return;
       const portrait = el.querySelector('.team-portrait');
       const mini = el.querySelector('.team-portrait-mini');
-      if (portrait && !portrait.querySelector('.team-photo')) {
-        const img = document.createElement('img');
-        img.className = 'team-photo';
-        img.src = photo.url;
-        img.alt = photo.title || member;
-        img.loading = 'lazy';
-        img.decoding = 'async';
-        portrait.insertBefore(img, portrait.firstChild);
+      if (portrait) {
+        let img = portrait.querySelector('.team-photo');
+        if (photo && photo.url) {
+          if (!img) {
+            img = document.createElement('img');
+            img.className = 'team-photo';
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            portrait.insertBefore(img, portrait.firstChild);
+          }
+          if (img.src !== photo.url) img.src = photo.url;
+          img.alt = photo.title || `Portrait of ${member}`;
+        } else if (img) {
+          img.remove(); // portrait removed in the CRM → monogram placeholder returns
+        }
       }
-      if (mini && !mini.querySelector('img')) {
-        const img = document.createElement('img');
-        img.src = photo.url;
-        img.alt = photo.title || member;
-        img.loading = 'lazy';
-        mini.appendChild(img);
+      if (mini) {
+        let img = mini.querySelector('img');
+        if (photo && photo.url) {
+          if (!img) {
+            img = document.createElement('img');
+            img.loading = 'lazy';
+            mini.appendChild(img);
+          }
+          if (img.src !== photo.url) img.src = photo.url;
+          img.alt = photo.title || `Portrait of ${member}`;
+        } else if (img) {
+          img.remove();
+        }
       }
     });
   }

@@ -29,6 +29,17 @@ Do not commit passwords, service-role keys, or `.env` files.
 
 The website can read public site settings and create contact enquiries. Only the allow-listed authenticated CRM user can edit content or view/manage enquiries because of Row Level Security.
 
+### Password reset by email (CRM sign-in)
+
+The CRM's **Forgot password?** link sends a Supabase recovery email. For the link to return the administrator to the CRM:
+
+1. Open **Authentication → URL Configuration**.
+2. Set **Site URL** to the public CRM address, e.g. `https://YOUR-VERCEL-DOMAIN.vercel.app/crm.html` (or `/crm` with the Vercel clean route).
+3. Add the same address to **Redirect URLs** (include both the local preview, e.g. `http://localhost:8000/crm.html`, and every deployed domain).
+4. The emailed link opens the CRM with a recovery token; the CRM then shows a **Set a new password** form. Both Supabase auth flow types are handled automatically (implicit `#access_token` links and PKCE `?code` links).
+
+Without the redirect allow-list entry, Supabase blocks the redirect and the reset link cannot return to the CRM. Email delivery is handled by Supabase's built-in mail service (or a custom SMTP provider under **Authentication → Emails** for production).
+
 ## 3. Deploy to Vercel
 
 1. Open Vercel and choose **Add New → Project**.
