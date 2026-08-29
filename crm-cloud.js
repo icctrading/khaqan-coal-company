@@ -90,6 +90,10 @@
     if (settings && window.KhaqanCMS) window.KhaqanCMS.save(settings);
     const leads = await cloud.listEnquiries();
     if (window.KhaqanCMS) window.KhaqanCMS.saveLeads(leads);
+    try {
+      const media = await cloud.listMedia();
+      if (Array.isArray(media) && window.KhaqanMedia) window.KhaqanMedia.setAll(media);
+    } catch (error) { /* keep the local media library if Storage is not ready */ }
   }
 
   async function finishSignedIn(session) {

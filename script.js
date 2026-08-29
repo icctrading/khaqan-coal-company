@@ -66,19 +66,26 @@ const MEDIA_KEY = 'khaqanMedia';
 const mediaRead = () => readJSON(MEDIA_KEY, []);
 const mediaWrite = (items) => {
   try { window.localStorage.setItem(MEDIA_KEY, JSON.stringify(items)); } catch (error) { /* no-op */ }
+  try { window.dispatchEvent(new CustomEvent('khaqan:media-change')); } catch (error) { /* no-op */ }
 };
+const normalizeMediaItem = (item, i = 0) => ({
+  id: (item && item.id) || `media-${Date.now()}-${i}-${Math.floor(Math.random() * 1e6)}`,
+  type: item && item.type === 'video' ? 'video' : 'image',
+  title: (item && item.title) || 'Untitled',
+  section: (item && item.section) || 'general',
+  url: (item && item.url) || '',
+  storagePath: (item && item.storagePath) || '',
+  addedAt: (item && item.addedAt) || new Date().toISOString()
+});
 window.KhaqanMedia = {
   get: mediaRead,
   add: (item) => {
-    const entry = {
+    const entry = normalizeMediaItem({
       ...(item || {}),
       id: (item && item.id) || `media-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
-      type: item && item.type === 'video' ? 'video' : 'image',
-      title: (item && item.title) || 'Untitled',
       section: (item && item.section) || 'home',
-      url: (item && item.url) || '',
       addedAt: (item && item.addedAt) || new Date().toISOString()
-    };
+    });
     mediaWrite([entry, ...mediaRead()]);
     return entry;
   },
@@ -89,25 +96,18 @@ window.KhaqanMedia = {
     let updated = null;
     const items = mediaRead().map((m) => {
       if (m.id !== id) return m;
-      updated = { ...m, ...(patch || {}), id: m.id, addedAt: m.addedAt };
-      updated.type = updated.type === 'video' ? 'video' : 'image';
+      updated = normalizeMediaItem({ ...m, ...(patch || {}), id: m.id, addedAt: m.addedAt });
       return updated;
     });
     mediaWrite(items);
     return updated;
   },
-  /* Replace the whole library — used when a JSON backup is imported. */
+  /* Replace the whole library — used when a JSON backup is imported or when
+     the shared Supabase catalogue is hydrated. */
   setAll: (items) => {
     const cleaned = (Array.isArray(items) ? items : [])
       .filter((m) => m && typeof m === 'object' && m.url)
-      .map((m, i) => ({
-        id: m.id || `media-${Date.now()}-${i}-${Math.floor(Math.random() * 1e6)}`,
-        type: m.type === 'video' ? 'video' : 'image',
-        title: m.title || 'Untitled',
-        section: m.section || 'general',
-        url: m.url,
-        addedAt: m.addedAt || new Date().toISOString()
-      }));
+      .map((m, i) => normalizeMediaItem(m, i));
     mediaWrite(cleaned);
     return cleaned;
   },
@@ -354,6 +354,12 @@ async function hydrateCloudContent() {
     if (remoteData) saveCmsData({ ...getCmsData(), ...remoteData });
   } catch (error) {
     // Keep the local preview available if Supabase is not yet configured or reachable.
+  }
+  try {
+    const remoteMedia = await window.KhaqanCloud.listMedia();
+    if (Array.isArray(remoteMedia) && window.KhaqanMedia) window.KhaqanMedia.setAll(remoteMedia);
+  } catch (error) {
+    // Keep the browser media library if Storage is not yet configured or reachable.
   }
 }
 hydrateCloudContent();
@@ -1231,8 +1237,11 @@ document.querySelectorAll('[data-team-hero]').forEach((hero) => {
   renderManagedMedia();
   applyTeamPhotos();
 
-  // Live-update when the Control Room adds/removes media in another tab.
+  // Live-update when the Control Room adds/removes media in another tab,
+  // or when the shared Supabase catalogue hydrates in this tab.
+  const refreshPublicMedia = () => { renderManagedMedia(); applyTeamPhotos(); };
   window.addEventListener('storage', (event) => {
-    if (event.key === MEDIA_KEY) { renderManagedMedia(); applyTeamPhotos(); }
+    if (event.key === MEDIA_KEY) refreshPublicMedia();
   });
+  window.addEventListener('khaqan:media-change', refreshPublicMedia);
 })();

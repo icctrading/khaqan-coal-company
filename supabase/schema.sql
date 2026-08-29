@@ -120,3 +120,74 @@ create policy "Admins can delete enquiries"
 -- Admin allow-list is intentionally not readable from the browser.
 -- Add the first administrator after signing up in Authentication → Users:
 -- insert into public.admin_users (user_id) values ('PASTE_AUTH_USER_UUID_HERE');
+
+-- Shared CRM media library (leadership portraits + page galleries).
+-- Files live in the public `media` Storage bucket; this table is the catalogue.
+create table if not exists public.media (
+  id uuid primary key default gen_random_uuid(),
+  title text not null default 'Untitled',
+  section text not null default 'general',
+  kind text not null default 'image' check (kind in ('image', 'video')),
+  storage_path text not null unique,
+  public_url text not null,
+  mime_type text not null default '',
+  byte_size bigint not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.media enable row level security;
+
+drop policy if exists "Public can read media" on public.media;
+create policy "Public can read media"
+  on public.media for select
+  to anon, authenticated
+  using (true);
+
+drop policy if exists "Admins can insert media" on public.media;
+create policy "Admins can insert media"
+  on public.media for insert
+  to authenticated
+  with check (public.is_admin());
+
+drop policy if exists "Admins can update media" on public.media;
+create policy "Admins can update media"
+  on public.media for update
+  to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
+
+drop policy if exists "Admins can delete media" on public.media;
+create policy "Admins can delete media"
+  on public.media for delete
+  to authenticated
+  using (public.is_admin());
+
+insert into storage.buckets (id, name, public, file_size_limit)
+values ('media', 'media', true, 52428800)
+on conflict (id) do update set public = excluded.public, file_size_limit = excluded.file_size_limit;
+
+drop policy if exists "Public can read media objects" on storage.objects;
+create policy "Public can read media objects"
+  on storage.objects for select
+  to anon, authenticated
+  using (bucket_id = 'media');
+
+drop policy if exists "Admins can upload media objects" on storage.objects;
+create policy "Admins can upload media objects"
+  on storage.objects for insert
+  to authenticated
+  with check (bucket_id = 'media' and public.is_admin());
+
+drop policy if exists "Admins can update media objects" on storage.objects;
+create policy "Admins can update media objects"
+  on storage.objects for update
+  to authenticated
+  using (bucket_id = 'media' and public.is_admin())
+  with check (bucket_id = 'media' and public.is_admin());
+
+drop policy if exists "Admins can delete media objects" on storage.objects;
+create policy "Admins can delete media objects"
+  on storage.objects for delete
+  to authenticated
+  using (bucket_id = 'media' and public.is_admin());
