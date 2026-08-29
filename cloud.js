@@ -128,6 +128,123 @@
     return request(`enquiries?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
   }
 
+  const normalizeMedia = (row) => row ? ({
+    id: row.id,
+    type: row.kind === 'video' ? 'video' : 'image',
+    title: row.title || 'Untitled',
+    section: row.section || 'general',
+    url: row.public_url || '',
+    storagePath: row.storage_path || '',
+    mimeType: row.mime_type || '',
+    byteSize: Number(row.byte_size) || 0,
+    addedAt: row.created_at || row.addedAt
+  }) : null;
+
+  function encodeStoragePath(path) {
+    return String(path || '').split('/').filter(Boolean).map(encodeURIComponent).join('/');
+  }
+
+  function safeFileName(name) {
+    const base = String(name || 'file').split(/[/\\]/).pop() || 'file';
+    return base.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 80) || 'file';
+  }
+
+  async function storageFetch(path, options = {}) {
+    if (!enabled) throw new Error('Supabase is not configured.');
+    const response = await fetch(`${url}/storage/v1/${path}`, {
+      ...options,
+      headers: {
+        apikey: anonKey,
+        Authorization: `Bearer ${accessToken()}`,
+        ...(options.headers || {})
+      }
+    });
+    const text = await response.text();
+    let payload = null;
+    try { payload = text ? JSON.parse(text) : null; } catch (error) { payload = text; }
+    if (!response.ok) throw new Error(payload?.message || payload?.error || `Storage request failed (${response.status}).`);
+    return payload;
+  }
+
+  async function uploadObject(file, section) {
+    const folder = String(section || 'general').replace(/[^a-z0-9_-]/gi, '-').toLowerCase() || 'general';
+    const storagePath = `${folder}/${Date.now()}-${safeFileName(file && file.name)}`;
+    await storageFetch(`object/media/${encodeStoragePath(storagePath)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': (file && file.type) || 'application/octet-stream',
+        'x-upsert': 'false'
+      },
+      body: file
+    });
+    return {
+      storagePath,
+      publicUrl: `${url}/storage/v1/object/public/media/${encodeStoragePath(storagePath)}`
+    };
+  }
+
+  async function removeObject(storagePath) {
+    if (!storagePath) return;
+    try {
+      await storageFetch(`object/media/${encodeStoragePath(storagePath)}`, { method: 'DELETE' });
+    } catch (error) { /* catalogue row is the source of truth */ }
+  }
+
+  async function listMedia() {
+    const rows = await request('media?select=*&order=created_at.desc');
+    return (rows || []).map(normalizeMedia);
+  }
+
+  async function uploadMedia({ file, title, section, type } = {}) {
+    if (!file) throw new Error('Choose a file first.');
+    const uploaded = await uploadObject(file, section);
+    const rows = await request('media', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({
+        title: title || 'Untitled',
+        section: section || 'general',
+        kind: type === 'video' ? 'video' : 'image',
+        storage_path: uploaded.storagePath,
+        public_url: uploaded.publicUrl,
+        mime_type: file.type || '',
+        byte_size: file.size || 0
+      })
+    });
+    return normalizeMedia(Array.isArray(rows) ? rows[0] : rows);
+  }
+
+  async function updateMedia(id, patch = {}) {
+    if (!id) throw new Error('Missing media id.');
+    const next = {};
+    if (patch.title != null) next.title = patch.title;
+    if (patch.section != null) next.section = patch.section;
+    if (patch.type) next.kind = patch.type === 'video' ? 'video' : 'image';
+    if (patch.file) {
+      const uploaded = await uploadObject(patch.file, patch.section || 'general');
+      next.storage_path = uploaded.storagePath;
+      next.public_url = uploaded.publicUrl;
+      next.mime_type = patch.file.type || '';
+      next.byte_size = patch.file.size || 0;
+    }
+    next.updated_at = new Date().toISOString();
+    const rows = await request(`media?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify(next)
+    });
+    if (patch.file && patch.storagePath && patch.storagePath !== next.storage_path) {
+      await removeObject(patch.storagePath);
+    }
+    return normalizeMedia(Array.isArray(rows) ? rows[0] : rows);
+  }
+
+  async function deleteMedia(id, storagePath) {
+    if (!id) throw new Error('Missing media id.');
+    await request(`media?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
+    await removeObject(storagePath);
+  }
+
   async function signIn(email, password) {
     if (!enabled) throw new Error('Add the Supabase URL and anon key first.');
     const response = await fetch(`${url}/auth/v1/token?grant_type=password`, {

@@ -16,12 +16,12 @@ The CRM is a working local prototype:
 - Save changes to `localStorage`; the public pages read the same data automatically.
 - Public enquiries submitted from `contact.html` are saved to the local CRM.
 - Update enquiry status, search, delete, clear, export, and import JSON backups (backups include the media library too).
-- **Media library**: upload images and videos, and *manage* anything already added — retitle, move it to another part of the site, swap the file, or remove it.
-- **Leadership portraits**: a dedicated panel uploads/replaces/removes the Director, CEO, MD and CFO photographs that appear in the rotating leadership hero (Home) and the team cards (About). Initials are shown until a portrait is set.
+- **Media library**: upload images and videos, and *manage* anything already added — retitle, move it to another part of the site, swap the file, or remove it. With a signed-in admin session the files go to the shared Supabase `media` bucket; otherwise they stay in this browser (`localStorage`, 12 MB/file).
+- **Leadership portraits**: a dedicated panel uploads/replaces/removes the Director, CEO, MD and CFO photographs that appear in the rotating leadership hero (Home) and the team cards (About). Initials are shown until a portrait is set. Portraits use the same shared storage when the cloud CRM is connected.
 - **Password reset**: once Supabase is connected, the cloud sign-in card offers **Forgot password?** — a reset link is emailed and opens the CRM to set a new password (see `deploy.md` for the Supabase redirect-URL setup).
 - Use the **Open main website** button in the CRM to launch the public site in a new tab.
 
-For a real team CRM, connect the same UI to Supabase using `supabase/schema.sql` and `supabase-config.js`. The browser bridge in `cloud.js` keeps the public site and CRM local-first until those values are filled. Use the cloud login in the CRM after adding an Auth user and allow-listing its UUID in `admin_users`.
+For a real team CRM, connect the same UI to Supabase using `supabase/schema.sql` and `supabase-config.js`. That schema creates the `media` table and the public `media` Storage bucket (anon read, `is_admin()` write/delete). The browser bridge in `cloud.js` keeps the public site and CRM local-first until those values are filled. Use the cloud login in the CRM after adding an Auth user and allow-listing its UUID in `admin_users`.
 
 ## Hosting
 

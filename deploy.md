@@ -27,7 +27,23 @@ Do not commit passwords, service-role keys, or `.env` files.
 6. Open **Project Settings → API** and copy the Project URL and the public anon/publishable key into `supabase-config.js`.
 7. Never use the `service_role` key in the browser or GitHub.
 
-The website can read public site settings and create contact enquiries. Only the allow-listed authenticated CRM user can edit content or view/manage enquiries because of Row Level Security.
+The website can read public site settings, create contact enquiries, and read the shared media catalogue. Only the allow-listed authenticated CRM user can edit content, view/manage enquiries, or upload/replace/delete media because of Row Level Security.
+
+### Media library (Storage bucket + RLS)
+
+`supabase/schema.sql` also creates:
+
+1. A public **`media` Storage bucket** (50 MB/file) for CRM uploads and leadership portraits.
+2. A **`public.media`** catalogue table (`title`, `section`, `kind`, `storage_path`, `public_url`, …).
+3. RLS on both: **anon/authenticated can read**; **only `public.is_admin()` can insert, update, or delete**.
+
+After running the schema:
+
+1. Confirm **Storage → Buckets → `media`** exists and is **public** (needed so `<img>` / `<video>` tags can load `…/storage/v1/object/public/media/…` URLs).
+2. Confirm **Storage → Policies** includes the four `media` object policies from the SQL file (public read, admin write/update/delete).
+3. Confirm **Authentication → Policies** (table `media`) allows public `SELECT` and admin writes.
+
+The CRM uses `listMedia` / `uploadMedia` / `updateMedia` / `deleteMedia` in `cloud.js`. When an administrator is signed in, uploads, retitles, re-tags, replacements and removals go through Storage + REST; if Supabase is unconfigured or the request fails, the same UI falls back to `localStorage`. Public pages hydrate the catalogue the same way they hydrate `site_settings`.
 
 ### Password reset by email (CRM sign-in)
 
