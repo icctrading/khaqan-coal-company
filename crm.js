@@ -121,6 +121,54 @@
     }
   });
 
+  /* ---- Media library manager: add / remove pictures & videos ---- */
+  const mediaGrid = query('#managed-media-grid');
+  const mediaEmpty = query('#managed-media-empty');
+  const mediaMetric = query('#metric-media');
+  const mediaTitle = query('#media-title');
+  const mediaSection = query('#media-section');
+  const imageFileInput = query('#media-image-file');
+  const videoFileInput = query('#media-video-file');
+
+  function renderMedia() {
+    const items = window.KhaqanMedia ? window.KhaqanMedia.get() : [];
+    if (mediaMetric) mediaMetric.textContent = String(items.length);
+    if (!mediaGrid) return;
+    mediaGrid.innerHTML = items.map((m) => {
+      const mediaEl = m.type === 'video'
+        ? `<video controls muted preload="metadata"><source src="${escapeHtml(m.url)}" type="video/mp4"></video>`
+        : `<img src="${escapeHtml(m.url)}" alt="${escapeHtml(m.title)}" loading="lazy">`;
+      return `<article><button class="media-remove" type="button" data-media-remove="${escapeHtml(m.id)}" aria-label="Remove media">×</button>${mediaEl}<div><span class="media-kind">${m.type === 'video' ? 'Video' : 'Image'}</span><strong>${escapeHtml(m.title)}</strong><span class="media-tag">${escapeHtml(m.section)}</span></div></article>`;
+    }).join('');
+    if (mediaEmpty) mediaEmpty.style.display = items.length ? 'none' : 'block';
+  }
+
+  function addMediaFile(input, type) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const title = (mediaTitle && mediaTitle.value.trim()) || file.name.replace(/\.[^.]+$/, '');
+    const section = mediaSection ? mediaSection.value : 'home';
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (window.KhaqanMedia) window.KhaqanMedia.add({ type, title, section, url: reader.result });
+      if (mediaTitle) mediaTitle.value = '';
+      input.value = '';
+      renderMedia();
+    };
+    reader.onerror = () => { if (saveStatus) saveStatus.textContent = 'That file could not be read.'; };
+    reader.readAsDataURL(file);
+  }
+
+  imageFileInput?.addEventListener('change', () => addMediaFile(imageFileInput, 'image'));
+  videoFileInput?.addEventListener('change', () => addMediaFile(videoFileInput, 'video'));
+  mediaGrid?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-media-remove]');
+    if (!button) return;
+    if (window.KhaqanMedia) window.KhaqanMedia.remove(button.dataset.mediaRemove);
+    renderMedia();
+  });
+
   loadSiteForm();
   renderLeads();
+  renderMedia();
 })();

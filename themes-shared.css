@@ -2895,3 +2895,684 @@ html[data-theme="night"] .page-contact .page-hero { background-image: linear-gra
    of leaving it on <body> (which restarts the tab order at the header). The container
    must not paint a ring around the whole page when it takes that focus. */
 #main:focus, #main:focus-visible { outline: none; }
+
+
+/* ==================================================================
+   V26 — LEADERSHIP SHOWCASE, ROTATING TEAM HERO, MANAGED MEDIA
+   AND VISIBLE NIGHT-MODE BACKGROUNDS
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   A. Rotating team hero — one member per slide, auto-advancing,
+      each with its own accent palette, entrance animation and
+      transition so no two leaders feel alike.
+   ------------------------------------------------------------------ */
+.team-hero {
+  --ta: #37c98f;            /* accent */
+  --tb: #f2c56b;            /* accent secondary */
+  position: relative;
+  min-height: 500px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--coal-2);
+  box-shadow: var(--shadow);
+  isolation: isolate;
+}
+.team-slides { position: absolute; inset: 0; }
+.team-slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(260px, .82fr) 1.18fr;
+  align-items: stretch;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(4%);
+  transition: opacity .7s cubic-bezier(.2, .8, .2, 1), transform .9s cubic-bezier(.2, .8, .2, 1), visibility .7s;
+  pointer-events: none;
+}
+.team-slide.active { opacity: 1; visibility: visible; transform: none; pointer-events: auto; z-index: 2; }
+
+/* Distinct palettes + textures per leader */
+.team-slide[data-team-accent="emerald"] { --ta: #3ecf97; --tb: #f2c56b; }
+.team-slide[data-team-accent="gold"]    { --ta: #f2c56b; --tb: #f0dfbb; }
+.team-slide[data-team-accent="ember"]   { --ta: #ff7a45; --tb: #ffd9a0; }
+.team-slide[data-team-accent="steel"]   { --ta: #79b8e0; --tb: #d6ecff; }
+
+.team-slide[data-team-accent="emerald"] .team-portrait {
+  background:
+    radial-gradient(120% 120% at 80% 12%, rgba(62, 207, 151, .34), transparent 46%),
+    radial-gradient(circle at 52% 40%, #f4e3b0 0 8%, transparent 8.4%),
+    radial-gradient(ellipse at 52% 47%, #c98d5a 0 17%, transparent 17.4%),
+    radial-gradient(ellipse at 52% 84%, #12231c 0 34%, transparent 34.4%),
+    linear-gradient(150deg, #1b4d38, #0f1d17 66%);
+}
+.team-slide[data-team-accent="gold"] .team-portrait {
+  background:
+    radial-gradient(120% 120% at 84% 14%, rgba(242, 197, 107, .4), transparent 48%),
+    radial-gradient(circle at 52% 40%, #fff0c4 0 8%, transparent 8.4%),
+    radial-gradient(ellipse at 52% 47%, #c88f55 0 17%, transparent 17.4%),
+    radial-gradient(ellipse at 52% 84%, #2a2416 0 34%, transparent 34.4%),
+    linear-gradient(150deg, #4a3a12, #191510 66%);
+}
+.team-slide[data-team-accent="ember"] .team-portrait {
+  background:
+    radial-gradient(120% 120% at 82% 12%, rgba(255, 122, 69, .4), transparent 48%),
+    radial-gradient(circle at 52% 40%, #ffe0b8 0 8%, transparent 8.4%),
+    radial-gradient(ellipse at 52% 47%, #c0814e 0 17%, transparent 17.4%),
+    radial-gradient(ellipse at 52% 84%, #2a1612 0 34%, transparent 34.4%),
+    linear-gradient(150deg, #4a2210, #190f0c 66%);
+}
+.team-slide[data-team-accent="steel"] .team-portrait {
+  background:
+    radial-gradient(120% 120% at 84% 14%, rgba(121, 184, 224, .38), transparent 48%),
+    radial-gradient(circle at 52% 40%, #e8f2ff 0 8%, transparent 8.4%),
+    radial-gradient(ellipse at 52% 47%, #8ba0c4 0 17%, transparent 17.4%),
+    radial-gradient(ellipse at 52% 84%, #121c2a 0 34%, transparent 34.4%),
+    linear-gradient(150deg, #16324a, #0c141d 66%);
+}
+
+/* Each leader enters with a different animation */
+.team-slide.active[data-team-accent="emerald"] .team-copy { animation: teamRise .9s cubic-bezier(.2, .8, .2, 1) both; }
+.team-slide.active[data-team-accent="gold"]    .team-copy { animation: teamOrbit 1s cubic-bezier(.2, .8, .2, 1) both; }
+.team-slide.active[data-team-accent="ember"]   .team-copy { animation: teamSweep .85s cubic-bezier(.2, .8, .2, 1) both; }
+.team-slide.active[data-team-accent="steel"]   .team-copy { animation: teamGlide .9s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes teamRise  { from { opacity: 0; transform: translateY(34px); } to { opacity: 1; transform: none; } }
+@keyframes teamOrbit { from { opacity: 0; transform: translateX(-40px) rotate(-1.2deg); } to { opacity: 1; transform: none; } }
+@keyframes teamSweep { from { opacity: 0; transform: translateX(40px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes teamGlide { from { opacity: 0; transform: translateY(-30px) scale(1.02); } to { opacity: 1; transform: none; } }
+
+.team-portrait {
+  position: relative;
+  overflow: hidden;
+  min-height: 340px;
+  border-right: 1px solid var(--line);
+}
+.team-portrait::after {
+  content: attr(data-monogram);
+  position: absolute;
+  right: 22px;
+  bottom: 10px;
+  color: rgba(246, 242, 232, .16);
+  font-family: Georgia, serif;
+  font-size: 6.5rem;
+  letter-spacing: -.1em;
+  line-height: 1;
+}
+.team-portrait .team-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  filter: saturate(.92) contrast(1.04);
+  animation: teamPhotoIn 1s ease both;
+}
+@keyframes teamPhotoIn { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: none; } }
+.team-portrait .team-halo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 18% 108%, rgba(0, 0, 0, .6), transparent 60%),
+    linear-gradient(90deg, transparent 55%, rgba(0, 0, 0, .18));
+}
+.team-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: clamp(34px, 5vw, 60px) clamp(34px, 5vw, 64px) 74px;
+}
+.team-copy .team-role {
+  align-self: flex-start;
+  padding: 8px 15px;
+  border: 1px solid rgba(255, 255, 255, .26);
+  border: 1px solid color-mix(in srgb, var(--ta) 55%, transparent);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .05);
+  background: color-mix(in srgb, var(--ta) 14%, transparent);
+  color: var(--ta);
+  font-size: .66rem;
+  font-weight: 850;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.team-copy h2 { margin: 0; font-size: clamp(2.4rem, 4.6vw, 4rem); line-height: 1.02; }
+.team-copy h2 span { color: var(--ta); }
+.team-copy p { max-width: 560px; font-size: 1rem; line-height: 1.7; color: var(--ink-soft); }
+.team-copy p strong { color: var(--ink); font-weight: 700; }
+.team-copy .team-kicker {
+  color: var(--tb);
+  font-size: .7rem;
+  font-weight: 850;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.team-copy::before {
+  content: "";
+  width: 52px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--ta), transparent);
+}
+html[data-skin="obsidian"] .team-hero { border-radius: 10px; }
+html[data-skin="obsidian"] .team-role { border-radius: 6px; }
+
+/* Slide chrome: dots + progress */
+.team-hero-foot {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 22px;
+  height: 46px;
+  border-top: 1px solid var(--line);
+  background: rgba(7, 11, 9, .5);
+  backdrop-filter: blur(8px);
+}
+.team-hero-count { color: var(--ink-soft); font-size: .6rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+.team-hero-dots { display: inline-flex; gap: 8px; }
+.team-dot {
+  width: 8px; height: 8px; padding: 0;
+  border: 0; border-radius: 999px;
+  background: rgba(246, 242, 232, .22);
+  cursor: pointer;
+  transition: background .3s ease, width .3s ease, box-shadow .3s ease;
+}
+.team-dot.active { width: 22px; background: var(--yellow); box-shadow: 0 0 10px rgba(242, 197, 107, .55); }
+.team-hero-progress { position: absolute; z-index: 6; left: 0; right: 0; bottom: 46px; height: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
+.team-hero-progress i {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, var(--tb), var(--ta));
+  transform-origin: left; transform: scaleX(0);
+}
+.team-hero-progress.run i { animation: teamProgress var(--team-duration, 6000ms) linear forwards; }
+.team-hero-progress.paused i { animation-play-state: paused; }
+@keyframes teamProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+@media (max-width: 780px) {
+  .team-hero { min-height: 0; }
+  .team-slides { position: static; }
+  .team-slide { grid-template-columns: 1fr; position: relative; }
+  .team-slide:not(.active) { display: none; }
+  .team-portrait { min-height: 240px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .team-portrait::after { font-size: 4.6rem; }
+  .team-hero-progress { position: static; height: 3px; }
+  .team-hero-foot { position: static; backdrop-filter: none; }
+  .team-copy { padding: 30px 22px; }
+}
+
+/* ------------------------------------------------------------------
+   B. Leadership grid — the four key members as separate modern cards
+   ------------------------------------------------------------------ */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.team-card {
+  position: relative;
+  overflow: hidden;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(160deg, rgba(255,255,255,.045), rgba(255,255,255,.012) 55%), var(--coal-2);
+  box-shadow: inset 0 1px 0 rgba(212, 160, 52, .13), 0 16px 40px rgba(0,0,0,.22);
+  transition: transform .4s cubic-bezier(.2,.8,.2,1), border-color .4s ease, box-shadow .4s ease;
+}
+.team-card:hover { transform: translateY(-5px); border-color: rgba(212,160,52,.4); box-shadow: 0 24px 60px rgba(0,0,0,.3), 0 0 44px rgba(212,160,52,.06); }
+.team-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--ta), transparent 70%);
+  opacity: .85;
+}
+.team-card .team-role { color: var(--ta); }
+.team-card h3 { margin: 10px 0 10px; font-size: 1.6rem; }
+.team-card p { margin: 0; font-size: .9rem; line-height: 1.65; }
+.team-card[data-team-accent="emerald"] { --ta: #3ecf97; --tb: #f2c56b; }
+.team-card[data-team-accent="gold"]    { --ta: #f2c56b; --tb: #f0dfbb; }
+.team-card[data-team-accent="ember"]   { --ta: #ff7a45; --tb: #ffd9a0; }
+.team-card[data-team-accent="steel"]   { --ta: #79b8e0; --tb: #d6ecff; }
+.team-card .team-portrait-mini {
+  width: 64px; height: 64px; margin-bottom: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .3);
+  border: 2px solid color-mix(in srgb, var(--ta) 55%, transparent);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 34%, #e8cfa6 0 12%, transparent 12.5%),
+    radial-gradient(ellipse at 50% 52%, #a06b47 0 26%, transparent 26.5%),
+    linear-gradient(160deg, #20241f, #141713);
+  background:
+    radial-gradient(circle at 50% 34%, #e8cfa6 0 12%, transparent 12.5%),
+    radial-gradient(ellipse at 50% 52%, #a06b47 0 26%, transparent 26.5%),
+    linear-gradient(160deg, color-mix(in srgb, var(--ta) 28%, #20241f), #141713);
+}
+.team-card .team-portrait-mini img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+html[data-skin="obsidian"] .team-card { border-radius: 8px; }
+html[data-theme="day"] .team-card { background: linear-gradient(160deg, #ffffff, #e9f1e6); border-color: rgba(16,74,38,.22); box-shadow: inset 0 1px 0 rgba(212,160,52,.18), 0 16px 40px rgba(70,60,30,.09); }
+html[data-theme="day"] .team-card p { color: #2a4634; }
+html[data-theme="day"] .team-card h3 { color: #102d1b; }
+@media (max-width: 720px) { .team-grid { grid-template-columns: 1fr; } }
+
+/* ------------------------------------------------------------------
+   C. Managed media — images & videos added from the Control Room
+   render here, tagged per website part.
+   ------------------------------------------------------------------ */
+.managed-media { margin-top: 4px; }
+.managed-media-empty {
+  padding: 26px 28px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--ink-soft);
+  font-size: .86rem;
+  text-align: center;
+}
+.managed-media-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.managed-item {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--coal-3);
+  box-shadow: 0 16px 40px rgba(0,0,0,.25);
+  transition: transform .45s cubic-bezier(.2,.8,.2,1), border-color .45s ease, box-shadow .45s ease;
+}
+.managed-item:hover { transform: translateY(-5px); border-color: rgba(212,160,52,.42); box-shadow: 0 24px 60px rgba(0,0,0,.34), 0 0 44px rgba(212,160,52,.06); }
+.managed-item img, .managed-item video { display: block; width: 100%; height: 230px; object-fit: cover; }
+.managed-item video { background: #000; }
+.managed-item figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 15px;
+}
+.managed-item figcaption span { color: var(--ink-soft); font-size: .68rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.managed-item figcaption b { color: var(--ink); font-size: .82rem; font-weight: 750; }
+html[data-skin="obsidian"] .managed-item { border-radius: 8px; }
+html[data-theme="day"] .managed-item { border-color: rgba(16,74,38,.22); box-shadow: 0 16px 40px rgba(70,60,30,.09); }
+html[data-theme="day"] .managed-item figcaption b { color: #102d1b; }
+html[data-theme="day"] .managed-item figcaption span { color: #355a3d; }
+@media (max-width: 900px) { .managed-media-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .managed-media-grid { grid-template-columns: 1fr; } }
+
+/* ------------------------------------------------------------------
+   D. VISIBLE night-mode backgrounds — stronger aurora glows and
+   contour lines so the layered section art reads in every skin.
+   ------------------------------------------------------------------ */
+html:not([data-theme="day"]) .section::before {
+  mix-blend-mode: screen;
+  opacity: .5;
+}
+html:not([data-theme="day"]) .section-dark::after,
+html:not([data-theme="day"]) .section-earth::after {
+  background-image:
+    radial-gradient(760px 540px at 86% 12%, rgba(212, 160, 52, .2), transparent 66%),
+    radial-gradient(680px 500px at 6% 90%, rgba(62, 207, 151, .14), transparent 70%),
+    radial-gradient(540px 440px at 52% 52%, rgba(239, 107, 61, .09), transparent 72%);
+  background-size: auto, auto, auto;
+  background-position: 86% 12%, 6% 90%, 52% 52%;
+  animation: nightGlow 16s ease-in-out infinite alternate;
+}
+html:not([data-theme="day"]) .section-soft::after {
+  background-image:
+    radial-gradient(700px 500px at 90% 8%, rgba(212, 160, 52, .16), transparent 66%),
+    radial-gradient(560px 440px at 8% 94%, rgba(62, 207, 151, .12), transparent 70%);
+  opacity: 1;
+  animation: nightGlow 18s ease-in-out infinite alternate-reverse;
+}
+@keyframes nightGlow {
+  from { background-position: 86% 12%, 6% 90%, 52% 52%; }
+  to   { background-position: 78% 8%, 12% 96%, 48% 46%; }
+}
+/* Give the aurora layers a touch more body without flattening the coal */
+html:not([data-theme="day"]) .page-hero::before { opacity: .8; }
+html:not([data-theme="day"]) .page-hero .page-hero-orb { opacity: .9; }
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-theme="day"]) .section-dark::after,
+  html:not([data-theme="day"]) .section-earth::after,
+  html:not([data-theme="day"]) .section-soft::after { animation: none; }
+}
+
+/* ==================================================================
+   V27 — REALISTIC CINEMATIC SCENES, VISIBLE SCROLL BACKDROP,
+   AND HIGH-CONTRAST NIGHT CTA
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   A. "Start a conversation" — clearly visible in night mode.
+   The header pill previously relied on a near-invisible border over a
+   transparent header, so its writing could disappear against the hero.
+   Now it carries a glass fill, a gold border and light text.
+   ------------------------------------------------------------------ */
+html:not([data-theme="day"]) .nav-cta {
+  color: #fdfbf2;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(242, 197, 107, .6);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+html:not([data-theme="day"]) .nav-cta:hover {
+  color: #ffffff;
+  background: rgba(242, 197, 107, .18);
+  border-color: rgba(242, 197, 107, .9);
+}
+html:not([data-theme="day"]) .nav-cta::after { color: #f2c56b; }
+/* Same assurance for the gold "Start a conversation" drawer button */
+html:not([data-theme="day"]) .btn-primary {
+  color: #201a07;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255, 250, 222, .6);
+}
+
+/* ------------------------------------------------------------------
+   B. Keep the living coal / cinematic backdrop visible on EVERY inner
+   page while scrolling. The section veils were near-opaque, so the
+   fixed backdrop vanished below the hero. These lower them enough for
+   the render to read through, in both modes and every skin.
+   ------------------------------------------------------------------ */
+html:not([data-theme="day"]) body:not(.page-home) .section-dark  { background: rgba(6, 14, 11, .42) !important; }
+html:not([data-theme="day"]) body:not(.page-home) .section-soft  { background: rgba(12, 22, 17, .40) !important; }
+html:not([data-theme="day"]) body:not(.page-home) .section-earth { background: rgba(20, 22, 15, .42) !important; }
+html[data-theme="day"] body:not(.page-home) .section-dark  { background: rgba(243, 247, 241, .48) !important; }
+html[data-theme="day"] body:not(.page-home) .section-soft  { background: rgba(233, 242, 230, .46) !important; }
+html[data-theme="day"] body:not(.page-home) .section-earth { background: rgba(238, 242, 224, .46) !important; }
+html:not([data-theme="day"]) body:not(.page-home) .faq-section { background: rgba(9, 20, 14, .42) !important; }
+html[data-theme="day"] body:not(.page-home) .faq-section { background: rgba(231, 240, 228, .46) !important; }
+/* Pull the fixed veil back a little so the coal frames read clearly */
+html:not([data-theme="day"]) .cine-veil {
+  background: linear-gradient(180deg, rgba(4, 7, 6, .14) 0%, rgba(4, 7, 6, .26) 54%, rgba(4, 7, 6, .42) 100%);
+}
+html[data-theme="day"] .cine-veil {
+  background: linear-gradient(180deg, rgba(240, 239, 228, .06) 0%, rgba(240, 239, 228, .22) 54%, rgba(240, 239, 228, .4) 100%);
+}
+
+/* ------------------------------------------------------------------
+   C. Realistic cinematic scenes — replace the flat CSS illustrations
+   (mine tunnel, supply board, valley) with photographic/3D imagery
+   given a slow Ken Burns drift, a light sweep and rising dust/embers.
+   ------------------------------------------------------------------ */
+.cine-scene { position: absolute; inset: 0; overflow: hidden; z-index: 0; border-radius: inherit; isolation: isolate; }
+.cine-scene-img {
+  position: absolute;
+  inset: -5%;
+  background-size: cover;
+  background-position: center;
+  animation: cineKenBurns 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes cineKenBurns {
+  from { transform: scale(1.03) translate3d(0, 0, 0); }
+  to   { transform: scale(1.14) translate3d(-1.6%, -1%, 0); }
+}
+.cine-scene-shade {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(4, 10, 7, .10) 0%, rgba(4, 10, 7, .22) 45%, rgba(4, 10, 7, .74) 100%),
+    radial-gradient(120% 90% at 50% 42%, transparent 45%, rgba(4, 10, 7, .32) 100%);
+}
+.cine-scene-glint {
+  position: absolute; inset: -35%;
+  background: linear-gradient(100deg, transparent 43%, rgba(255, 236, 180, .16) 50%, transparent 57%);
+  mix-blend-mode: screen;
+  animation: cineGlint 8.5s ease-in-out infinite;
+}
+@keyframes cineGlint {
+  0%, 100% { transform: translateX(-46%) rotate(2deg); }
+  50%      { transform: translateX(46%) rotate(2deg); }
+}
+.cine-scene-particles {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255, 206, 108, .9) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(255, 178, 84, .6) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle, rgba(255, 226, 150, .75) 0 1.2px, transparent 2.2px);
+  background-size: 120px 170px, 160px 210px, 90px 140px;
+  background-position: 12% 108%, 46% 114%, 78% 110%;
+  background-repeat: repeat;
+  opacity: .5;
+  -webkit-mask-image: linear-gradient(to top, black 12%, transparent 74%);
+  mask-image: linear-gradient(to top, black 12%, transparent 74%);
+  animation: cineParticles 14s linear infinite;
+}
+@keyframes cineParticles {
+  from { background-position: 12% 108%, 46% 114%, 78% 110%; }
+  to   { background-position: 12% -28%, 46% -20%, 78% -32%; }
+}
+.cine-scene-scan {
+  position: absolute; left: 8%; right: 8%; top: 16%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(242, 197, 107, .8), transparent);
+  box-shadow: 0 0 18px rgba(242, 197, 107, .5);
+  opacity: .55;
+  animation: cineScan 5.5s ease-in-out infinite;
+}
+@keyframes cineScan {
+  0%, 100% { transform: translateY(0); opacity: 0; }
+  15% { opacity: .55; }
+  50% { transform: translateY(190px); opacity: .3; }
+  85% { opacity: .55; }
+}
+.cine-scene-caption {
+  position: absolute; z-index: 3; left: 14px; right: 14px; bottom: 12px;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid rgba(242, 197, 107, .32);
+  border-radius: 10px;
+  background: rgba(6, 12, 9, .55);
+  backdrop-filter: blur(8px);
+}
+.cine-scene-caption span { color: #f2c56b; font-size: .56rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+.cine-scene-caption strong { color: #f6f2e8; font-family: "Playfair Display", Georgia, serif; font-size: .95rem; font-weight: 400; letter-spacing: .01em; }
+
+/* Video scene (operations) — real footage, cinematic grade */
+.cine-video { position: relative; overflow: hidden; border-radius: 16px; border: 1px solid rgba(242, 197, 107, .38); background: #050a07; box-shadow: 0 26px 60px rgba(0, 0, 0, .4); }
+.cine-video video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: saturate(.82) contrast(1.1) brightness(.78);
+}
+html[data-theme="day"] .cine-video video { filter: saturate(.9) contrast(1.05) brightness(1.02); }
+
+/* Operations: the old flat illustration becomes a real video scene */
+.mine-animation.cine-video { height: 440px; background: #050a07; }
+.mine-animation.cine-video::before { display: none; } /* drop the star field */
+.mine-animation.cine-video::after { display: none; }  /* drop the old sweep */
+.mine-animation.cine-video video { filter: saturate(.84) contrast(1.12) brightness(.8); }
+
+/* Supply board: realistic railhead behind the route nodes */
+.supply-scene { z-index: 0; }
+.supply-board .supply-scene .cine-scene-img { inset: -3%; animation-duration: 30s; }
+.supply-board .route-node b, .supply-board .route-node.active b { box-shadow: 0 9px 22px rgba(0, 0, 0, .45); }
+.supply-board-top, .supply-board-note, .supply-route { text-shadow: 0 1px 10px rgba(0, 0, 0, .6); }
+
+/* Community: real Darra Adam Khel photo with gentle motion */
+.valley-scene.cine-scene { background: #0a120d; }
+.valley-scene .cine-scene-img { inset: -4%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cine-scene-img, .cine-scene-glint, .cine-scene-particles, .cine-scene-scan { animation: none !important; }
+}
+
+/* ==================================================================
+   V28 — RAIL SCENE, READABILITY, HERO/TEAM/NUMBER EFFECTS
+   ================================================================== */
+
+/* ------------------------------------------------------------------
+   A. Readability — brighter body copy, clearer lines, and soft backing
+   behind the right-hand paragraph of every section head so text never
+   fights the now-visible backdrop.
+   ------------------------------------------------------------------ */
+html:not([data-theme="day"]) {
+  --ink-soft: #c9c6bd;
+  --line: rgba(246, 242, 232, .21);
+  --line-strong: rgba(246, 242, 232, .36);
+}
+html:not([data-theme="day"]) .section-head > p,
+html:not([data-theme="day"]) .reel-band-head > p {
+  background: radial-gradient(closest-side at 50% 50%, rgba(6, 14, 10, .5), rgba(6, 14, 10, .18) 60%, rgba(6, 14, 10, 0) 100%);
+  padding: 14px 18px;
+  margin: -10px -18px;
+  border-radius: 14px;
+}
+html[data-theme="day"] .section-head > p,
+html[data-theme="day"] .reel-band-head > p {
+  background: radial-gradient(closest-side at 50% 50%, rgba(247, 250, 245, .7), rgba(247, 250, 245, .3) 60%, rgba(247, 250, 245, 0) 100%);
+  padding: 14px 18px;
+  margin: -10px -18px;
+  border-radius: 14px;
+}
+@media (max-width: 900px) {
+  .section-head > p, .reel-band-head > p { margin: 4px 0 0; padding: 12px 14px; }
+}
+
+/* ------------------------------------------------------------------
+   B. Rail scene (gallery) — a realistic animated railhead with a moving
+   wagon convoy, light sweep and rising dust.
+   ------------------------------------------------------------------ */
+.film-card-animated { background: #0a120d; }
+.rail-track {
+  position: absolute; z-index: 2; left: -2%; right: -2%; bottom: 13%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(242, 197, 107, .65) 12%, rgba(242, 197, 107, .65) 88%, transparent);
+  box-shadow: 0 0 14px rgba(242, 197, 107, .5), 0 3px 6px rgba(0, 0, 0, .55);
+  opacity: .7;
+  transform: perspective(400px) rotateX(28deg);
+  transform-origin: bottom;
+}
+.rail-track::after {
+  content: "";
+  position: absolute; left: 0; right: 0; top: 5px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(242, 197, 107, .35) 20%, rgba(242, 197, 107, .35) 80%, transparent);
+}
+.rail-train {
+  position: absolute; z-index: 3; left: -30%; right: -30%; bottom: 14.5%;
+  height: 24px;
+  background-image: repeating-linear-gradient(90deg,
+    #060a08 0px, #060a08 44px,
+    #10150f 44px, #10150f 60px,
+    #1b211a 60px, #1b211a 76px,
+    rgba(0,0,0,0) 76px, rgba(0,0,0,0) 128px);
+  background-size: 128px 100%;
+  filter: drop-shadow(0 5px 7px rgba(0, 0, 0, .6));
+  animation: railTrain 8s linear infinite;
+  will-change: background-position;
+}
+.rail-train::before {
+  content: "";
+  position: absolute; left: 0; right: 0; top: 0; height: 5px;
+  background: rgba(242, 197, 107, .28);
+  opacity: .6;
+}
+@keyframes railTrain {
+  from { background-position-x: 0; }
+  to   { background-position-x: -128px; }
+}
+@media (prefers-reduced-motion: reduce) { .rail-train { animation: none; } }
+
+/* ------------------------------------------------------------------
+   C. Hero effects — a breathing glow on the inner-page orb and a gold
+   sheen sweeping the headline (the home hero already carries its own
+   embers, glint and Ken Burns motion).
+   ------------------------------------------------------------------ */
+.page-hero-orb {
+  animation: orb 6s ease-in-out infinite, orbGlow 8s ease-in-out infinite;
+}
+@keyframes orbGlow {
+  0%, 100% { filter: blur(1px) brightness(1); }
+  50%      { filter: blur(3px) brightness(1.25); }
+}
+/* Headline sheen — a gold highlight sweeps across inner-page heroes.
+   The base tone is the heading's own colour, so it never loses contrast. */
+.page-hero h1 {
+  background-image: linear-gradient(100deg, var(--ink) 0%, var(--ink) 36%, rgba(255, 240, 190, .95) 50%, var(--ink) 64%, var(--ink) 100%);
+  background-size: 240% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: headlineShimmer 7s ease-in-out infinite;
+}
+@keyframes headlineShimmer {
+  0%, 100% { background-position: 130% 0; }
+  50%      { background-position: -30% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-hero::after, body.page-home .hero::after,
+  .page-hero-orb, .page-hero h1 { animation: none !important; }
+}
+
+/* ------------------------------------------------------------------
+   D. Team showcase — accent glow pulse behind each portrait, a shimmer
+   on the member name, and a slow breathing scale on the portrait.
+   ------------------------------------------------------------------ */
+.team-portrait::before {
+  content: "";
+  position: absolute; inset: -30%;
+  z-index: 0;
+  background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--ta) 30%, transparent), transparent 62%);
+  animation: teamGlow 7s ease-in-out infinite;
+}
+@keyframes teamGlow {
+  0%, 100% { opacity: .5; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.12); }
+}
+.team-copy h2 span {
+  background: linear-gradient(100deg, var(--ta) 0%, #fff3c4 50%, var(--ta) 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: teamNameShimmer 6s ease-in-out infinite;
+}
+@keyframes teamNameShimmer { to { background-position: 100% 0; } }
+.team-portrait .team-photo { animation: teamPhotoIn 1s ease both, teamPhotoBreathe 14s ease-in-out 1s infinite; }
+@keyframes teamPhotoBreathe {
+  0%, 100% { transform: scale(1.02); }
+  50%      { transform: scale(1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .team-portrait::before, .team-copy h2 span, .team-portrait .team-photo { animation: none !important; }
+}
+
+/* ------------------------------------------------------------------
+   E. The numbers — gold shimmer on turnover / clients / quantity so the
+   key figures catch the eye, ready for the count-up (script.js).
+   ------------------------------------------------------------------ */
+.proof-strip strong, .mini-stat strong, .big-num, .crm-metrics strong {
+  background: linear-gradient(100deg, #f6dd9a 0%, #e6b954 26%, #fff3c4 50%, #c08e22 74%, #f0cd76 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #d9ab41;
+  animation: numberShimmer 7s ease-in-out infinite;
+}
+@keyframes numberShimmer { to { background-position: 100% 0; } }
+html[data-theme="day"] .proof-strip strong,
+html[data-theme="day"] .mini-stat strong,
+html[data-theme="day"] .big-num {
+  background: linear-gradient(100deg, #7d560a 0%, #a97a17 40%, #6e4e09 60%, #9c7318 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: numberShimmer 8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .proof-strip strong, .mini-stat strong, .big-num, .crm-metrics strong { animation: none !important; }
+}

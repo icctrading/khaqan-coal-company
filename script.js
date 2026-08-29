@@ -59,6 +59,33 @@ window.KhaqanCMS = {
   }
 };
 
+/* Managed media library — images & videos added or removed from the Control Room.
+   Each item is tagged to a website part (`section`) so the public pages render
+   exactly the media meant for them. */
+const MEDIA_KEY = 'khaqanMedia';
+const mediaRead = () => readJSON(MEDIA_KEY, []);
+const mediaWrite = (items) => {
+  try { window.localStorage.setItem(MEDIA_KEY, JSON.stringify(items)); } catch (error) { /* no-op */ }
+};
+window.KhaqanMedia = {
+  get: mediaRead,
+  add: (item) => {
+    const entry = {
+      ...(item || {}),
+      id: (item && item.id) || `media-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
+      type: item && item.type === 'video' ? 'video' : 'image',
+      title: (item && item.title) || 'Untitled',
+      section: (item && item.section) || 'home',
+      url: (item && item.url) || '',
+      addedAt: (item && item.addedAt) || new Date().toISOString()
+    };
+    mediaWrite([entry, ...mediaRead()]);
+    return entry;
+  },
+  remove: (id) => mediaWrite(mediaRead().filter((m) => m.id !== id)),
+  bySection: (section) => mediaRead().filter((m) => m.section === section)
+};
+
 function applyCmsData() {
   const data = getCmsData();
   document.querySelectorAll('[data-cms]').forEach((node) => {
@@ -372,29 +399,57 @@ if (canTilt) {
   });
 }
 
-/* Number count-up when the qom facts scroll into view. */
-const countEls = document.querySelectorAll('.qom-facts strong');
-if ('IntersectionObserver' in window && countEls.length
-    && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+/* Number count-up — the big figures (turnover, quantity, clients, qom
+   facts) count from zero as they scroll into view. Handles comma-grouped
+   numbers, currency prefixes, decimals and trailing units; skips year
+   ranges and labels that only carry an ordinal like "01". */
+const countEls = document.querySelectorAll('.qom-facts strong, .proof-strip strong');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function isOrdinalLabel(value) {
+  // "01", "02", "03"… step counters are labels, not metrics to animate.
+  return /^0\d$/.test(value);
+}
+function isYearRange(value) {
+  return /[\u2013\u2014-]\s*\d/.test(value); // 2022–2026 style ranges stay still
+}
+
+function animateNumber(el) {
+  const original = el.textContent.trim();
+  if (isOrdinalLabel(original) || isYearRange(original)) return;
+  const match = original.match(/^([^0-9]*?)([\d][\d,]*(?:\.\d+)?)([\s\S]*)$/);
+  if (!match) return;
+  const [, prefix, numText, suffix] = match;
+  const raw = numText.replace(/,/g, '');
+  const target = parseFloat(raw);
+  if (!Number.isFinite(target) || target === 0) return;
+  const decimals = (raw.split('.')[1] || '').length;
+  const grouped = numText.indexOf(',') > -1;
+  const duration = 1900;
+  const start = performance.now();
+  const format = (value) => {
+    let fixed = value.toFixed(decimals);
+    if (grouped) {
+      const [intPart, decPart] = fixed.split('.');
+      fixed = Number(intPart).toLocaleString('en-US') + (decPart ? '.' + decPart : '');
+    }
+    return prefix + fixed + suffix;
+  };
+  const tick = (now) => {
+    const p = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = format(target * eased);
+    if (p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+if ('IntersectionObserver' in window && countEls.length && !reducedMotion) {
   const countObserver = new IntersectionObserver((entries, obs) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
       obs.unobserve(entry.target);
-      const el = entry.target;
-      const match = el.textContent.match(/^([^0-9]*)(\d+(?:\.\d+)?)([\s\S]*)$/);
-      if (!match) return;
-      const [, prefix, numText, suffix] = match;
-      const target = parseFloat(numText);
-      const decimals = (numText.split('.')[1] || '').length;
-      const duration = 1700;
-      const start = performance.now();
-      const tick = (now) => {
-        const p = Math.min(1, (now - start) / duration);
-        const eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = prefix + (target * eased).toFixed(decimals) + suffix;
-        if (p < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
+      animateNumber(entry.target);
     });
   }, { threshold: 0.4 });
   countEls.forEach((el) => countObserver.observe(el));
@@ -974,5 +1029,125 @@ const khaqanScroll = (function () {
     const top = Math.max(0, Math.round(main.getBoundingClientRect().top + window.scrollY - pad));
     main.focus({ preventScroll: true });
     if (Math.abs(window.scrollY - top) > 2) window.scrollTo(0, top);
+  });
+})();
+
+/* =====================================================================
+   Rotating team hero — cycles the key company members with individual
+   accents, transitions and animations; pauses on hover/focus.
+   ===================================================================== */
+document.querySelectorAll('[data-team-hero]').forEach((hero) => {
+  const slides = Array.from(hero.querySelectorAll('.team-slide'));
+  const dotsWrap = hero.querySelector('[data-team-dots]');
+  const countEl = hero.querySelector('[data-team-count]');
+  const progress = hero.querySelector('.team-hero-progress');
+  const interval = Number(hero.dataset.teamInterval) || 6000;
+  let index = 0;
+  let timer = null;
+  if (!slides.length) return;
+  hero.style.setProperty('--team-duration', `${interval}ms`);
+
+  if (dotsWrap) {
+    dotsWrap.innerHTML = slides.map((_, i) => `<button class="team-dot${i === 0 ? ' active' : ''}" type="button" data-team-dot="${i}" aria-label="Show team member ${i + 1}"></button>`).join('');
+    dotsWrap.addEventListener('click', (event) => {
+      const dot = event.target.closest('[data-team-dot]');
+      if (!dot) return;
+      activate(Number(dot.dataset.teamDot));
+      restart();
+    });
+  }
+
+  function activate(nextIndex) {
+    index = (nextIndex + slides.length) % slides.length;
+    slides.forEach((slide, i) => {
+      const on = i === index;
+      slide.classList.toggle('active', on);
+      slide.setAttribute('aria-hidden', String(!on));
+    });
+    if (countEl) countEl.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+    dotsWrap?.querySelectorAll('.team-dot').forEach((dot, i) => dot.classList.toggle('active', i === index));
+    if (progress) { progress.classList.remove('run'); void progress.offsetWidth; progress.classList.add('run'); }
+  }
+
+  function stop() {
+    if (timer) { window.clearInterval(timer); timer = null; }
+    if (progress) progress.classList.add('paused');
+  }
+  function restart() {
+    stop();
+    if (progress) progress.classList.remove('paused');
+    timer = window.setInterval(() => activate(index + 1), interval);
+  }
+
+  hero.addEventListener('mouseenter', stop);
+  hero.addEventListener('mouseleave', restart);
+  hero.addEventListener('focusin', stop);
+  hero.addEventListener('focusout', (event) => { if (!hero.contains(event.relatedTarget)) restart(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else restart(); });
+
+  activate(0);
+  restart();
+});
+
+/* =====================================================================
+   Managed media + team photos — render Control Room media on the public
+   pages and drop uploaded member portraits into the leadership sections.
+   ===================================================================== */
+(function () {
+  const escapeMediaHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+
+  function renderManagedMedia() {
+    const media = window.KhaanMedia ? window.KhaanMedia.get() : [];
+    document.querySelectorAll('[data-managed-media]').forEach((wrap) => {
+      const section = wrap.dataset.managedMedia;
+      const items = media.filter((m) => m.section === section);
+      if (!items.length) return;
+      const grid = document.createElement('div');
+      grid.className = 'managed-media-grid';
+      grid.innerHTML = items.slice(0, 12).map((m) => {
+        const mediaEl = m.type === 'video'
+          ? `<video controls muted loop playsinline preload="metadata" poster=""><source src="${escapeMediaHtml(m.url)}" type="video/mp4"></video>`
+          : `<img src="${escapeMediaHtml(m.url)}" alt="${escapeMediaHtml(m.title)}" loading="lazy" decoding="async">`;
+        return `<figure class="managed-item">${mediaEl}<figcaption><span>${escapeMediaHtml(m.title)}</span><b>${escapeMediaHtml(m.section)}</b></figcaption></figure>`;
+      }).join('');
+      const empty = wrap.querySelector('.managed-media-empty');
+      if (empty) empty.replaceWith(grid);
+      else wrap.appendChild(grid);
+    });
+  }
+
+  function applyTeamPhotos() {
+    const media = window.KhaanMedia ? window.KhaanMedia.get() : [];
+    document.querySelectorAll('[data-member]').forEach((el) => {
+      const member = el.dataset.member;
+      const photo = media.find((m) => m.type === 'image' && m.section === `team-${member}`);
+      if (!photo || !photo.url) return;
+      const portrait = el.querySelector('.team-portrait');
+      const mini = el.querySelector('.team-portrait-mini');
+      if (portrait && !portrait.querySelector('.team-photo')) {
+        const img = document.createElement('img');
+        img.className = 'team-photo';
+        img.src = photo.url;
+        img.alt = photo.title || member;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        portrait.insertBefore(img, portrait.firstChild);
+      }
+      if (mini && !mini.querySelector('img')) {
+        const img = document.createElement('img');
+        img.src = photo.url;
+        img.alt = photo.title || member;
+        img.loading = 'lazy';
+        mini.appendChild(img);
+      }
+    });
+  }
+
+  renderManagedMedia();
+  applyTeamPhotos();
+
+  // Live-update when the Control Room adds/removes media in another tab.
+  window.addEventListener('storage', (event) => {
+    if (event.key === MEDIA_KEY) { renderManagedMedia(); applyTeamPhotos(); }
   });
 })();
