@@ -185,3 +185,59 @@ html[data-theme="day"] .crm-media-addform-row input[type="text"],
 html[data-theme="day"] .crm-media-addform-row select { color: #173420; background: #fff; border-color: rgba(30,81,52,.22); }
 html[data-theme="day"] .crm-media-addform .file-label { color: #173420; background: #fff; border-color: rgba(30,81,52,.22); }
 html[data-theme="day"] .crm-media-hint { color: #5f7b62; }
+
+/* Password-reset message line inside the cloud card */
+.cloud-auth-message { margin: 10px 0 0; max-width: 560px; font-size: .72rem; line-height: 1.5; color: #9bc28f; }
+.cloud-auth-message.is-error { color: #ffae80; }
+.crm-cloud-card form button.btn-quiet { background: transparent; border: 1px solid rgba(195,218,198,.22); color: #cfdfc6; }
+.crm-cloud-card form button.btn-quiet:hover { border-color: var(--yellow); }
+#cloud-newpassword-form input { width: 200px; }
+
+/* Leadership portraits — CRM management for the rotating hero team */
+.crm-portrait-intro { margin: -8px 0 20px; color: #a9c09f; font-size: .78rem; line-height: 1.6; }
+.crm-portrait-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.crm-portrait-slot { display: grid; gap: 10px; padding: 14px; border: 1px solid rgba(195,218,198,.14); border-radius: 13px; background: #09150d; }
+.crm-portrait-frame { position: relative; aspect-ratio: 1 / 1; overflow: hidden; display: grid; place-items: center; border-radius: 10px; background: radial-gradient(circle at 50% 32%, #243b29, #0d1d12 72%); border: 1px solid rgba(195,218,198,.14); }
+.crm-portrait-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.crm-portrait-monogram { color: rgba(246,242,232,.28); font-family: Georgia, serif; font-size: 3.2rem; letter-spacing: -.04em; }
+.crm-portrait-badge { position: absolute; left: 8px; bottom: 8px; padding: 3px 8px; border-radius: 999px; background: rgba(10,18,12,.72); color: #cfe2bf; font-size: .55rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; backdrop-filter: blur(4px); }
+.crm-portrait-slot.has-photo .crm-portrait-badge { color: #f0d9a0; }
+.crm-portrait-meta { display: grid; gap: 3px; }
+.crm-portrait-meta strong { color: #eef5e8; font-size: .82rem; }
+.crm-portrait-meta span { color: #9fb49a; font-size: .62rem; font-weight: 750; letter-spacing: .05em; text-transform: uppercase; }
+.crm-portrait-meta small { color: #718a76; font-size: .64rem; line-height: 1.45; }
+.crm-portrait-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.crm-portrait-actions .file-label, .crm-portrait-actions .btn { display: inline-flex; align-items: center; padding: 8px 11px; border: 1px solid rgba(195,218,198,.2); border-radius: 8px; color: #e5efdc; background: #0b1a10; font-size: .65rem; font-weight: 750; cursor: pointer; }
+.crm-portrait-actions .file-label:hover { border-color: var(--yellow); }
+.crm-portrait-actions .btn-quiet { background: transparent; }
+.crm-portrait-actions .crm-danger { color: #ffd4b7; border-color: rgba(255,173,125,.4); }
+.crm-portrait-actions .crm-danger:hover { background: rgba(150,40,20,.35); }
+
+/* Manage controls on media-library tiles */
+.crm-media-grid.managed .media-item-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; z-index: 2; }
+.crm-media-grid.managed .media-edit,
+.crm-media-grid.managed .media-remove {
+  position: static;
+  width: auto; min-width: 26px; height: 26px; padding: 0 9px;
+  display: inline-grid; place-items: center;
+  border: 1px solid rgba(195,218,198,.3);
+  border-radius: 999px;
+  color: #e5efdc;
+  background: rgba(10,18,12,.72);
+  font-size: .58rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  line-height: 1; cursor: pointer; backdrop-filter: blur(4px);
+}
+.crm-media-grid.managed .media-remove { padding: 0; width: 26px; font-size: 1rem; border-color: rgba(255,173,125,.4); color: #ffd4b7; }
+.crm-media-grid.managed .media-edit:hover { color: #173420; background: var(--yellow); border-color: var(--yellow); }
+.crm-media-grid.managed .media-remove:hover { color: #fff; background: rgba(150,40,20,.75); border-color: rgba(255,160,120,.7); }
+.crm-media-addform .file-label.has-file { border-color: rgba(152,206,131,.65); color: #bfe4ad; }
+html[data-theme="day"] .crm-portrait-slot,
+html[data-theme="day"] .crm-portrait-frame { background: #fff; border-color: rgba(30,81,52,.18); }
+html[data-theme="day"] .crm-portrait-meta strong { color: #173420; }
+html[data-theme="day"] .crm-portrait-meta span { color: #4c774f; }
+html[data-theme="day"] .crm-portrait-meta small { color: #5f7b62; }
+html[data-theme="day"] .crm-portrait-actions .file-label, html[data-theme="day"] .crm-portrait-actions .btn { color: #173420; background: #fff; border-color: rgba(30,81,52,.22); }
+html[data-theme="day"] .crm-portrait-intro { color: #4e6f53; }
+html[data-theme="day"] .crm-cloud-card form button.btn-quiet { color: #173420; border-color: rgba(30,81,52,.25); }
+@media (max-width: 1100px) { .crm-portrait-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .crm-portrait-grid { grid-template-columns: 1fr 1fr; gap: 10px; } #cloud-newpassword-form input { width: 100%; } }
