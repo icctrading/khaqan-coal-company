@@ -982,14 +982,14 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   }
 
   nextButton?.addEventListener('click', () => goTo(index + 1));
-  // Hover pauses only while the pointer is over the reel screen itself — the
-  // same behaviour as the team hero — so moving the cursor through the section
-  // head or the chapter rail no longer freezes the deck. Keyboard focus still
-  // pauses the whole deck (rail included) so a reader can study a frame while
-  // tabbing through the chapter buttons.
+  // Pause on pointer movement only inside the visible picture area. Listening
+  // on the stage/deck made their larger layout boxes count as part of the
+  // screen in some responsive layouts, so merely moving across the page could
+  // freeze the reel. Keyboard focus still pauses the deck for accessibility.
   const deck = reel.closest('.reel-deck') || band || reel;
-  reel.addEventListener('mouseenter', stop);
-  reel.addEventListener('mouseleave', restart);
+  const reelScreen = reel.querySelector('.reel-slides') || reel;
+  reelScreen.addEventListener('pointerenter', stop);
+  reelScreen.addEventListener('pointerleave', restart);
   deck.addEventListener('focusin', stop);
   deck.addEventListener('focusout', (event) => { if (!deck.contains(event.relatedTarget)) restart(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else restart(); });
