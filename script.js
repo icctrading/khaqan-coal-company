@@ -982,12 +982,16 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   }
 
   nextButton?.addEventListener('click', () => goTo(index + 1));
-  // Hover/focus pauses the whole deck — rail included — so a reader can study a frame.
-  const pauseZone = band && band.matches('.reel-deck, .reel-band, section') ? band : reel;
-  pauseZone.addEventListener('mouseenter', stop);
-  pauseZone.addEventListener('mouseleave', restart);
-  pauseZone.addEventListener('focusin', stop);
-  pauseZone.addEventListener('focusout', (event) => { if (!pauseZone.contains(event.relatedTarget)) restart(); });
+  // Hover pauses only while the pointer is over the reel screen itself — the
+  // same behaviour as the team hero — so moving the cursor through the section
+  // head or the chapter rail no longer freezes the deck. Keyboard focus still
+  // pauses the whole deck (rail included) so a reader can study a frame while
+  // tabbing through the chapter buttons.
+  const deck = reel.closest('.reel-deck') || band || reel;
+  reel.addEventListener('mouseenter', stop);
+  reel.addEventListener('mouseleave', restart);
+  deck.addEventListener('focusin', stop);
+  deck.addEventListener('focusout', (event) => { if (!deck.contains(event.relatedTarget)) restart(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else restart(); });
 
   /* Decode budget: a 30fps clip should not keep decoding while the reader is
@@ -1866,7 +1870,9 @@ document.querySelectorAll('.team-card').forEach((card) => {
       source.src = item.url;
       node.appendChild(source);
       try { node.src = item.url; } catch (error) { /* source tag is enough */ }
-      applyAutoplayCeiling(node, item.duration);
+      /* Reel slides follow the reel's own rotation timing, not a playback
+         ceiling — the reel's cut logic owns play/pause in the stage. */
+      if (!el.closest('[data-reel]')) applyAutoplayCeiling(node, item.duration);
     } else {
       node = document.createElement('img');
       node.src = item.url;
