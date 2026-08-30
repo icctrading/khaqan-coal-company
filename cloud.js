@@ -58,9 +58,10 @@
 
   // Clamp a rotation setting on the way out: out-of-range or blank values are
   // written as the 5s default so the public site can rely on the column.
+  // Values from 2–30 seconds are kept — including 2/3/4s "fast" pace.
   const clampRotationSec = (value) => {
     const n = Number(value);
-    return (Number.isFinite(n) && n >= 3 && n <= 30) ? Math.round(n) : 5;
+    return (Number.isFinite(n) && n >= 2 && n <= 30) ? Math.round(n) : 5;
   };
 
   const toCms = (row) => row ? ({

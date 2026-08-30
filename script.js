@@ -825,7 +825,7 @@ window.addEventListener('storage', (event) => {
    teamHeroIntervalSec) overrides each deck's data-*-interval attribute; values
    are clamped to 3–30 seconds so a bad entry can never freeze a deck, and an
    empty / out-of-range value falls back to the attribute, then the default. */
-const ROTATION_MIN_MS = 3000;
+const ROTATION_MIN_MS = 2000;
 const ROTATION_MAX_MS = 30000;
 function rotationIntervalMs(cmsSeconds, attributeMs, fallbackMs) {
   const fromCms = Number(cmsSeconds);
