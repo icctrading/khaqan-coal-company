@@ -37,6 +37,9 @@ create table if not exists public.site_settings (
   cfo_card2 text not null default '',
   reel_interval_sec integer not null default 5,
   team_hero_interval_sec integer not null default 5,
+  -- Page copy overrides edited in the Control Room (headings, frame captions,
+  -- reel tile labels), keyed 'home:reel' / 'home:reel:4'. See script.js.
+  slot_copy jsonb not null default '{}'::jsonb,
   updated_at timestamptz not null default now()
 );
 
@@ -61,6 +64,8 @@ alter table public.site_settings add column if not exists cfo_card2 text not nul
 -- Rotation timing (seconds per frame) for the home reel and the leadership hero.
 alter table public.site_settings add column if not exists reel_interval_sec integer not null default 5;
 alter table public.site_settings add column if not exists team_hero_interval_sec integer not null default 5;
+-- Page copy overrides (headings · captions · tile labels) as one jsonb map.
+alter table public.site_settings add column if not exists slot_copy jsonb not null default '{}'::jsonb;
 
 insert into public.site_settings (id) values ('default') on conflict (id) do nothing;
 
@@ -171,6 +176,9 @@ create table if not exists public.media (
 alter table public.media add column if not exists area text not null default 'gallery';
 alter table public.media add column if not exists slot text not null default '';
 alter table public.media add column if not exists duration integer not null default 0;
+-- Index for the All-media inventory (everything on one page, ordered by placement).
+create index if not exists media_placement_idx on public.media (section, area, slot);
+create index if not exists media_created_idx on public.media (created_at desc);
 
 alter table public.media enable row level security;
 

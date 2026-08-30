@@ -21,6 +21,12 @@ const DEFAULT_CMS_DATA = {
      the home page highlights reel and the leadership hero (Home + About). */
   reelIntervalSec: 5,
   teamHeroIntervalSec: 5,
+  /* Per-spot wording overrides edited in the Control Room ("Headings, captions
+     & tiles"). Keyed by the same reference a media slot uses — `home:reel` for
+     a section head, `home:reel:4` for one frame — with `eyebrow`, `heading`,
+     `text` (section head) and `caption`, `heading`, `tile` (single frame).
+     An absent key or blank field keeps the copy that ships in the HTML. */
+  slotCopy: {},
   /* Leadership descriptions — edited from the Control Room. The opening
      phrase may be wrapped in <strong>…</strong> to keep the bold lead-in;
      everything else is rendered as plain text. */
@@ -118,11 +124,59 @@ function mergeCmsSources(base, remote) {
    Each item is tagged to a website part (`section`) so the public pages render
    exactly the media meant for them. */
 const MEDIA_KEY = 'khaqanMedia';
-const mediaRead = () => readJSON(MEDIA_KEY, []);
-const mediaWrite = (items) => {
-  try { window.localStorage.setItem(MEDIA_KEY, JSON.stringify(items)); } catch (error) { /* no-op */ }
-  try { window.dispatchEvent(new CustomEvent('khaqan:media-change')); } catch (error) { /* no-op */ }
+
+/* The media catalogue is held in memory first and written through to
+   localStorage. That matters for deletes: a library of data-URL uploads can
+   pass the ~5 MB origin quota, and once `setItem` throws EVERY write used to
+   be lost silently — the row stayed in localStorage, so a deleted photo or
+   reel clip simply reappeared as if Delete had never been pressed. With the
+   mirror, the change always lands for this tab, the persistence failure is
+   reported instead of swallowed, and the Control Room can say so. */
+let mediaMirror = null;
+let mediaPersistError = null;
+
+const mediaRead = () => {
+  if (!mediaMirror) {
+    const stored = readJSON(MEDIA_KEY, []);
+    mediaMirror = Array.isArray(stored) ? stored : [];
+  }
+  /* A copy: callers may sort or splice what they are handed (the cloud adopt
+     path does), and that must never rewrite the catalogue behind its back. */
+  return mediaMirror.slice();
 };
+
+function mediaWrite(items) {
+  mediaMirror = (Array.isArray(items) ? items : []).slice();
+  mediaPersistError = null;
+  try {
+    window.localStorage.setItem(MEDIA_KEY, JSON.stringify(mediaMirror));
+    /* `mediaMirror` is now exactly what the origin holds, so a later read in a
+       different tab can rebuild from storage and agree with this one. */
+  } catch (error) {
+    const quota = /quota/i.test(String((error && error.name) || '')) ||
+      Number(error && error.code) === 22 || Number(error && error.code) === 1014;
+    mediaPersistError = {
+      quota,
+      message: quota
+        ? 'This browser\'s storage is full, so the media list is only saved for this tab. Sign in to Supabase storage (or remove a large upload) to keep changes between visits.'
+        : 'The media list could not be saved in this browser.'
+    };
+    try { window.dispatchEvent(new CustomEvent('khaqan:media-error', { detail: mediaPersistError })); } catch (ignored) { /* no-op */ }
+  }
+  try { window.dispatchEvent(new CustomEvent('khaqan:media-change')); } catch (error) { /* no-op */ }
+}
+
+/* Media rows created in Supabase are keyed by a server UUID; anything else
+   (`media-1699…`) only exists in this browser until it is queued or uploaded. */
+const isRemoteMediaId = (id) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id || ''));
+
+/* Another tab saved the library (a Control Room delete, an upload): drop the
+   mirror so the next read picks up the new catalogue. */
+window.addEventListener('storage', (event) => {
+  if (event.key !== MEDIA_KEY) return;
+  mediaMirror = null;
+  try { window.dispatchEvent(new CustomEvent('khaqan:media-change')); } catch (error) { /* no-op */ }
+});
 const normalizeMediaItem = (item, i = 0) => {
   const section = (item && item.section) || 'general';
   const isTeam = /^team-/.test(section);
@@ -157,7 +211,25 @@ window.KhaqanMedia = {
     mediaWrite([entry, ...mediaRead()]);
     return entry;
   },
-  remove: (id) => mediaWrite(mediaRead().filter((m) => m.id !== id)),
+  /* Delete a row for good. Removal also settles the sync queue, otherwise a
+     queued upload for the same item would resurrect it on the next flush (this
+     is how a deleted reel clip could come back after signing in). When the row
+     is cloud-backed, the pending delete is recorded here so Storage and the
+     catalogue row are cleaned up even if the network is down right now. */
+  remove: (id) => {
+    const removed = mediaRead().find((m) => m.id === id) || null;
+    mediaWrite(mediaRead().filter((m) => m.id !== id));
+    const sync = window.KhaqanSync;
+    if (sync && id) {
+      if (sync.forgetMedia) sync.forgetMedia(id);
+      if (removed && (removed.storagePath || isRemoteMediaId(id)) && sync.queueDelete) {
+        sync.queueDelete(id, removed.storagePath || '');
+      }
+    }
+    return removed;
+  },
+  /* True when the last write could not be persisted (quota reached). */
+  persistError: () => mediaPersistError,
   /* Edit an existing item in place — used by the Control Room "Manage" button
      for retitling, re-tagging to another website part, or swapping the file. */
   update: (id, patch) => {
@@ -214,7 +286,9 @@ window.KhaqanMedia = {
     mediaWrite(merged);
     return merged;
   },
-  bySection: (section) => mediaRead().filter((m) => m.section === section)
+  bySection: (section) => mediaRead().filter((m) => m.section === section),
+  /* Shared with the Control Room: does this id belong to a Supabase row? */
+  isRemoteId: isRemoteMediaId
 };
 
 /* =====================================================================
@@ -416,6 +490,22 @@ window.KhaqanSync = {
     notifySyncState();
   },
 
+  /* An item that never reached Supabase was deleted: forget its queued upload
+     (and the raw file held for it in IndexedDB) so the retry can't re-create a
+     row the administrator just removed. */
+  forgetMedia(id) {
+    if (!id) return 0;
+    const state = readSyncState();
+    const doomed = (state.upserts || []).filter((u) => u.localId === id || u.id === id);
+    if (doomed.length) {
+      state.upserts = state.upserts.filter((u) => u.localId !== id && u.id !== id);
+      writeSyncState(state);
+      notifySyncState();
+    }
+    doomed.forEach((entry) => { if (entry.fileKey) removePendingFile(entry.fileKey); });
+    return doomed.length;
+  },
+
   /* Scan the browser library for files that never reached the cloud and queue
      them (a raw file may already be waiting in IndexedDB; otherwise a data-URL
      fallback is converted back into a File). Never rewrites cloud-backed rows. */
@@ -519,6 +609,15 @@ window.KhaqanSync = {
 
     const remainingDeletes = [];
     for (const item of state.deletes || []) {
+      /* A browser-side id was never sent to Supabase, so there is no remote row
+         to remove — dropping it here keeps the queue from retrying a delete
+         against a UUID column forever (which left "1 change waiting" on screen). */
+      if (!item.id || !isRemoteMediaId(item.id)) {
+        if (item.storagePath) {
+          try { await cloud.removeMediaObject(item.storagePath); synced = true; } catch (error) { remainingDeletes.push(item); }
+        }
+        continue;
+      }
       try {
         await cloud.deleteMedia(item.id, item.storagePath);
         synced = true;
@@ -799,6 +898,66 @@ window.KHAQAN_MEDIA_PLACEMENT = (() => {
     pageMeta, areaMeta, slotMeta, label, occupant
   };
 })();
+
+/* =====================================================================
+   Page copy & tile labels (KhaqanSlotCopy)
+   ---------------------------------------------------------------------
+   Every heading, caption line and reel chapter tile on the public pages can
+   be re-worded from the Control Room without touching a line of HTML. Two
+   kinds of key are supported, using the same reference as a media slot:
+
+     'home:reel'      → the section head above the area (eyebrow / heading / intro)
+     'home:reel:4'    → one frame: its caption line, its heading, and the label
+                        on the chapter tile beside the reel stage
+
+   The map lives inside the site-settings payload (`slotCopy`), so it saves,
+   syncs, queues and hydrates exactly like every other piece of site copy —
+   no extra column groups to deploy, and a public page re-applies it on the
+   `khaqan:cms-change` event. Blank values fall back to the wording shipped in
+   the HTML, so clearing an override is always safe.
+   ===================================================================== */
+const SLOT_COPY_FIELDS = { eyebrow: 60, heading: 120, text: 260, caption: 90, tile: 40 };
+
+window.KhaqanSlotCopy = {
+  fields: SLOT_COPY_FIELDS,
+  all() {
+    const map = getCmsData().slotCopy;
+    return map && typeof map === 'object' && !Array.isArray(map) ? map : {};
+  },
+  get(key) {
+    const entry = window.KhaqanSlotCopy.all()[key];
+    return entry && typeof entry === 'object' ? entry : null;
+  },
+  /* Write (or blank) one field of one spot. Returns the stored entry. */
+  set(key, patch) {
+    const map = { ...window.KhaqanSlotCopy.all() };
+    const next = { ...(map[key] || {}) };
+    Object.entries(patch || {}).forEach(([field, value]) => {
+      if (!Object.prototype.hasOwnProperty.call(SLOT_COPY_FIELDS, field)) return;
+      const text = String(value == null ? '' : value).replace(/\s+/g, ' ').trim().slice(0, SLOT_COPY_FIELDS[field]);
+      if (text) next[field] = text;
+      else delete next[field];
+    });
+    if (Object.keys(next).length) map[key] = next;
+    else delete map[key];
+    saveCmsData({ ...getCmsData(), slotCopy: map });
+    return Object.keys(next).length ? next : null;
+  },
+  clear(key) { return window.KhaqanSlotCopy.set(key, { eyebrow: '', heading: '', text: '', caption: '', tile: '' }); },
+  /* How many spots currently carry custom wording (shown in the Control Room). */
+  count() { return Object.keys(window.KhaqanSlotCopy.all()).length; },
+  /* The copy shipped in the page, used as the placeholder of every field so
+     the administrator can see what a blank box will fall back to. */
+  defaults(key) {
+    const parts = String(key || '').split(':');
+    const [pageId, areaId, slotId] = parts;
+    const areas = (window.KHAQAN_PAGE_AREAS && window.KHAQAN_PAGE_AREAS[pageId]) || [];
+    const area = areas.find((item) => item.id === areaId);
+    if (!slotId || !area || !area.slots) return { area: area ? area.label : areaId || '' };
+    const slot = area.slots.find((item) => String(item.id) === String(slotId)) || {};
+    return { area: area.label, slot: slot.label || '', file: slot.defaultSrc || '' };
+  }
+};
 
 /* Leadership bio fields are edited from the Control Room. They may keep a
    <strong> lead-in (rendered bold); all other HTML is stripped for safety. */
@@ -2359,15 +2518,222 @@ document.querySelectorAll('.team-card').forEach((card) => {
     });
   }
 
+  /* ---------------------------------------------------------------------
+     Page copy & tile labels — apply the Control Room's wording overrides.
+     `page:area` restyles the section head above the media; `page:area:slot`
+     rewrites one frame (caption line, heading, and the reel chapter tile,
+     whose thumbnail follows the uploaded file). Blank fields keep the copy
+     that ships in the HTML, so clearing an override is always safe.
+     --------------------------------------------------------------------- */
+  const copyValue = (entry, field) => (entry && entry[field] ? String(entry[field]).trim() : '');
+  const slotCopyMap = () => (window.KhaqanSlotCopy ? window.KhaqanSlotCopy.all() : {});
+
+  /* Clearing an override in the Control Room must give the page back the words
+     it shipped with — so the text that was there before the first override is
+     remembered per element and restored when the override disappears. */
+  const captionOriginals = new WeakMap();
+  /* Reel slides and their chapter tiles also keep the label they shipped with,
+     so clearing an override reverts the tag under the stage too. */
+  const slideTagOriginals = new WeakMap();
+  const tileLabelOriginals = new WeakMap();
+  function rememberCaption(el, captionNode) {
+    if (!captionNode || captionOriginals.has(el)) return;
+    const strong = captionNode.querySelector('strong');
+    const span = captionNode.querySelector('span');
+    captionOriginals.set(el, {
+      text: captionNode.textContent,
+      span: span ? span.textContent : null,
+      strong: strong ? strong.textContent : null
+    });
+  }
+  function restoreCaption(el) {
+    const saved = captionOriginals.get(el);
+    if (!saved) return;
+    const captionNode = el.querySelector('figcaption');
+    if (!captionNode) return;
+    const strong = captionNode.querySelector('strong');
+    const span = captionNode.querySelector('span');
+    if (strong && span && saved.span !== null && saved.strong !== null) {
+      span.textContent = saved.span;
+      strong.textContent = saved.strong;
+    } else {
+      captionNode.textContent = saved.text;
+    }
+  }
+
+  const headOriginals = new WeakMap();
+
+  function applySectionCopy() {
+    const copy = slotCopyMap();
+    document.querySelectorAll('[data-section-copy]').forEach((head) => {
+      const eyebrowNode = head.querySelector('.eyebrow');
+      const headingNode = head.querySelector('h1, h2, h3');
+      const textNode = head.querySelector('p');
+      /* Captured once, before anything is overwritten: [eyebrow, heading, intro]
+         exactly as they were written in the HTML. Clearing an override in the
+         Control Room hands those words back to the page. */
+      if (!headOriginals.has(head)) {
+        headOriginals.set(head, [
+          eyebrowNode ? eyebrowNode.textContent : '',
+          headingNode ? headingNode.textContent : '',
+          textNode ? textNode.textContent : ''
+        ]);
+      }
+      const saved = headOriginals.get(head);
+      const entry = copy[head.dataset.sectionCopy];
+      const write = (node, index, value) => {
+        if (!node) return;
+        const next = value || saved[index];
+        if (next != null) node.textContent = next;
+      };
+      write(eyebrowNode, 0, entry ? copyValue(entry, 'eyebrow') : '');
+      write(headingNode, 1, entry ? copyValue(entry, 'heading') : '');
+      write(textNode, 2, entry ? copyValue(entry, 'text') : '');
+    });
+  }
+
+
+  /* The chapter rail beside the reel stage: one tile per slide, matched by the
+     slide's position, so a re-worded frame and its tile never drift apart. */
+  function reelTileFor(slide) {
+    const reel = slide.closest('[data-reel]');
+    if (!reel) return null;
+    const slides = Array.from(reel.querySelectorAll('.reel-slide'));
+    const index = slides.indexOf(slide);
+    if (index < 0) return null;
+    const band = reel.closest('section') || reel.parentElement || document;
+    return band.querySelector(`[data-reel-jump="${index}"]`) || null;
+  }
+
+  const tileOriginals = new WeakMap();
+  function tileMediaNode(url, type) {
+    const node = type === 'video' ? document.createElement('video') : document.createElement('img');
+    node.setAttribute('aria-hidden', 'true');
+    if (type === 'video') {
+      node.muted = true;
+      node.loop = true;
+      node.playsInline = true;
+      node.setAttribute('preload', 'metadata');
+      node.src = url;
+    } else {
+      node.loading = 'lazy';
+      node.decoding = 'async';
+      node.alt = '';
+      node.src = url;
+    }
+    return node;
+  }
+  /* A tile shows exactly one thumbnail: the stock frame, or the uploaded file
+     that currently occupies the slot. The stock node is remembered once so
+     removing the upload puts the page back the way it shipped. */
+  function paintTileThumb(tile, url, type) {
+    if (!tileOriginals.has(tile)) {
+      const first = tile.querySelector('img, video');
+      tileOriginals.set(tile, first ? first.cloneNode(true) : null);
+    }
+    const already = tile.querySelector('img, video');
+    if (tile.dataset.khaqanThumb === 'override' && already && already.tagName === (type === 'video' ? 'VIDEO' : 'IMG') && already.getAttribute('src') === url) return;
+    const label = tile.querySelector('span');
+    tile.querySelectorAll('img, video').forEach((node) => node.remove());
+    const next = tileMediaNode(url, type);
+    if (label) tile.insertBefore(next, label);
+    else tile.appendChild(next);
+    tile.dataset.khaqanThumb = 'override';
+    tile.classList.add('has-media-override');
+  }
+  function restoreTileThumb(tile) {
+    if (tile.dataset.khaqanThumb !== 'override') return;
+    const original = tileOriginals.get(tile);
+    tile.querySelectorAll('img, video').forEach((node) => node.remove());
+    if (original) {
+      const label = tile.querySelector('span');
+      if (label) tile.insertBefore(original.cloneNode(true), label);
+      else tile.appendChild(original.cloneNode(true));
+    }
+    delete tile.dataset.khaqanThumb;
+    tile.classList.remove('has-media-override');
+  }
+
+  function applySlotCopy() {
+    const copy = slotCopyMap();
+    const media = window.KhaqanMedia ? window.KhaqanMedia.get() : [];
+    const place = window.KHAQAN_MEDIA_PLACEMENT;
+    document.querySelectorAll('[data-media-slot]').forEach((el) => {
+      const key = el.dataset.mediaSlot || '';
+      const parts = key.split(':');
+      if (parts.length < 2) return;
+      const entry = copy[key] || null;
+      const caption = copyValue(entry, 'caption');
+      const heading = copyValue(entry, 'heading');
+      const tile = copyValue(entry, 'tile');
+      const captionNode = el.querySelector('figcaption');
+      if (entry) {
+        rememberCaption(el, captionNode);
+        if (captionNode) {
+          const strong = captionNode.querySelector('strong');
+          const span = captionNode.querySelector('span');
+          if (strong && span) {
+            if (caption) span.textContent = caption;
+            if (heading) strong.textContent = heading;
+          } else if (heading || caption) {
+            captionNode.textContent = heading || caption;
+          }
+        } else if (heading || caption) {
+          el.insertAdjacentHTML('beforeend', `<figcaption>${escapeMediaHtml(heading || caption)}</figcaption>`);
+        }
+      } else {
+        restoreCaption(el);
+      }
+      /* The reel keeps its own labels: the live tag under the stage and the
+         chapter tile on the side (its text and, once a file is uploaded, its
+         thumbnail — a tile must never show a picture the frame no longer uses). */
+      if (!el.classList.contains('reel-slide')) return;
+      const override = place
+        ? place.occupant(media, parts[0], parts[1], parts[2] || '1')
+        : media.find((m) => m.section === parts[0] && (m.area || '') === parts[1] && (m.slot || '1') === (parts[2] || '1'));
+      if (!slideTagOriginals.has(el)) slideTagOriginals.set(el, el.dataset.reelTag || '');
+      const tag = tile || caption || heading || slideTagOriginals.get(el);
+      if (tag) {
+        el.dataset.reelTag = tag;
+        if (el.classList.contains('active')) {
+          const band = el.closest('section') || document;
+          const live = band.querySelector('[data-reel-tag-out]');
+          if (live) live.textContent = tag;
+        }
+      }
+      const tileButton = reelTileFor(el);
+      if (!tileButton) return;
+      const labelNode = tileButton.querySelector('span');
+      if (labelNode) {
+        if (!tileLabelOriginals.has(tileButton)) tileLabelOriginals.set(tileButton, labelNode.textContent);
+        labelNode.textContent = tag || tileLabelOriginals.get(tileButton);
+      }
+      if (override && override.url) paintTileThumb(tileButton, override.url, override.type);
+      else restoreTileThumb(tileButton);
+    });
+  }
+
   renderManagedMedia();
   applyTeamPhotos();
   applyMediaSlots();
+  applySectionCopy();
+  applySlotCopy();
 
   // Live-update when the Control Room adds/removes media in another tab,
   // or when the shared Supabase catalogue hydrates in this tab.
-  const refreshPublicMedia = () => { renderManagedMedia(); applyTeamPhotos(); applyMediaSlots(); };
+  const refreshPublicMedia = () => {
+    renderManagedMedia();
+    applyTeamPhotos();
+    applyMediaSlots();
+    applySectionCopy();
+    applySlotCopy();
+  };
   window.addEventListener('storage', (event) => {
     if (event.key === MEDIA_KEY) refreshPublicMedia();
   });
   window.addEventListener('khaqan:media-change', refreshPublicMedia);
+  /* Re-wording saved in the Control Room lands in the same site-settings
+     payload, so the copy refreshes without a reload. */
+  window.addEventListener('khaqan:cms-change', () => { applySectionCopy(); applySlotCopy(); });
+
 })();

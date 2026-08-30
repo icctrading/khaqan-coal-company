@@ -21,7 +21,7 @@ Do not commit passwords, service-role keys, or `.env` files.
 
 1. Create a Supabase project using the desired company email.
 2. Open **SQL Editor**.
-3. Run `supabase/schema.sql`.
+3. Run `supabase/schema.sql`. On a project that already exists, run `supabase/migrate-slot-copy-and-media.sql` instead (or as well) — it is idempotent and adds only what the newer Control Room needs: the `slot_copy` column for page headings/captions/tile labels, the media placement indexes, and the media/bucket **delete** policies that make a media delete remove the file from storage too.
 4. Open **Authentication → Users** and create the CRM administrator with the company email.
 5. Copy that user UUID and run the final `insert into public.admin_users` statement shown in the SQL file.
 6. Open **Project Settings → API** and copy the Project URL and the public anon/publishable key into `supabase-config.js`.
@@ -44,8 +44,20 @@ The admin check is read through the `rpc/is_admin` endpoint (the `public.is_admi
 `supabase/schema.sql` also creates:
 
 1. A public **`media` Storage bucket** (50 MB/file) for CRM uploads and leadership portraits.
-2. A **`public.media`** catalogue table (`title`, `section`, `area`, `slot`, `kind`, `storage_path`, `public_url`, …). `section` is the public page, `area` is the page region (gallery, field notes, reel, …) and `slot` is the named photograph inside that region. Re-run the `alter table public.media add column if not exists` lines if the project already had a `media` table.
+2. A **`public.media`** catalogue table (`title`, `section`, `area`, `slot`, `kind`, `duration`, `storage_path`, `public_url`, `mime_type`, `byte_size`) plus `media_placement_idx` / `media_created_idx` for the All-media list. `section` is the public page, `area` is the page region (gallery, field notes, reel, …) and `slot` is the named photograph inside that region. Re-run the `alter table public.media add column if not exists` lines if the project already had a `media` table.
 3. RLS on both: **anon/authenticated can read**; **only `public.is_admin()` can insert, update, or delete**.
+4. **`site_settings.slot_copy`** (jsonb) — the page copy overrides: section headings, frame captions and reel tile labels edited under **Headings · captions · tiles**. Keyed `home:reel` (a section head) and `home:reel:4` (one frame), so one column carries every spot and no new table is needed.
+
+### Deleting media (row + bucket file)
+
+`deleteMedia(id, storagePath)` in `cloud.js` is deliberately verified, because an unverified delete is what makes a Control Room delete “not work”:
+
+1. `DELETE media?id=eq.<uuid>` asks for the affected rows back (`Prefer: return=representation`). PostgREST answers “0 rows” **exactly** the same way for “already gone” and “RLS refused you”, so when nothing comes back the row is re-read once. A row that survives the delete raises an error the administrator actually sees, and the change stays in the `KhaqanSync` queue until it lands — the item does not silently reappear on the next refresh.
+2. The object is then deleted from the `media` bucket (`DELETE /storage/v1/object/media/<path>`), which needs the **`Admins can delete media objects`** policy on `storage.objects`. If storage refuses, the row is still gone and the status line says the file was left behind.
+3. Deleting a row also clears that item's queued upload (`KhaqanSync.forgetMedia`), so an upload that never reached Supabase cannot resurrect a file the administrator removed. Browser-only ids are dropped from the queue instead of retrying a UUID delete forever.
+4. Anything still occupying the bucket with no catalogue row shows up as an **orphan** in Control Room → **All media** (tab 04), where `Purge orphaned files` removes them (that is also the manual retry for step 2).
+
+The stock images and clips in the repository's own `media/` folder are listed in the same tab for reference, read-only: a browser cannot delete files that ship in Git.
 
 After running the schema:
 

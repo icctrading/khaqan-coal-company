@@ -449,15 +449,16 @@
     }).catch(() => { /* queued; retried automatically */ });
   }, true);
 
-  /* Delegated (the button lives in the mounted workspace template) and capture
-     phase so the delete intents are queued before crm.js clears the list. */
-  document.addEventListener('click', (event) => {
-    if (!cloud.session() || !event.target.closest('#clear-leads')) return;
+  /* "Clear all" is confirmed in the page first (see `askConfirm` in crm.js), so
+     the delete intents are queued by the event it dispatches on the way THROUGH
+     — cancelling the dialog then never wipes the shared database. */
+  window.addEventListener('khaqan:leads-clear', () => {
     const sync = window.KhaqanSync;
-    if (!sync || !window.KhaqanCMS) return;
+    if (!cloud.session() || !sync || !window.KhaqanCMS) return;
     (window.KhaqanCMS.readLeads() || []).forEach((lead) => {
       if (lead.id && /^[0-9a-f-]{36}$/i.test(lead.id)) sync.markLeadDelete(lead.id);
     });
     sync.flush().catch(() => {});
-  }, true);
+  });
+
 })();

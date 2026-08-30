@@ -394,3 +394,129 @@ html[data-theme="day"] .crm-media-area-head h4 { color: #173420; }
 html[data-theme="day"] .crm-media-grid.managed .media-place b { color: #8a6a1f; }
 html[data-theme="day"] .crm-media-grid.managed .media-place span, html[data-theme="day"] .crm-media-grid.managed .media-place em { color: #5f7b62; }
 @media (max-width: 1100px) { .crm-media-addform-row.crm-media-place-row { grid-template-columns: 1fr 1fr; } }
+
+/* =====================================================================
+   Media upload form · wording row (caption / heading / tile label)
+   ===================================================================== */
+.crm-media-addform-row.crm-media-copy-row { grid-template-columns: minmax(150px, 1fr) minmax(150px, 1fr) minmax(140px, .9fr) minmax(160px, 1fr); align-items: end; }
+.crm-media-addform-row.crm-media-copy-row label { display: grid; gap: 6px; }
+.crm-media-addform-row.crm-media-copy-row label > span { color: #bccc9a; font-size: .6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.crm-media-copy-note { padding-bottom: 11px; color: #718a76; font-size: .65rem; line-height: 1.5; }
+html[data-theme="day"] .crm-media-addform-row.crm-media-copy-row label > span { color: #4c774f; }
+html[data-theme="day"] .crm-media-copy-note { color: #5f7b62; }
+
+/* =====================================================================
+   Headings · captions · tiles card (KhaqanSlotCopy)
+   ===================================================================== */
+#slot-copy-form .crm-media-addform-row { grid-template-columns: minmax(130px, 1fr) minmax(150px, 1.1fr) minmax(190px, 1.2fr) minmax(150px, .9fr); align-items: end; }
+.crm-copy-current { display: grid; gap: 4px; padding: 8px 12px; border: 1px dashed rgba(195,218,198,.2); border-radius: 9px; }
+.crm-copy-current small { color: #718a76; font-size: .58rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.crm-copy-current b { color: #f0d9a0; font-size: .74rem; font-weight: 750; line-height: 1.35; }
+#copy-card .crm-form-grid { margin-top: 15px; }
+#copy-card [hidden] { display: none !important; }
+html[data-theme="day"] .crm-copy-current { border-color: rgba(30,81,52,.24); }
+html[data-theme="day"] .crm-copy-current b { color: #8a6a1f; }
+html[data-theme="day"] .crm-copy-current small { color: #5f7b62; }
+
+/* =====================================================================
+   All media — one list of every upload, the bucket, and the stock files
+   ===================================================================== */
+.crm-allmedia-head-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+.crm-allmedia-head-actions .btn { padding: 10px 13px; font-size: .68rem; }
+.crm-allmedia-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 18px; align-items: center; margin: 4px 0 12px; }
+.crm-allmedia-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 9px 12px; }
+.crm-allmedia-filters label { display: grid; gap: 5px; }
+.crm-allmedia-filters label > span { color: #718a76; font-size: .58rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.crm-allmedia-filters select,
+.crm-allmedia-filters input[type="search"] { min-height: 38px; padding: 0 11px; border: 1px solid rgba(195,218,198,.18); border-radius: 9px; color: #edf5e7; background: #08130c; font-size: .74rem; outline: 0; }
+.crm-allmedia-filters select { padding-right: 26px; }
+.crm-allmedia-filters input[type="search"] { width: min(250px, 100%); }
+.crm-allmedia-filters select:focus, .crm-allmedia-filters input[type="search"]:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(239,209,116,.11); }
+.crm-allmedia-bulk { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 9px; }
+.crm-allmedia-bulk .btn { padding: 10px 13px; font-size: .68rem; }
+.crm-allmedia-all { display: inline-flex; align-items: center; gap: 7px; color: #9caf9d; font-size: .7rem; font-weight: 700; cursor: pointer; }
+.crm-allmedia-all input { accent-color: var(--yellow); }
+.crm-media-health { display: grid; gap: 6px; margin: 4px 0 12px; padding: 12px 14px; border: 1px solid rgba(255,173,125,.34); border-radius: 11px; background: rgba(112,48,14,.2); }
+.crm-media-health p { margin: 0; color: #ffd4b7; font-size: .72rem; line-height: 1.5; }
+html[data-theme="day"] .crm-media-health { background: rgba(212,120,52,.1); }
+html[data-theme="day"] .crm-media-health p { color: #8a4a16; }
+.crm-allmedia-table td { vertical-align: middle; }
+.crm-allmedia-table td:first-child { min-width: 0; width: 34px; }
+.crm-allmedia-table .am-check input { accent-color: var(--yellow); }
+.crm-allmedia-table .am-thumb { width: 84px; padding: 9px 6px; }
+.crm-allmedia-table .am-thumb img, .crm-allmedia-table .am-thumb video { display: block; width: 74px; height: 50px; border-radius: 7px; object-fit: cover; background: #09150d; }
+.crm-allmedia-table .am-missing { display: grid; place-items: center; width: 74px; height: 50px; border: 1px dashed rgba(195,218,198,.26); border-radius: 7px; color: #78917b; font-size: .56rem; text-transform: uppercase; letter-spacing: .08em; }
+.crm-allmedia-table .am-title { min-width: 190px; }
+.crm-allmedia-table .am-title small, .crm-allmedia-table .am-src-cell small, .crm-allmedia-table .am-where small { max-width: 320px; }
+.am-warn { color: #ffae80 !important; }
+.crm-allmedia-table .am-where { white-space: nowrap; }
+.crm-allmedia-table .am-where a { display: block; margin-top: 4px; color: #e8c86a; font-size: .62rem; font-weight: 750; text-decoration: underline; text-underline-offset: 2px; }
+.crm-allmedia-table .am-meta { white-space: nowrap; color: #9fb49a; font-size: .7rem; }
+.crm-allmedia-table .am-meta small { display: block; margin-top: 3px; color: #718a76; font-size: .64rem; }
+.crm-allmedia-table .am-actions { text-align: right; white-space: nowrap; }
+.crm-allmedia-table .am-actions .btn { padding: 8px 11px; font-size: .64rem; }
+.am-src { display: inline-block; padding: 4px 8px; border: 1px solid rgba(195,218,198,.2); border-radius: 999px; font-size: .58rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+.am-src-cloud { color: #b6e0a5; border-color: rgba(152,206,131,.4); }
+.am-src-local { color: #f0d9a0; border-color: rgba(239,209,116,.4); }
+.am-src-pending { color: #ffd4b7; border-color: rgba(255,173,125,.45); }
+.crm-allmedia-empty { padding: 40px 16px 22px; text-align: center; color: #78917b; }
+.crm-allmedia-empty span { display: block; color: var(--yellow); font-size: 1.9rem; }
+.crm-allmedia-empty h3 { margin: 10px 0 6px; color: #e2eedc; font-family: Inter, sans-serif; font-size: .95rem; font-weight: 750; }
+.crm-allmedia-empty p { margin: 0; font-size: .76rem; }
+.crm-allmedia-storage, .crm-allmedia-stock { display: grid; gap: 12px; }
+.am-storage-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; color: #9fb49a; font-size: .72rem; }
+.am-storage-head b { color: #ffd4b7; }
+.am-storage-head .btn { padding: 9px 12px; font-size: .66rem; }
+.crm-allmedia-table .am-path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .68rem; color: #c8d9c2; word-break: break-all; }
+.am-group h5 { display: flex; align-items: baseline; gap: 8px; margin: 4px 0 8px; color: #e8f0df; font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.am-group h5 small { color: #718a76; font-size: .62rem; letter-spacing: .04em; }
+.am-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.am-chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid rgba(195,218,198,.16); border-radius: 999px; background: rgba(9,21,13,.5); font-size: .66rem; }
+.am-chip a { color: #d9e8d1; text-decoration: none; }
+.am-chip a:hover { color: var(--yellow); text-decoration: underline; }
+.am-chip em { color: #718a76; font-style: normal; font-size: .6rem; }
+html[data-theme="day"] .crm-allmedia-filters select, html[data-theme="day"] .crm-allmedia-filters input[type="search"] { color: #173420; background: #fff; border-color: rgba(30,81,52,.22); }
+html[data-theme="day"] .crm-allmedia-filters label > span { color: #5f7b62; }
+html[data-theme="day"] .am-chip { background: rgba(255,255,255,.65); border-color: rgba(30,81,52,.16); }
+html[data-theme="day"] .am-chip a { color: #173420; }
+html[data-theme="day"] .crm-allmedia-table .am-path { color: #2f4b33; }
+html[data-theme="day"] .crm-allmedia-table .am-thumb img, html[data-theme="day"] .crm-allmedia-table .am-thumb video { background: #e6ecdf; }
+@media (max-width: 900px) { .crm-allmedia-toolbar { grid-template-columns: 1fr; } .crm-allmedia-bulk { justify-content: flex-start; } }
+@media (max-width: 640px) {
+  #slot-copy-form .crm-media-addform-row, .crm-media-addform-row.crm-media-copy-row { grid-template-columns: 1fr; }
+  .crm-allmedia-table .am-thumb { display: none; }
+}
+
+/* =====================================================================
+   In-page confirmation (replaces window.confirm, which browsers suppress
+   inside embedded frames — a suppressed dialog returns false silently and
+   made Delete look broken).
+   ===================================================================== */
+.crm-modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 22px; background: rgba(4,10,7,.74); backdrop-filter: blur(6px); animation: crmModalIn .18s ease both; }
+.crm-modal[hidden] { display: none; }
+.crm-modal-card { width: min(560px, 100%); display: grid; gap: 13px; padding: 26px 27px 22px; border: 1px solid rgba(195,218,198,.2); border-radius: 17px; background: linear-gradient(145deg, #12261c, #0a1710); box-shadow: 0 40px 90px rgba(0,0,0,.5); }
+.crm-modal-card h3 { margin: 0; font-family: Georgia, serif; font-size: 1.5rem; font-weight: 400; color: var(--yellow); }
+.crm-modal-body p { margin: 0; color: #c1d0bf; font-size: .78rem; line-height: 1.6; }
+.crm-modal-body p + p { margin-top: 8px; }
+.crm-modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 6px; padding-top: 16px; border-top: 1px solid rgba(195,218,198,.12); }
+.crm-modal-actions .btn { padding: 11px 15px; font-size: .72rem; }
+@keyframes crmModalIn { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .crm-modal { animation: none; } }
+html[data-theme="day"] .crm-modal-card { background: linear-gradient(145deg, #fbfdf7, #e6efdf); border-color: rgba(30,81,52,.2); }
+html[data-theme="day"] .crm-modal-card h3 { color: #8a6a1f; }
+html[data-theme="day"] .crm-modal-body p { color: #3d5a41; }
+
+.crm-media-grid.managed .media-copy-flag { color: #8fd0a0; font-size: .55rem; font-style: normal; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; border: 1px solid rgba(143,208,160,.35); border-radius: 999px; padding: 2px 6px; }
+html[data-theme="day"] .crm-media-grid.managed .media-copy-flag { color: #2f6b40; border-color: rgba(47,107,64,.35); }
+
+/* The storage / stock tables in tab 04 reuse .crm-table, but their last column
+   holds an action button and the middle ones a file name — give those a shape. */
+.am-table td { vertical-align: middle; }
+.am-table th:last-child, .am-table td:last-child { width: 170px; text-align: right; }
+.am-table .btn { padding: 8px 11px; font-size: .64rem; }
+.am-table .am-title b { display: block; color: #edf5e7; font-size: .78rem; font-weight: 750; }
+.am-table .am-where em { color: #718a76; font-style: normal; font-size: .64rem; }
+html[data-theme="day"] .am-table .am-title b { color: #173420; }
+@media (max-width: 640px) {
+  .am-table th:last-child, .am-table td:last-child { width: auto; text-align: left; }
+}

@@ -56,6 +56,19 @@
     return Number.isFinite(n) && n > 0 ? String(Math.round(n)) : undefined;
   };
 
+  /* Page copy overrides (`slotCopy`) arrive as a jsonb map, but a project that
+     has not run the latest schema has no column at all, and an empty map means
+     "nobody has re-worded anything" — both must stay `undefined` so the
+     browser's own copy is never blanked by hydration. */
+  const slotCopyMap = (value) => {
+    let map = value;
+    if (typeof map === 'string') {
+      try { map = JSON.parse(map); } catch (error) { return undefined; }
+    }
+    if (!map || typeof map !== 'object' || Array.isArray(map)) return undefined;
+    return Object.keys(map).length ? map : undefined;
+  };
+
   // Clamp a rotation setting on the way out: out-of-range or blank values are
   // written as the 5s default so the public site can rely on the column.
   // Values from 2–30 seconds are kept — including 2/3/4s "fast" pace.
@@ -84,6 +97,7 @@
     email: row.email || '',
     reelIntervalSec: rotationSec(row.reel_interval_sec),
     teamHeroIntervalSec: rotationSec(row.team_hero_interval_sec),
+    slotCopy: slotCopyMap(row.slot_copy),
     directorBio: bioText(row.director_bio),
     ceoBio: bioText(row.ceo_bio),
     mdBio: bioText(row.md_bio),
@@ -119,6 +133,7 @@
     email: data.email || '',
     reel_interval_sec: clampRotationSec(data.reelIntervalSec),
     team_hero_interval_sec: clampRotationSec(data.teamHeroIntervalSec),
+    slot_copy: data.slotCopy && typeof data.slotCopy === 'object' ? data.slotCopy : {},
     director_bio: data.directorBio || '',
     ceo_bio: data.ceoBio || '',
     md_bio: data.mdBio || '',
@@ -153,6 +168,16 @@
     'md_card1', 'md_card2', 'cfo_card1', 'cfo_card2'
   ];
   const ROTATION_COLUMNS = ['reel_interval_sec', 'team_hero_interval_sec'];
+  const COPY_COLUMNS = ['slot_copy'];
+
+  /* PostgREST rejects a PATCH naming a column the project has not created yet
+     ("Could not find the 'x' column…"). For the newest group that is expected
+     until supabase/schema.sql is re-run, so it must not be reported as a save
+     failure — the browser copy is the source of truth either way. */
+  function isMissingColumnError(error, column) {
+    const text = `${(error && error.message) || ''} ${(error && error.code) || ''}`;
+    return new RegExp(`could not find the '${column}'|${column}.*does not exist|42703|PGRST204`, 'i').test(text);
+  }
 
   async function getSettings() {
     const rows = await request('site_settings?id=eq.default&select=*');
@@ -180,6 +205,11 @@
     try { await sendGroup(CORE_COLUMNS); } catch (error) { errors.push(error); }
     try { await sendGroup(ROTATION_COLUMNS); } catch (error) { errors.push(error); }
     try { await sendGroup(BIO_COLUMNS); } catch (error) { errors.push(error); }
+    try {
+      await sendGroup(COPY_COLUMNS);
+    } catch (error) {
+      if (!isMissingColumnError(error, 'slot_copy')) errors.push(error);
+    }
     if (errors.length) {
       const error = new Error(`Site settings could not reach the cloud: ${errors[0].message || errors[0]}`);
       error.cause = errors;
@@ -280,11 +310,59 @@
     };
   }
 
+  /* Delete one object in the `media` bucket. Failures are reported to the
+     caller instead of being swallowed: an orphaned file still occupies the
+     bucket, and the Control Room needs to say so (and offer a retry). */
   async function removeObject(storagePath) {
-    if (!storagePath) return;
+    if (!storagePath) return { attempted: false, removed: false, error: '' };
     try {
       await storageFetch(`object/media/${encodeStoragePath(storagePath)}`, { method: 'DELETE' });
-    } catch (error) { /* catalogue row is the source of truth */ }
+      return { attempted: true, removed: true, error: '' };
+    } catch (error) {
+      return { attempted: true, removed: false, error: error.message || 'Storage refused the delete.' };
+    }
+  }
+
+  /* One page of a bucket listing. `prefix` is the folder path ([] = root). */
+  async function listObjects(prefix = [], limit = 500, offset = 0) {
+    const payload = await storageFetch('object/list/media', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prefix, limit, offset, sortBy: { column: 'name', order: 'asc' } })
+    });
+    return Array.isArray(payload) ? payload : [];
+  }
+
+  /* Flatten the whole bucket (folders first-class in the Storage API) so the
+     Control Room can compare what is IN storage with what the catalogue knows
+     about. `metadata.size` is the byte count Supabase holds for the object. */
+  async function listMediaObjects(maxDepth = 4) {
+    const files = [];
+    async function walk(prefix, depth) {
+      const rows = await listObjects(prefix);
+      for (const row of rows) {
+        if (!row || !row.name) continue;
+        const path = [...prefix, row.name].join('/');
+        if (!row.id) {
+          if (depth < maxDepth) await walk([...prefix, row.name], depth + 1);
+          continue;
+        }
+        files.push({
+          path,
+          size: Number((row.metadata && row.metadata.size) || 0) || 0,
+          mimeType: (row.metadata && row.metadata.mimetype) || '',
+          updatedAt: row.updated_at || row.created_at || ''
+        });
+      }
+    }
+    await walk([], 0);
+    return files;
+  }
+
+  async function removeMediaObject(path) {
+    if (!path) throw new Error('Missing storage path.');
+    await storageFetch(`object/media/${encodeStoragePath(path)}`, { method: 'DELETE' });
+    return true;
   }
 
   async function listMedia() {
@@ -342,10 +420,36 @@
     return normalizeMedia(Array.isArray(rows) ? rows[0] : rows);
   }
 
+  /* A row may only be deleted by an allow-listed admin (RLS), and PostgREST
+     answers "0 rows deleted" exactly like "row already gone" — so a refused
+     delete used to look like a success: the card disappeared from the Control
+     Room and came back on the next refresh. The delete therefore asks for the
+     affected rows back and, when nothing came back, checks the catalogue once
+     more: a row that survives is reported as an error the administrator can
+     act on, not silently swallowed. */
+  async function mediaRowExists(id) {
+    const rows = await request(`media?id=eq.${encodeURIComponent(id)}&select=id`);
+    return Array.isArray(rows) ? rows.length > 0 : false;
+  }
+
   async function deleteMedia(id, storagePath) {
     if (!id) throw new Error('Missing media id.');
-    await request(`media?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
-    await removeObject(storagePath);
+    const removed = await request(`media?id=eq.${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { Prefer: 'return=representation' }
+    });
+    const deleted = Array.isArray(removed) ? removed.length > 0 : Boolean(removed);
+    if (!deleted && await mediaRowExists(id).catch(() => false)) {
+      throw new Error('Supabase refused to delete the media row — the RLS policy for the media table is missing or this account is not in admin_users. Re-run supabase/schema.sql.');
+    }
+    const storage = await removeObject(storagePath);
+    return {
+      rowDeleted: true,
+      storageAttempted: storage.attempted,
+      storageRemoved: storage.removed,
+      storageError: storage.error,
+      storagePath: storagePath || ''
+    };
   }
 
   async function signIn(email, password) {
@@ -488,6 +592,7 @@
   window.KhaqanCloud = {
     enabled, getSettings, saveSettings, createEnquiry, listEnquiries, updateEnquiry, deleteEnquiry,
     listMedia, uploadMedia, updateMedia, deleteMedia,
+    listMediaObjects, removeMediaObject,
     signIn, signUp, isAdmin,
     requestPasswordReset, exchangeRecoveryCode, saveSessionFromHash, resetPassword, getCurrentUser,
     signOut: () => saveSession(null), session: readSession,
