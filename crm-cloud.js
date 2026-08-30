@@ -15,6 +15,7 @@
 
   const authScreen = document.querySelector('#crm-auth-screen');
   const pendingScreen = document.querySelector('#crm-pending-screen');
+  const bootStatus = document.querySelector('#crm-boot-status');
   const logoutButton = document.querySelector('#cloud-logout');
   const logoutPendingButton = document.querySelector('#cloud-logout-pending');
   const message = document.querySelector('#cloud-auth-message');
@@ -39,6 +40,10 @@
   const confirmPasswordInput = document.querySelector('#cloud-new-password-confirm');
 
   let workspaceMounted = false;
+
+  function hideBootStatus() {
+    if (bootStatus) bootStatus.hidden = true;
+  }
 
   function showMessage(text, ok = true) {
     if (!message) return;
@@ -76,6 +81,7 @@
   };
 
   function showAuthScreen() {
+    hideBootStatus();
     if (authScreen) authScreen.hidden = false;
     if (pendingScreen) pendingScreen.hidden = true;
     if (logoutButton) logoutButton.hidden = true;
@@ -83,6 +89,7 @@
   }
 
   function showPendingScreen() {
+    hideBootStatus();
     if (authScreen) authScreen.hidden = true;
     if (pendingScreen) pendingScreen.hidden = false;
     if (logoutButton) logoutButton.hidden = true;
@@ -108,6 +115,7 @@
   }
 
   async function enterAdminWorkspace() {
+    hideBootStatus();
     if (authScreen) authScreen.hidden = true;
     if (pendingScreen) pendingScreen.hidden = true;
     mountWorkspace();
@@ -121,7 +129,17 @@
     try {
       const user = await cloud.getCurrentUser();
       email = user?.email || email;
-    } catch (error) { /* session still valid without the profile read */ }
+    } catch (error) {
+      /* An expired / revoked token (401) must not strand the visitor on the
+         "waiting for approval" screen — clear it and offer sign in again. */
+      if (error && error.status === 401) {
+        cloud.signOut();
+        showAuthScreen();
+        showMessage('Your sign-in session has expired. Sign in again.', false);
+        return;
+      }
+      /* otherwise the session is still valid without the profile read */
+    }
     const admin = await cloud.isAdmin().catch(() => false);
     if (admin) await enterAdminWorkspace();
     else {
@@ -142,6 +160,7 @@
     const code = params.get('code');
     const isRecoveryHash = /access_token=/.test(hash) && /type=recovery/.test(hash);
     if (!code && !isRecoveryHash) return false;
+    hideBootStatus();
     try {
       if (isRecoveryHash) cloud.saveSessionFromHash(hash);
       else await cloud.exchangeRecoveryCode(code);
@@ -160,11 +179,12 @@
   }
 
   /* ---- Boot: decide which screen owns the page ------------------------- */
+  /* The auth screen ships hidden so a signed-in refresh never flashes the
+     sign-in card; this status line is the only thing painted while the
+     session check runs. */
+  if (bootStatus) bootStatus.hidden = false;
   if (!cloud.enabled) {
-    if (authScreen) authScreen.hidden = false;
-    if (pendingScreen) pendingScreen.hidden = true;
-    if (logoutButton) logoutButton.hidden = true;
-    showSignIn();
+    showAuthScreen();
     showMessage('Supabase is not configured — add the project URL and anon key to supabase-config.js to enable sign-in.', false);
   } else if (await consumeRecoveryLink()) {
     // Recovery flow owns the screen; the new-password form is showing.

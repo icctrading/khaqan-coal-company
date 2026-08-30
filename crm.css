@@ -186,6 +186,26 @@ html[data-theme="day"] .crm-cloud-form input { color: #173420; background: #fff;
   font-size: .58rem; font-weight: 800; letter-spacing: .06em; vertical-align: 1px;
 }
 html[data-theme="day"] .crm-media-grid.managed .media-duration-badge { color: #8a6a1f; border-color: rgba(138,106,31,.4); background: rgba(212,160,52,.12); }
+/* Playback-time control on every media-library video tile */
+.crm-media-grid.managed .crm-media-duration-tile {
+  display: inline-flex; align-items: center; gap: 7px; width: max-content;
+  margin-top: 7px; padding: 6px 9px;
+  border: 1px dashed rgba(195,218,198,.24); border-radius: 8px;
+  color: #bccc9a; background: #0b1a10; font-size: .62rem; font-weight: 750;
+}
+.crm-media-grid.managed .crm-media-duration-tile span {
+  font-size: .55rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  color: #9fb49a; white-space: nowrap; line-height: 1.2;
+}
+.crm-media-grid.managed .crm-media-duration-tile input {
+  width: 7ch; min-height: 26px; box-sizing: border-box; padding: 0 7px;
+  border: 1px solid rgba(195,218,198,.2); border-radius: 6px;
+  color: #edf5e7; background: #08130c; font-size: .7rem; outline: 0;
+}
+.crm-media-grid.managed .crm-media-duration-tile input:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(239,209,116,.11); }
+html[data-theme="day"] .crm-media-grid.managed .crm-media-duration-tile { color: #173420; background: #fff; border-color: rgba(30,81,52,.22); }
+html[data-theme="day"] .crm-media-grid.managed .crm-media-duration-tile span { color: #4c774f; }
+html[data-theme="day"] .crm-media-grid.managed .crm-media-duration-tile input { color: #173420; background: #fff; border-color: rgba(30,81,52,.22); }
 .crm-media-addform .file-label {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   min-height: 42px;
@@ -233,6 +253,12 @@ html[data-theme="day"] .crm-media-addform .crm-media-duration input { color: #17
 .cloud-auth-message.is-error { color: #ffae80; }
 
 /* ---- Dedicated sign-in / sign-up gate (shown until an admin session) ---- */
+.crm-boot-status {
+  margin: 0; padding: 34vh 0;
+  color: #8aa08a; font-size: .78rem; letter-spacing: .06em;
+  text-align: center;
+}
+html[data-theme="day"] .crm-boot-status { color: #5f7b62; }
 .crm-auth-screen { display: grid; place-items: start center; min-height: 62vh; }
 .crm-auth-card { width: min(520px, 100%); margin: 0 auto; padding: 38px 40px 30px; border: 1px solid rgba(141,175,118,.24); border-radius: 20px; background: linear-gradient(120deg, rgba(26,67,37,.82), rgba(13,31,19,.9)); }
 .crm-auth-head { margin-bottom: 28px; }
