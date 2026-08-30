@@ -323,8 +323,9 @@
     flashStatus(`${member.name}'s portrait removed.`);
   }
 
-  // Persist a hero/leadership video's playback time to local + cloud storage.
-  async function updateMediaDuration(item, durationNum, key, input) {
+  // Persist a video's playback time to local + cloud storage (used by the
+  // leadership portraits and by every media-library video tile).
+  async function updateMediaDuration(item, durationNum, label, input) {
     if (!item || item.type !== 'video') { if (input) input.value = ''; return; }
     const cloud = cloudAdmin();
     const patch = { duration: durationNum };
@@ -341,8 +342,11 @@
     renderPortraits();
     renderMedia();
     updateMediaMetric();
-    const message = durationNum > 0 ? `Playback time set to ${formatDuration(durationNum)}.` : 'Playback time cleared — video loops as normal.';
-    flashStatus(`${key} ${message}`);
+    const who = label ? ` for ${label}` : '';
+    const message = durationNum > 0
+      ? `Playback time set to ${formatDuration(durationNum)}${who}.`
+      : `Playback time cleared${who} — video loops as normal.`;
+    flashStatus(message);
     if (input) input.value = formatDuration(durationNum);
   }
 
@@ -361,8 +365,9 @@
     const key = input.dataset.portraitDuration;
     const item = window.KhaqanMedia ? window.KhaqanMedia.get().find((m) => m.section === `team-${key}` && (m.type === 'image' || m.type === 'video')) : null;
     if (!item) return;
+    const member = PORTRAIT_MEMBERS.find((m) => m.key === key);
     const durationNum = parseDuration(input.value);
-    updateMediaDuration(item, durationNum, key, input);
+    updateMediaDuration(item, durationNum, member && member.name, input);
   });
 
   /* =====================================================================
@@ -437,6 +442,16 @@
   function durationBadge(duration) {
     const label = formatDuration(duration);
     return label ? `<span class="media-duration-badge" title="Video stops after ${label}">${label}</span>` : '';
+  }
+
+  /* Inline playback-time field on EVERY media-library video tile — same rule
+     as the leadership portraits: seconds ("15") or mm:ss ("1:30"), blank
+     clears the ceiling so the clip loops as normal. */
+  function playbackTimeField(id, duration) {
+    return `<label class="crm-media-duration-tile" title="Set how long the video plays before it stops">
+      <span>Playback time</span>
+      <input type="text" inputmode="numeric" placeholder="e.g. 0:15" value="${escapeHtml(formatDuration(duration))}" data-media-duration="${escapeHtml(id)}" aria-label="Video playback time">
+    </label>`;
   }
 
   // Show the duration field only when a video is being added or edited.
@@ -538,7 +553,7 @@
       const ref = placementLabel(m);
       return `<article data-media-id="${escapeHtml(m.id)}" class="has-override">
         ${mediaVisual(m.url, m.title, m.type)}
-        <div><span class="media-kind">${m.type === 'video' ? 'Video' : 'Image'}</span>${durationBadge(m.duration)}<strong>${escapeHtml(m.title)}</strong>${placeMetaHtml(ref)}</div>
+        <div><span class="media-kind">${m.type === 'video' ? 'Video' : 'Image'}</span>${durationBadge(m.duration)}<strong>${escapeHtml(m.title)}</strong>${placeMetaHtml(ref)}${m.type === 'video' ? playbackTimeField(m.id, m.duration) : ''}</div>
         ${cardActions({ id: m.id, canEdit: true, canRemove: m.section !== 'general', canDelete: true, replaceLabel: 'Replace' })}
       </article>`;
     }).join('');
@@ -558,7 +573,7 @@
       };
       return `<article class="${override ? 'has-override' : 'is-default'}" ${override ? `data-media-id="${escapeHtml(override.id)}"` : ''} data-slot-key="${escapeHtml(key)}">
         ${mediaVisual(url, slot.label, type)}
-        <div><span class="media-kind">${override ? 'Live on page' : 'Stock on page'}</span>${durationBadge(override && override.duration)}<strong>${escapeHtml(override ? (override.title || slot.label) : slot.label)}</strong>${placeMetaHtml(ref)}</div>
+        <div><span class="media-kind">${override ? 'Live on page' : 'Stock on page'}</span>${durationBadge(override && override.duration)}<strong>${escapeHtml(override ? (override.title || slot.label) : slot.label)}</strong>${placeMetaHtml(ref)}${override && override.type === 'video' ? playbackTimeField(override.id, override.duration) : ''}</div>
         ${cardActions({
           id: override && override.id,
           replaceKey: key,
@@ -931,6 +946,14 @@
     if (deleteButton) { deleteMedia(deleteButton.dataset.mediaDelete); }
   });
   mediaBoard?.addEventListener('change', (event) => {
+    // Playback time typed on a video tile — saved without re-uploading.
+    const durationInput = event.target.closest('[data-media-duration]');
+    if (durationInput) {
+      const id = durationInput.dataset.mediaDuration;
+      const item = window.KhaqanMedia ? window.KhaqanMedia.get().find((m) => m.id === id) : null;
+      if (item) updateMediaDuration(item, parseDuration(durationInput.value), item.title || 'Media', durationInput);
+      return;
+    }
     const input = event.target.closest('[data-media-replace], [data-slot-replace]');
     if (!input || !input.files || !input.files[0]) return;
     replaceFromCard(input.files[0], input.dataset.mediaReplace, input.dataset.slotReplace);

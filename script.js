@@ -63,9 +63,16 @@ function getCmsData() {
 }
 
 function saveCmsData(nextData) {
-  // Undefined values (e.g. remote columns that don't exist yet) fall back to
-  // the defaults instead of clobbering them.
-  const merged = { ...DEFAULT_CMS_DATA, ...(nextData || {}) };
+  // Undefined values mean "the source has no value" (e.g. remote columns that
+  // don't exist yet) — they never enter the merge, so a cloud hydration that
+  // is missing a column cannot wipe a setting the Control Room already saved
+  // (this is what made rotation timing revert to 5s after a refresh).
+  const stored = readJSON(CMS_KEY, {});
+  const incoming = {};
+  Object.entries(nextData || {}).forEach(([key, value]) => {
+    if (value !== undefined) incoming[key] = value;
+  });
+  const merged = { ...DEFAULT_CMS_DATA, ...(stored || {}), ...incoming };
   const next = {};
   Object.entries(merged).forEach(([key, value]) => {
     if (value !== undefined) next[key] = value;
@@ -82,11 +89,30 @@ window.KhaqanCMS = {
   defaults: { ...DEFAULT_CMS_DATA },
   get: getCmsData,
   save: saveCmsData,
+  /* Cloud → browser hydration with these rules:
+     - undefined (a column missing from the DB) never overwrites local;
+     - an EMPTY remote bio/leadership field never blanks the non-empty local
+       (or default) version until the Control Room actually saves the texts
+       to the cloud — right after the SQL migration the DB returns '' and
+       must not wipe the content already on screen. */
+  hydrate: (remote, base) => saveCmsData(mergeCmsSources(base || getCmsData(), remote)),
   readLeads: () => readJSON(LEADS_KEY, []),
   saveLeads: (leads) => {
     try { window.localStorage.setItem(LEADS_KEY, JSON.stringify(leads)); } catch (error) { /* no-op */ }
   }
 };
+
+function mergeCmsSources(base, remote) {
+  const next = { ...(base || {}) };
+  Object.entries(remote || {}).forEach(([key, value]) => {
+    if (value === undefined) return;
+    /* Empty remote leadership text = the cloud row has no bio content yet
+       (fresh column default); keep the local/default version until then. */
+    if (BIO_FIELDS.has(key) && value === '' && next[key]) return;
+    next[key] = value;
+  });
+  return next;
+}
 
 /* Managed media library — images & videos added or removed from the Control Room.
    Each item is tagged to a website part (`section`) so the public pages render
@@ -599,7 +625,7 @@ async function hydrateCloudContent() {
   if (!window.KhaqanCloud?.enabled) return;
   try {
     const remoteData = await window.KhaqanCloud.getSettings();
-    if (remoteData) saveCmsData({ ...getCmsData(), ...remoteData });
+    if (remoteData) window.KhaqanCMS.hydrate(remoteData);
   } catch (error) {
     // Keep the local preview available if Supabase is not yet configured or reachable.
   }
@@ -799,7 +825,7 @@ window.addEventListener('storage', (event) => {
    teamHeroIntervalSec) overrides each deck's data-*-interval attribute; values
    are clamped to 3–30 seconds so a bad entry can never freeze a deck, and an
    empty / out-of-range value falls back to the attribute, then the default. */
-const ROTATION_MIN_MS = 3000;
+const ROTATION_MIN_MS = 2000;
 const ROTATION_MAX_MS = 30000;
 function rotationIntervalMs(cmsSeconds, attributeMs, fallbackMs) {
   const fromCms = Number(cmsSeconds);
@@ -1692,7 +1718,11 @@ document.querySelectorAll('.team-card').forEach((card) => {
     const source = /^data:video\//.test(m.url)
       ? `<source src="${escapeMediaHtml(m.url)}">`
       : `<source src="${escapeMediaHtml(m.url)}" type="video/mp4"><source src="${escapeMediaHtml(m.url)}" type="video/webm">`;
-    return `<video controls muted loop playsinline preload="metadata">${source}</video>`;
+    /* The playback ceiling (set in the Control Room on any video tile) is
+       carried on the element and wired after render — gallery clips stop
+       after that many seconds just like hero and portrait videos. */
+    const playback = Math.max(0, Number(m.duration) || 0);
+    return `<video controls muted loop playsinline preload="metadata" data-media-playback="${playback}">${source}</video>`;
   }
 
   function isGalleryPlacement(item) {
@@ -1730,6 +1760,10 @@ document.querySelectorAll('.team-card').forEach((card) => {
           : `<img src="${escapeMediaHtml(m.url)}" alt="${escapeMediaHtml(m.title)}" loading="lazy" decoding="async">`;
         return `<figure class="managed-item">${mediaEl}<figcaption><span>${escapeMediaHtml(m.title)}</span><b>${escapeMediaHtml((window.KHAQAN_MEDIA_SECTION_LABEL ? window.KHAQAN_MEDIA_SECTION_LABEL(m.section) : m.section))}</b></figcaption></figure>`;
       }).join('');
+      // Playback ceiling: stop each gallery clip after its Control Room time.
+      grid.querySelectorAll('video[data-media-playback]').forEach((video) => {
+        applyAutoplayCeiling(video, Number(video.dataset.mediaPlayback) || 0);
+      });
     });
   }
 

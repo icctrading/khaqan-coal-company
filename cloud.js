@@ -58,9 +58,10 @@
 
   // Clamp a rotation setting on the way out: out-of-range or blank values are
   // written as the 5s default so the public site can rely on the column.
+  // Values from 2–30 seconds are kept — including 2/3/4s "fast" pace.
   const clampRotationSec = (value) => {
     const n = Number(value);
-    return (Number.isFinite(n) && n >= 3 && n <= 30) ? Math.round(n) : 5;
+    return (Number.isFinite(n) && n >= 2 && n <= 30) ? Math.round(n) : 5;
   };
 
   const toCms = (row) => row ? ({
@@ -101,6 +102,11 @@
     id: 'default',
     brand_name: data.brandName,
     company_name: data.companyName,
+    legal_name: data.legalName,
+    incorporation_date: data.incorporationDate,
+    total_quantity: data.totalQuantity,
+    total_turnover: data.totalTurnover,
+    client_count: data.clientCount,
     director_name: data.directorName,
     ownership_line: data.ownershipLine,
     location: data.location,
@@ -128,6 +134,26 @@
     updated_at: new Date().toISOString()
   });
 
+  /* Column groups for site_settings. The bio columns and the rotation columns
+     were both added after the original schema deploy, so a project that has
+     not run supabase/schema.sql yet is missing one or both groups. Each group
+     is patched in its OWN best-effort request: one missing column must never
+     block the others (it previously did — and that is why rotation timing
+     looked "saved" but reverted to the old value after a refresh). */
+  const CORE_COLUMNS = [
+    'brand_name', 'company_name', 'legal_name', 'incorporation_date',
+    'total_quantity', 'total_turnover', 'client_count', 'director_name',
+    'ownership_line', 'location', 'hero_eyebrow', 'hero_description',
+    'export_heading', 'export_message', 'phone', 'whatsapp', 'email',
+    'updated_at'
+  ];
+  const BIO_COLUMNS = [
+    'director_bio', 'ceo_bio', 'md_bio', 'cfo_bio',
+    'director_card1', 'director_card2', 'ceo_card1', 'ceo_card2',
+    'md_card1', 'md_card2', 'cfo_card1', 'cfo_card2'
+  ];
+  const ROTATION_COLUMNS = ['reel_interval_sec', 'team_hero_interval_sec'];
+
   async function getSettings() {
     const rows = await request('site_settings?id=eq.default&select=*');
     return toCms(rows?.[0]);
@@ -135,29 +161,24 @@
 
   async function saveSettings(data) {
     const patch = fromCms(data);
-    /* The rotation columns were added after the original schema deploy. They
-       travel in a second, best-effort patch: on a project that has not run
-       the migration yet the whole settings save would otherwise fail and
-       none of the content would reach the cloud. */
-    const rotationPatch = {
-      reel_interval_sec: patch.reel_interval_sec,
-      team_hero_interval_sec: patch.team_hero_interval_sec,
-      updated_at: new Date().toISOString()
-    };
-    delete patch.reel_interval_sec;
-    delete patch.team_hero_interval_sec;
-    await request('site_settings?id=eq.default', {
-      method: 'PATCH',
-      headers: { Prefer: 'return=minimal' },
-      body: JSON.stringify(patch)
-    });
-    try {
+    const sendGroup = async (columns) => {
+      const body = {};
+      columns.forEach((column) => { if (patch[column] !== undefined) body[column] = patch[column]; });
+      if (!Object.keys(body).length) return;
       await request('site_settings?id=eq.default', {
         method: 'PATCH',
         headers: { Prefer: 'return=minimal' },
-        body: JSON.stringify(rotationPatch)
+        body: JSON.stringify(body)
       });
-    } catch (error) { /* older database without the rotation columns — timing stays local */ }
+    };
+    let coreError = null;
+    try { await sendGroup(CORE_COLUMNS); } catch (error) { coreError = error; }
+    /* Rotation timing — the group the Control Room card writes. Best-effort:
+       an older database without these columns keeps the setting local. */
+    try { await sendGroup(ROTATION_COLUMNS); } catch (error) { /* timing stays local */ }
+    /* Leadership texts — best-effort until the migration adds these columns. */
+    try { await sendGroup(BIO_COLUMNS); } catch (error) { /* bios stay local */ }
+    if (coreError) throw coreError;
     return data;
   }
 
@@ -446,7 +467,11 @@
       headers: { apikey: anonKey, Authorization: `Bearer ${accessToken()}` }
     });
     const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error_description || payload.msg || 'Could not read the account.');
+    if (!response.ok) {
+      const error = new Error(payload.error_description || payload.msg || 'Could not read the account.');
+      error.status = response.status;
+      throw error;
+    }
     const session = readSession();
     if (session) { session.user = payload; saveSession(session); }
     return payload;
