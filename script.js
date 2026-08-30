@@ -170,8 +170,8 @@ window.KhaqanMedia = {
     mediaWrite(items);
     return updated;
   },
-  /* Replace the whole library — used when a JSON backup is imported or when
-     the shared Supabase catalogue is hydrated. */
+  /* Replace the whole library — used when a JSON backup is imported (an
+     explicit, deliberate restore, not a background refresh). */
   setAll: (items) => {
     const cleaned = (Array.isArray(items) ? items : [])
       .filter((m) => m && typeof m === 'object' && m.url)
@@ -179,7 +179,425 @@ window.KhaqanMedia = {
     mediaWrite(cleaned);
     return cleaned;
   },
+  /* Cloud → browser merge. The cloud catalogue is the shared source of truth,
+     but it must NEVER wipe browser-held files or newer edits that are still
+     waiting to reach Supabase (a failed upload, an offline save, a change made
+     right before sign-out). Local-only items are kept; rows that are pending
+     an update retain the browser's newer copy; pending deletions stay deleted
+     even if the remote row has not vanished yet. */
+  mergeRemote: (remoteItems) => {
+    const sync = window.KhaqanSync;
+    const state = sync ? sync.pendingState() : { upserts: [], deletes: [] };
+    const deleteIds = new Set((state.deletes || []).map((d) => d.id));
+    const updateIds = new Set((state.upserts || []).filter((u) => u.storagePath).map((u) => u.id));
+    const localById = new Map();
+    /* First occurrence wins: the list is newest-first, so a transient duplicate
+       id never lets a stale copy beat the freshest one. */
+    mediaRead().forEach((m) => { if (!localById.has(m.id)) localById.set(m.id, m); });
+    const merged = [];
+    const seen = new Set();
+    (Array.isArray(remoteItems) ? remoteItems : []).forEach((m) => {
+      if (!m || typeof m !== 'object' || !m.url) return;
+      if (deleteIds.has(m.id)) return;
+      const localVersion = localById.get(m.id);
+      // A newer edit is queued for the cloud — keep the browser's copy until
+      // the write lands, otherwise the stale catalogue row wins and the change
+      // looks "lost" on the next load.
+      if (updateIds.has(m.id) && localVersion) merged.push(normalizeMediaItem(localVersion));
+      else merged.push(normalizeMediaItem(m));
+      seen.add(m.id);
+    });
+    mediaRead().forEach((m) => {
+      if (seen.has(m.id) || deleteIds.has(m.id)) return;
+      merged.push(normalizeMediaItem(m));
+    });
+    mediaWrite(merged);
+    return merged;
+  },
   bySection: (section) => mediaRead().filter((m) => m.section === section)
+};
+
+/* =====================================================================
+   Durable cloud-sync queue (KhaqanSync)
+   ---------------------------------------------------------------------
+   The Control Room is local-first: every edit and upload lands in this
+   browser's localStorage immediately, and Supabase is the shared store
+   for the live site and other browsers. Previously a failed cloud write
+   was silently dropped AND any later fetch of the cloud catalogue
+   replaced the browser library with it — so changes made while the cloud
+   call failed (or made right before sign-out) vanished on the next load,
+   and re-signing into the CRM "forgot" them too.
+
+   KhaqanSync keeps an explicit durable queue: metadata in localStorage,
+   raw file blobs in IndexedDB. Anything queued is retried on page load,
+   on CRM sign-in, when the network comes back and on a slow background
+   timer until it reaches Supabase. Signing out never discards it, and
+   cloud hydration merges instead of replacing.
+   ===================================================================== */
+const SYNC_STATE_KEY = 'khaqanCloudPending';
+const SYNC_DB_NAME = 'khaqan-cloud-sync';
+const SYNC_DB_STORE = 'pending-files';
+const SYNC_DB_VERSION = 1;
+
+const emptySyncState = () => ({
+  settingsPending: false,
+  settingsDirtyAt: 0,
+  lastSettingsSyncAt: 0,
+  upserts: [],      // media create/update entries waiting for the cloud
+  deletes: [],      // media rows waiting to be removed from the cloud
+  leadOps: {},      // lead id → { status } waiting for the cloud
+  leadDeletes: [],  // lead ids waiting to be removed from the cloud
+  leadCreates: []   // contact-form leads waiting to be created in the cloud
+});
+
+const readSyncState = () => ({ ...emptySyncState(), ...(readJSON(SYNC_STATE_KEY, {})) });
+
+function writeSyncState(state) {
+  try { window.localStorage.setItem(SYNC_STATE_KEY, JSON.stringify(state)); } catch (error) { /* metadata only */ }
+}
+
+function notifySyncState() {
+  const state = readSyncState();
+  const mediaPending = state.upserts.length + state.deletes.length;
+  const leadPending = state.leadCreates.length + state.leadDeletes.length + Object.keys(state.leadOps).length;
+  const detail = {
+    settingsPending: !!state.settingsPending,
+    mediaPending,
+    leadPending,
+    totalPending: mediaPending + leadPending + (state.settingsPending ? 1 : 0),
+    lastSyncAt: state.lastSettingsSyncAt || 0
+  };
+  try { window.dispatchEvent(new CustomEvent('khaqan:sync-state', { detail })); } catch (error) { /* no-op */ }
+  return detail;
+}
+
+/* Raw files (up to 50 MB) live in IndexedDB — localStorage only holds metadata. */
+function openSyncDb() {
+  return new Promise((resolve, reject) => {
+    const request = window.indexedDB.open(SYNC_DB_NAME, SYNC_DB_VERSION);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(SYNC_DB_STORE)) db.createObjectStore(SYNC_DB_STORE);
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+function withSyncStore(mode, fn) {
+  return openSyncDb().then((db) => new Promise((resolve, reject) => {
+    const tx = db.transaction(SYNC_DB_STORE, mode);
+    const store = tx.objectStore(SYNC_DB_STORE);
+    const request = fn(store);
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = () => { db.close(); reject(tx.error); };
+    request.onerror = () => reject(request.error);
+  }));
+}
+const putPendingFile = (key, file) => withSyncStore('readwrite', (store) => store.put(file, key));
+const getPendingFile = (key) => openSyncDb().then((db) => new Promise((resolve, reject) => {
+  const request = db.transaction(SYNC_DB_STORE, 'readonly').objectStore(SYNC_DB_STORE).get(key);
+  request.onsuccess = () => { db.close(); resolve(request.result || null); };
+  request.onerror = () => { db.close(); reject(request.error); };
+}));
+const removePendingFile = (key) => withSyncStore('readwrite', (store) => store.delete(key)).catch(() => {});
+
+const dataUrlToBlob = (dataUrl) => {
+  try {
+    const comma = String(dataUrl).indexOf(',');
+    if (comma < 0) return null;
+    const mime = (/^data:([^;]+)/.exec(String(dataUrl).slice(0, comma)) || [])[1] || 'application/octet-stream';
+    const bytes = window.atob(String(dataUrl).slice(comma + 1));
+    const buffer = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i += 1) buffer[i] = bytes.charCodeAt(i);
+    return new Blob([buffer], { type: mime });
+  } catch (error) { return null; }
+};
+
+function pendingCount() {
+  const state = readSyncState();
+  return state.upserts.length + state.deletes.length + state.leadCreates.length + state.leadDeletes.length +
+    Object.keys(state.leadOps).length + (state.settingsPending ? 1 : 0);
+}
+
+/* Replace a browser-side placeholder with the item the cloud returned. */
+function adoptRemoteItem(localId, remote) {
+  if (!remote || !window.KhaqanMedia) return;
+  const items = window.KhaqanMedia.get();
+  const index = items.findIndex((m) => m.id === localId || m.id === remote.id);
+  if (index > -1) {
+    const next = normalizeMediaItem({
+      ...items[index],
+      ...remote,
+      id: remote.id,
+      url: remote.url,
+      storagePath: remote.storagePath,
+      mimeType: remote.mimeType || items[index].mimeType,
+      byteSize: remote.byteSize || items[index].byteSize,
+      addedAt: items[index].addedAt || remote.addedAt
+    });
+    items[index] = next;
+    window.KhaqanMedia.setAll(items);
+  } else {
+    window.KhaqanMedia.add(remote);
+  }
+}
+
+window.KhaqanSync = {
+  pendingState: readSyncState,
+  pendingCount,
+
+  markSettingsPending() {
+    const state = readSyncState();
+    state.settingsPending = true;
+    state.settingsDirtyAt = Date.now();
+    writeSyncState(state);
+    notifySyncState();
+  },
+  clearSettingsPending() {
+    const state = readSyncState();
+    state.settingsPending = false;
+    state.settingsDirtyAt = 0;
+    state.lastSettingsSyncAt = Date.now();
+    writeSyncState(state);
+    notifySyncState();
+  },
+  isSettingsPending: () => !!readSyncState().settingsPending,
+
+  /* Queue a media item for the cloud. `file` is optional — editing metadata
+     only (title / placement / playback time) needs no new file. */
+  async queueMedia(id, file) {
+    const item = (window.KhaqanMedia ? window.KhaqanMedia.get() : []).find((m) => m.id === id);
+    if (!item) return false;
+    const state = readSyncState();
+    const previous = state.upserts.find((u) => u.localId === id || u.id === id);
+    const entry = {
+      id: item.id,
+      localId: item.id,
+      storagePath: item.storagePath || '',
+      title: item.title || 'Untitled',
+      section: item.section || 'general',
+      area: item.area || 'gallery',
+      slot: item.slot || '',
+      type: item.type || 'image',
+      duration: Number(item.duration) || 0,
+      mime: item.mimeType || (file && file.type) || '',
+      url: item.url || '',
+      fileName: (file && file.name) || (item.fileName || ''),
+      queuedAt: Date.now(),
+      fileKey: (previous && previous.fileKey) || ''
+    };
+    if (file) {
+      const key = `file-${item.id}`;
+      try {
+        await putPendingFile(key, file);
+        entry.fileKey = key;
+        entry.mime = file.type || entry.mime;
+        entry.fileName = file.name || entry.fileName;
+      } catch (error) {
+        /* IndexedDB unavailable — keep the entry anyway. Data-URL items are
+           still recoverable from the queue; raw big files simply retry when
+           storage is available again. */
+      }
+    }
+    state.upserts = state.upserts.filter((u) => u.localId !== id && u.id !== id);
+    state.upserts.push(entry);
+    writeSyncState(state);
+    notifySyncState();
+    return true;
+  },
+
+  queueDelete(id, storagePath) {
+    const state = readSyncState();
+    state.upserts = state.upserts.filter((u) => u.localId !== id && u.id !== id);
+    if (!state.deletes.some((d) => d.id === id)) {
+      state.deletes.push({ id, storagePath: storagePath || '', queuedAt: Date.now() });
+    }
+    writeSyncState(state);
+    notifySyncState();
+  },
+
+  /* Scan the browser library for files that never reached the cloud and queue
+     them (a raw file may already be waiting in IndexedDB; otherwise a data-URL
+     fallback is converted back into a File). Never rewrites cloud-backed rows. */
+  async enqueueLocalOnlyMedia(ids) {
+    const cloud = window.KhaqanCloud;
+    if (!cloud || !cloud.enabled || !cloud.session()) return { queued: 0 };
+    const wanted = ids ? new Set(ids) : null;
+    const items = (window.KhaqanMedia ? window.KhaqanMedia.get() : []).filter((m) => {
+      if (wanted && !wanted.has(m.id)) return false;
+      if (m.storagePath) return false;
+      return !/^https?:/i.test(m.url || '');
+    });
+    let queued = 0;
+    for (const item of items) {
+      if (readSyncState().upserts.some((u) => u.localId === item.id)) { queued += 1; continue; }
+      let file = null;
+      try { file = await getPendingFile(`file-${item.id}`); } catch (error) { file = null; }
+      if (!file && item.url && item.url.startsWith('data:')) {
+        const blob = dataUrlToBlob(item.url);
+        if (blob) {
+          const ext = (blob.type.split('/')[1] || 'bin').replace(/[^a-z0-9]/gi, '');
+          file = new File([blob], item.fileName || `${item.title || 'upload'}.${ext}`, { type: blob.type });
+        }
+      }
+      if (await this.queueMedia(item.id, file)) queued += 1;
+    }
+    return { queued };
+  },
+
+  markLeadStatus(id, status) {
+    const state = readSyncState();
+    state.leadOps[id] = { status, queuedAt: Date.now() };
+    state.leadDeletes = state.leadDeletes.filter((d) => d !== id);
+    writeSyncState(state);
+    notifySyncState();
+  },
+  clearLeadStatus(id) {
+    const state = readSyncState();
+    delete state.leadOps[id];
+    writeSyncState(state);
+    notifySyncState();
+  },
+  markLeadDelete(id) {
+    const state = readSyncState();
+    delete state.leadOps[id];
+    if (state.leadDeletes.indexOf(id) === -1) state.leadDeletes.push(id);
+    writeSyncState(state);
+    notifySyncState();
+  },
+  clearLeadDelete(id) {
+    const state = readSyncState();
+    state.leadDeletes = state.leadDeletes.filter((d) => d !== id);
+    writeSyncState(state);
+    notifySyncState();
+  },
+  markLeadCreate(lead) {
+    if (!lead || !lead.id) return;
+    const state = readSyncState();
+    if (!state.leadCreates.some((l) => l.id === lead.id)) state.leadCreates.push({ ...lead, queuedAt: Date.now() });
+    writeSyncState(state);
+    notifySyncState();
+  },
+  resolveLeadCreate(id) {
+    const state = readSyncState();
+    state.leadCreates = state.leadCreates.filter((l) => l.id !== id);
+    writeSyncState(state);
+    notifySyncState();
+  },
+  /* A status change on a lead that has NOT reached the cloud yet: update the
+     queued copy instead of queueing a pointless remote update for a row that
+     does not exist. */
+  patchLeadCreate(id, status) {
+    const state = readSyncState();
+    state.leadCreates = state.leadCreates.map((l) => (l.id === id ? { ...l, status, queuedAt: Date.now() } : l));
+    writeSyncState(state);
+    notifySyncState();
+  },
+  isPendingLeadCreate(id) {
+    return readSyncState().leadCreates.some((l) => l.id === id);
+  },
+
+  /* Push everything waiting to Supabase. Only runs with a session (the anon
+     key cannot write), so a signed-out browser keeps the queue untouched. */
+  async flush() {
+    const cloud = window.KhaqanCloud;
+    if (!cloud || !cloud.enabled || !cloud.session() || !cloud.session().access_token) {
+      return { attempted: false, pending: pendingCount() };
+    }
+    const state = readSyncState();
+    let synced = false;
+
+    if (state.settingsPending && window.KhaqanCMS) {
+      try {
+        await cloud.saveSettings(window.KhaqanCMS.get());
+        state.settingsPending = false;
+        state.settingsDirtyAt = 0;
+        state.lastSettingsSyncAt = Date.now();
+        synced = true;
+      } catch (error) { /* stays queued; retried later */ }
+    }
+
+    const remainingDeletes = [];
+    for (const item of state.deletes || []) {
+      try {
+        await cloud.deleteMedia(item.id, item.storagePath);
+        synced = true;
+      } catch (error) { remainingDeletes.push(item); }
+    }
+    state.deletes = remainingDeletes;
+
+    const remainingUpserts = [];
+    for (const entry of state.upserts || []) {
+      try {
+        let file = null;
+        if (entry.fileKey) {
+          try { file = await getPendingFile(entry.fileKey); } catch (error) { file = null; }
+        }
+        let saved = null;
+        if (entry.storagePath) {
+          saved = await cloud.updateMedia(entry.id, {
+            title: entry.title, section: entry.section, area: entry.area, slot: entry.slot,
+            duration: entry.duration, type: entry.type,
+            file: file || undefined,
+            storagePath: entry.storagePath
+          });
+        } else {
+          let uploadFile = file;
+          if (!uploadFile && entry.url && entry.url.startsWith('data:')) {
+            const blob = dataUrlToBlob(entry.url);
+            if (blob) {
+              const ext = (blob.type.split('/')[1] || 'bin').replace(/[^a-z0-9]/gi, '');
+              uploadFile = new File([blob], entry.fileName || `${entry.title || 'upload'}.${ext}`, { type: entry.mime || blob.type });
+            }
+          }
+          if (!uploadFile) { remainingUpserts.push(entry); continue; }
+          saved = await cloud.uploadMedia({
+            file: uploadFile, title: entry.title, section: entry.section, area: entry.area,
+            slot: entry.slot, type: entry.type, duration: entry.duration
+          });
+        }
+        if (saved && window.KhaqanMedia) adoptRemoteItem(entry.localId || entry.id, saved);
+        if (entry.fileKey) await removePendingFile(entry.fileKey);
+        synced = true;
+      } catch (error) {
+        remainingUpserts.push(entry);
+      }
+    }
+    state.upserts = remainingUpserts;
+
+    const remainingLeadDeletes = [];
+    for (const id of state.leadDeletes || []) {
+      try {
+        await cloud.deleteEnquiry(id);
+        synced = true;
+      } catch (error) { remainingLeadDeletes.push(id); }
+    }
+    state.leadDeletes = remainingLeadDeletes;
+
+    const remainingLeadOps = {};
+    for (const [id, op] of Object.entries(state.leadOps || {})) {
+      try {
+        await cloud.updateEnquiry(id, op.status);
+        synced = true;
+      } catch (error) { remainingLeadOps[id] = op; }
+    }
+    state.leadOps = remainingLeadOps;
+
+    const remainingCreates = [];
+    for (const lead of state.leadCreates || []) {
+      try {
+        await cloud.createEnquiry(lead);
+        synced = true;
+        /* leave resolution to mergeLeads — the row now exists remotely with a
+           new UUID and the local copy is dropped when it matches */
+      } catch (error) { remainingCreates.push(lead); }
+    }
+    state.leadCreates = remainingCreates;
+
+    writeSyncState(state);
+    notifySyncState();
+    return { attempted: true, synced, pending: pendingCount() };
+  }
 };
 
 /* Friendly labels for the website part a media item is tagged to. */
@@ -622,21 +1040,56 @@ updateThemeColorMeta();
 applyCmsData();
 
 async function hydrateCloudContent() {
-  if (!window.KhaqanCloud?.enabled) return;
+  const cloud = window.KhaqanCloud;
+  if (!cloud || !cloud.enabled) return;
+  const sync = window.KhaqanSync;
+  /* First push anything still waiting from an earlier session. A not-yet-expired
+     session token lets any page finish the sync; otherwise the CRM retries
+     after the next sign-in. Sign-out never deletes the queue. */
+  if (sync && cloud.session()) await sync.flush().catch(() => {});
   try {
-    const remoteData = await window.KhaqanCloud.getSettings();
-    if (remoteData) window.KhaqanCMS.hydrate(remoteData);
+    const remoteData = await cloud.getSettings();
+    if (remoteData && !(sync && sync.isSettingsPending())) window.KhaqanCMS.hydrate(remoteData);
   } catch (error) {
     // Keep the local preview available if Supabase is not yet configured or reachable.
   }
   try {
-    const remoteMedia = await window.KhaqanCloud.listMedia();
-    if (Array.isArray(remoteMedia) && window.KhaqanMedia) window.KhaqanMedia.setAll(remoteMedia);
+    const remoteMedia = await cloud.listMedia();
+    if (Array.isArray(remoteMedia) && window.KhaqanMedia) {
+      /* Merge — never replace. Browser-held files and newer edits stay. */
+      window.KhaqanMedia.mergeRemote(remoteMedia);
+      if (sync && cloud.session()) {
+        await sync.enqueueLocalOnlyMedia().catch(() => {});
+        await sync.flush().catch(() => {});
+      }
+    }
   } catch (error) {
     // Keep the browser media library if Storage is not yet configured or reachable.
   }
 }
 hydrateCloudContent();
+
+/* Keep working through a queue: retry when the network returns, when the tab
+   becomes visible again, and on a slow background timer while anything is
+   pending. All of it is harmless on pages without a session (no-op). */
+const syncRetryTimer = window.setInterval(() => {
+  const sync = window.KhaqanSync;
+  const cloud = window.KhaqanCloud;
+  if (sync && cloud && cloud.enabled && cloud.session() && sync.pendingCount() > 0) {
+    sync.flush().catch(() => {});
+  }
+}, 30000);
+window.addEventListener('online', () => {
+  const sync = window.KhaqanSync;
+  if (sync && window.KhaqanCloud && window.KhaqanCloud.enabled) sync.flush().catch(() => {});
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  const sync = window.KhaqanSync;
+  if (sync && window.KhaqanCloud && window.KhaqanCloud.enabled && window.KhaqanCloud.session()) {
+    sync.flush().catch(() => {});
+  }
+});
 
 /* Drawer control lives in the Header 2.0 module below (`.is-open`). */
 
@@ -675,7 +1128,12 @@ if (contactForm && formStatus) {
     try { window.localStorage.setItem(LEADS_KEY, JSON.stringify(leads)); } catch (error) { /* no-op */ }
     if (window.KhaqanCloud?.enabled) {
       window.KhaqanCloud.createEnquiry(lead).catch(() => {
-        // The local lead is retained if the cloud endpoint is not ready yet.
+        // The local lead is retained if the cloud endpoint is not ready yet —
+        // and it is queued so the CRM's sync retries it instead of losing it.
+        if (window.KhaqanSync) {
+          window.KhaqanSync.markLeadCreate(lead);
+          window.KhaqanSync.flush().catch(() => {});
+        }
       });
     }
     const name = payload.name?.trim() || 'there';

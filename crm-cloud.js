@@ -80,13 +80,44 @@
     newPasswordInput?.focus?.();
   };
 
+  function pendingNotice() {
+    const sync = window.KhaqanSync;
+    if (!sync) return '';
+    const state = sync.pendingState();
+    const mediaPending = state.upserts.length + state.deletes.length;
+    const leadPending = state.leadCreates.length + state.leadDeletes.length + Object.keys(state.leadOps).length;
+    const parts = [];
+    if (state.settingsPending) parts.push('website text');
+    if (mediaPending) parts.push(`${mediaPending} media item${mediaPending === 1 ? '' : 's'}`);
+    if (leadPending) parts.push(`${leadPending} enquiry${leadPending === 1 ? '' : 'ies'}`);
+    if (!parts.length) return '';
+    return `You have unsynced changes saved in this browser (${parts.join(', ')}). They are safe here and will upload to the live site automatically when you sign in again.`;
+  }
+
   function showAuthScreen() {
     hideBootStatus();
     if (authScreen) authScreen.hidden = false;
     if (pendingScreen) pendingScreen.hidden = true;
     if (logoutButton) logoutButton.hidden = true;
     showSignIn();
+    if (message && pendingNotice()) showMessage(pendingNotice());
   }
+
+  /* Small always-on indicator so the administrator can SEE cloud sync state
+     instead of a silent failure (silent failures were why changes looked
+     "saved" but vanished after sign-out). */
+  function syncStatusText(pending, lastSyncAt) {
+    if (pending > 0) return `Cloud sync queue: ${pending} change${pending === 1 ? '' : 's'} waiting — they will keep retrying automatically.`;
+    if (lastSyncAt) return 'Cloud sync: everything is up to date with the live site.';
+    return 'Cloud sync: ready.';
+  }
+  window.addEventListener('khaqan:sync-state', (event) => {
+    const detail = event.detail || {};
+    const targets = [document.querySelector('#site-save-status'), document.querySelector('#media-save-status')].filter(Boolean);
+    if (!targets.length) return;
+    const text = syncStatusText(detail.totalPending || 0, detail.lastSyncAt || 0);
+    targets.forEach((el) => { el.textContent = text; el.style.color = detail.totalPending ? '#ffd9a0' : ''; });
+  });
 
   function showPendingScreen() {
     hideBootStatus();
@@ -101,16 +132,72 @@
     main.appendChild(workspaceTemplate.content.cloneNode(true));
   }
 
+  /* Two enquiries with the same contact + received-time are the same row:
+     the cloud gives it a fresh UUID on create, so match by value, not id. */
+  function leadFingerprint(lead) {
+    return [String((lead && lead.contact) || '').toLowerCase().trim(),
+      String((lead && (lead.created_at || lead.createdAt)) || '').slice(0, 19)].join('|');
+  }
+
+  /* Merge remote enquiries with browser-held ones. Cloud rows that are waiting
+     for a status change / delete keep their local intent; enquiries created
+     from the contact form that never reached the cloud stay visible and are
+     queued for creation instead of being silently wiped. */
+  function mergeLeads(localLeads, remoteLeads) {
+    const sync = window.KhaqanSync;
+    const state = sync ? sync.pendingState() : { leadOps: {}, leadDeletes: [], leadCreates: [] };
+    const remote = Array.isArray(remoteLeads) ? remoteLeads : [];
+    const remoteById = new Map(remote.map((lead) => [lead.id, lead]));
+    const remoteFingerprints = new Set(remote.map(leadFingerprint));
+    const pendingDeletes = new Set(state.leadDeletes || []);
+    const pendingCreates = new Set((state.leadCreates || []).map((lead) => lead.id));
+    const merged = [];
+    const seen = new Set();
+
+    remote.forEach((lead) => {
+      if (!lead || pendingDeletes.has(lead.id)) return;
+      const op = state.leadOps && state.leadOps[lead.id];
+      merged.push(op ? { ...lead, status: op.status } : lead);
+      seen.add(lead.id);
+    });
+    (Array.isArray(localLeads) ? localLeads : []).forEach((lead) => {
+      if (!lead || seen.has(lead.id)) return;
+      const fingerprint = leadFingerprint(lead);
+      if (remoteById.has(lead.id)) return;
+      /* A queued create that reached the cloud on a retry now exists remotely
+         under a new UUID — replace the stale local copy with the remote row
+         (it is already in `merged`) and stop queuing it. */
+      if (pendingCreates.has(lead.id) && remoteFingerprints.has(fingerprint)) {
+        if (sync) sync.resolveLeadCreate(lead.id);
+        return;
+      }
+      if (remoteFingerprints.has(fingerprint)) { if (sync) sync.resolveLeadCreate(lead.id); return; }
+      merged.push(lead);
+      seen.add(lead.id);
+    });
+    return merged;
+  }
+
   /* Only called after is_admin() passes — this is the first point any CRM
-     data is read from Supabase. */
+     data is read from Supabase. Anything waiting from a previous session is
+     pushed FIRST (settings, media, enquiries), then remote state is merged in
+     — never replaced, so browser-held content survives a failed cloud call. */
   async function syncRemote() {
+    const sync = window.KhaqanSync;
+    if (sync) await sync.flush().catch(() => {});
     const settings = await cloud.getSettings();
-    if (settings && window.KhaqanCMS) window.KhaqanCMS.hydrate(settings);
+    if (settings && window.KhaqanCMS && !(sync && sync.isSettingsPending())) window.KhaqanCMS.hydrate(settings);
     const leads = await cloud.listEnquiries();
-    if (window.KhaqanCMS) window.KhaqanCMS.saveLeads(leads);
+    if (window.KhaqanCMS) window.KhaqanCMS.saveLeads(mergeLeads(window.KhaqanCMS.readLeads(), leads));
     try {
       const media = await cloud.listMedia();
-      if (Array.isArray(media) && window.KhaqanMedia) window.KhaqanMedia.setAll(media);
+      if (Array.isArray(media) && window.KhaqanMedia) {
+        window.KhaqanMedia.mergeRemote(media);
+        if (sync && cloud.session()) {
+          await sync.enqueueLocalOnlyMedia().catch(() => {});
+          await sync.flush().catch(() => {});
+        }
+      }
     } catch (error) { /* keep the local media library if Storage is not ready */ }
   }
 
@@ -295,7 +382,17 @@
     }
   });
 
-  logoutButton?.addEventListener('click', () => { cloud.signOut(); window.location.reload(); });
+  logoutButton?.addEventListener('click', () => {
+    const sync = window.KhaqanSync;
+    if (sync && sync.pendingCount() > 0) {
+      /* Give the queue one last chance to reach Supabase BEFORE the session is
+         cleared; if it fails the queue is still saved and retried on sign-in. */
+      Promise.race([sync.flush(), new Promise((resolve) => window.setTimeout(resolve, 4000))])
+        .finally(() => { cloud.signOut(); window.location.reload(); });
+    } else {
+      cloud.signOut(); window.location.reload();
+    }
+  });
   logoutPendingButton?.addEventListener('click', () => { cloud.signOut(); window.location.reload(); });
 
   /* ---- Mirror local CRM actions to Supabase once an admin session exists.
@@ -303,21 +400,64 @@
   document.addEventListener('submit', (event) => {
     if (!event.target || (event.target.id !== 'site-form' && event.target.id !== 'leadership-form' && event.target.id !== 'rotation-form')) return;
     if (!cloud.session()) return;
+    const sync = window.KhaqanSync;
     window.setTimeout(async () => {
       const data = {};
       document.querySelectorAll('[data-field]').forEach((field) => { data[field.dataset.field] = field.value.trim(); });
-      try { await cloud.saveSettings({ ...window.KhaqanCMS.get(), ...data }); }
-      catch (error) { /* saved locally; cloud sync needs attention */ }
+      /* Mark first (local-first): if the cloud write ever fails the browser
+         keeps its newer copy instead of being reverted by a stale cache. */
+      if (sync) sync.markSettingsPending();
+      try {
+        await cloud.saveSettings({ ...window.KhaqanCMS.get(), ...data });
+        if (sync) sync.clearSettingsPending();
+      } catch (error) {
+        /* queued — retried on sign-in, page load, network return and timer */
+        if (sync) sync.flush().catch(() => {});
+      }
     }, 0);
   }, true);
 
   document.addEventListener('change', (event) => {
     if (!cloud.session() || !event.target.matches('.lead-status')) return;
-    cloud.updateEnquiry(event.target.dataset.id, event.target.value).catch(() => {});
+    const id = event.target.dataset.id;
+    const status = event.target.value;
+    const sync = window.KhaqanSync;
+    /* A lead still waiting to be created in the cloud is patched in the queue —
+       there is no remote row to update yet. */
+    if (sync && sync.isPendingLeadCreate(id)) {
+      sync.patchLeadCreate(id, status);
+      return;
+    }
+    if (sync) sync.markLeadStatus(id, status);
+    cloud.updateEnquiry(id, status).then(() => {
+      if (sync) sync.clearLeadStatus(id);
+    }).catch(() => { /* queued; retried automatically */ });
   }, true);
 
   document.addEventListener('click', (event) => {
     if (!cloud.session() || !event.target.matches('.lead-delete')) return;
-    cloud.deleteEnquiry(event.target.dataset.id).catch(() => {});
+    const id = event.target.dataset.id;
+    const sync = window.KhaqanSync;
+    /* Never reached the cloud — nothing remote to delete, just drop the queue. */
+    if (sync && sync.isPendingLeadCreate(id)) {
+      sync.resolveLeadCreate(id);
+      return;
+    }
+    if (sync) sync.markLeadDelete(id);
+    cloud.deleteEnquiry(id).then(() => {
+      if (sync) sync.clearLeadDelete(id);
+    }).catch(() => { /* queued; retried automatically */ });
+  }, true);
+
+  /* Delegated (the button lives in the mounted workspace template) and capture
+     phase so the delete intents are queued before crm.js clears the list. */
+  document.addEventListener('click', (event) => {
+    if (!cloud.session() || !event.target.closest('#clear-leads')) return;
+    const sync = window.KhaqanSync;
+    if (!sync || !window.KhaqanCMS) return;
+    (window.KhaqanCMS.readLeads() || []).forEach((lead) => {
+      if (lead.id && /^[0-9a-f-]{36}$/i.test(lead.id)) sync.markLeadDelete(lead.id);
+    });
+    sync.flush().catch(() => {});
   }, true);
 })();

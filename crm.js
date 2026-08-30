@@ -26,8 +26,31 @@
     const cloud = cloudAdmin();
     if (!cloud || !cloud.listMedia) return false;
     const items = await cloud.listMedia();
-    if (Array.isArray(items) && window.KhaqanMedia) window.KhaqanMedia.setAll(items);
+    if (Array.isArray(items) && window.KhaqanMedia) {
+      /* Merge — never replace: browser-held files and newer edits survive a
+         failed upload, so nothing disappears on refresh or sign-out. */
+      window.KhaqanMedia.mergeRemote(items);
+      if (window.KhaqanSync) {
+        await window.KhaqanSync.enqueueLocalOnlyMedia().catch(() => {});
+        await window.KhaqanSync.flush().catch(() => {});
+      }
+    }
     return true;
+  }
+
+  /* Push a media change to the durable queue + try the cloud right away. The
+     queue is retried on sign-in, page load, network-return and a timer, so a
+     failed call can never leave the change silently in limbo. */
+  function queueMediaFor(id, file) {
+    const sync = window.KhaqanSync;
+    if (!sync || !id) return;
+    sync.queueMedia(id, file).then(() => sync.flush().catch(() => {})).catch(() => {});
+  }
+  function queueDeleteFor(id, storagePath) {
+    const sync = window.KhaqanSync;
+    if (!sync || !id) return;
+    sync.queueDelete(id, storagePath);
+    sync.flush().catch(() => {});
   }
 
   function flashStatus(message, ok = true) {
@@ -37,7 +60,9 @@
       el.style.color = ok ? '' : '#ffae80';
     });
     window.setTimeout(() => {
-      targets.forEach((el) => { el.textContent = ''; el.style.color = ''; });
+      targets.forEach((el) => {
+        if (!el.textContent.startsWith('Cloud sync:')) { el.textContent = ''; el.style.color = ''; }
+      });
     }, 6000);
   }
 
@@ -147,6 +172,12 @@
         renderPortraits();
         renderMedia();
         flashStatus('Backup imported successfully — content, enquiries and media restored.');
+        /* Imported content is browser-local; queue it so it also reaches the
+           shared cloud store instead of living only on this browser. */
+        if (window.KhaqanSync) {
+          window.KhaqanSync.markSettingsPending();
+          window.KhaqanSync.enqueueLocalOnlyMedia().then(() => window.KhaqanSync.flush().catch(() => {})).catch(() => {});
+        }
       } catch (error) {
         flashStatus('That backup could not be read.', false);
       }
@@ -160,6 +191,12 @@
       cms.save(cms.defaults);
       loadSiteForm();
       flashStatus('Defaults restored.');
+      /* Push the reset to the shared store too — otherwise the live site keeps
+         the old text and "restores" it on the next refresh. */
+      if (window.KhaqanSync) {
+        window.KhaqanSync.markSettingsPending();
+        window.KhaqanSync.flush().catch(() => {});
+      }
     }
   });
 
@@ -224,6 +261,7 @@
         else window.KhaqanMedia.remove(item.id);
       } catch (error) {
         window.KhaqanMedia.remove(item.id);
+        if (item.storagePath) queueDeleteFor(item.id, item.storagePath);
       }
     }
   }
@@ -283,12 +321,14 @@
       try {
         const url = await readFileAsDataURL(file);
         const existing = portraitFor(key);
-        if (existing) window.KhaqanMedia.update(existing.id, { url, title, section, type, duration: durationNum });
-        else window.KhaqanMedia.add({ type, title, section, url, duration: durationNum });
+        let savedItem = null;
+        if (existing) savedItem = window.KhaqanMedia.update(existing.id, { url, title, section, type, duration: durationNum });
+        else savedItem = window.KhaqanMedia.add({ type, title, section, url, duration: durationNum });
         renderPortraits();
         renderMedia();
         updateMediaMetric();
-        flashStatus(`${member.name}'s ${type === 'video' ? 'video' : 'portrait'} saved in this browser. Cloud sync needs attention.`, false);
+        if (savedItem) queueMediaFor(savedItem.id, file);
+        flashStatus(`${member.name}'s ${type === 'video' ? 'video' : 'portrait'} saved in this browser and queued for the live site — it will sync automatically.`, false);
       } catch (localError) {
         flashStatus(error.message || 'That portrait file could not be saved.', false);
       }
@@ -308,14 +348,14 @@
     try {
       if (cloud) {
         for (const item of portraits) {
-          try { await cloud.deleteMedia(item.id, item.storagePath); } catch (error) { window.KhaqanMedia.remove(item.id); }
+          try { await cloud.deleteMedia(item.id, item.storagePath); } catch (error) { window.KhaqanMedia.remove(item.id); queueDeleteFor(item.id, item.storagePath); }
         }
         await refreshMediaFromCloud();
       } else {
         portraits.forEach((m) => window.KhaqanMedia.remove(m.id));
       }
     } catch (error) {
-      portraits.forEach((m) => window.KhaqanMedia.remove(m.id));
+      portraits.forEach((m) => { window.KhaqanMedia.remove(m.id); queueDeleteFor(m.id, m.storagePath); });
     }
     renderPortraits();
     renderMedia();
@@ -338,6 +378,7 @@
       }
     } catch (error) {
       window.KhaqanMedia.update(item.id, patch);
+      queueMediaFor(item.id);
     }
     renderPortraits();
     renderMedia();
@@ -687,6 +728,7 @@
       const remote = cloudAdmin();
       let url = '';
       if (!remote || file.size <= MAX_MEDIA_BYTES) url = await readFileAsDataURL(file);
+      else url = URL.createObjectURL(file); // preview only; the original file is queued at save time
       stagedFile = { type, url, name: file.name, file };
       const label = input.closest('.file-label');
       if (label) label.classList.add('has-file');
@@ -721,18 +763,19 @@
     }
   }
 
-  function applyLocalMediaChange(title, section, area, slot, existingId, duration) {
-    const id = existingId || editingMediaId;
+  function applyLocalMediaChange(title, section, area, slot, existingId, duration, localId) {
+    const id = existingId || editingMediaId || localId;
     const patch = { title, section, area, slot };
     const durationNum = parseDuration(duration != null ? duration : (videoDurationInput && videoDurationInput.value));
     if (durationNum > 0) patch.duration = durationNum;
     else if (id) patch.duration = 0;
     if (stagedFile) { patch.url = stagedFile.url; patch.type = stagedFile.type; }
-    if (id) window.KhaqanMedia.update(id, patch);
-    else window.KhaqanMedia.add({ type: stagedFile.type, title, section, area, slot, duration: durationNum, url: stagedFile.url });
+    if (id) return window.KhaqanMedia.update(id, patch);
+    const entry = window.KhaqanMedia.add({ id: localId, type: stagedFile ? stagedFile.type : 'image', title, section, area, slot, duration: durationNum, url: stagedFile ? stagedFile.url : '' });
+    return entry;
   }
 
-  async function persistMedia({ title, section, area, slot, file, type, existing, duration }) {
+  async function persistMedia({ title, section, area, slot, file, type, existing, duration, localId }) {
     const cloud = cloudAdmin();
     const id = existing && existing.id;
     const durationNum = parseDuration(duration != null ? duration : (videoDurationInput && videoDurationInput.value));
@@ -788,9 +831,13 @@
     }
     const existing = editingMediaId ? window.KhaqanMedia.get().find((m) => m.id === editingMediaId) : null;
     const duration = videoDurationInput ? videoDurationInput.value : '';
+    /* The browser-side id is fixed before the cloud call so a failed upload can
+       be queued under the SAME id the local copy is written with — nothing is
+       orphaned or duplicated when the queue retries. */
+    const localId = (existing && existing.id) || `media-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
     try {
       await persistMedia({
-        title, section, area, slot, duration,
+        title, section, area, slot, duration, localId,
         file: stagedFile && stagedFile.file,
         type: stagedFile ? stagedFile.type : undefined,
         existing
@@ -800,8 +847,9 @@
         : 'Media published to the selected page and page area.');
     } catch (error) {
       if ((stagedFile && stagedFile.url) || (editingMediaId && !stagedFile)) {
-        applyLocalMediaChange(title, section, area, slot, null, duration);
-        flashStatus('Saved in this browser. Cloud sync needs attention.', false);
+        const savedId = applyLocalMediaChange(title, section, area, slot, null, duration, localId);
+        if (savedId) queueMediaFor(savedId, stagedFile && stagedFile.file);
+        flashStatus('Saved in this browser and queued for the live site — it will sync automatically.', false);
       } else {
         flashStatus(error.message || 'That media could not be saved.', false);
         return;
@@ -852,6 +900,7 @@
       }
     } catch (error) {
       window.KhaqanMedia.update(id, { section: 'general', area: 'library', slot: '' });
+      queueMediaFor(id);
     }
     renderMedia();
     renderPortraits();
@@ -874,6 +923,7 @@
       }
     } catch (error) {
       window.KhaqanMedia.remove(id);
+      if (item && item.storagePath) queueDeleteFor(id, item.storagePath);
     }
     renderMedia();
     renderPortraits();
@@ -909,17 +959,20 @@
       const remote = cloudAdmin();
       let url = '';
       if (!remote || file.size <= MAX_MEDIA_BYTES) url = await readFileAsDataURL(file);
+      else url = URL.createObjectURL(file); // preview only; the real file is queued
       stagedFile = { type, url, name: file.name, file };
       await persistMedia({ title, section, area, slot, file, type, duration: existing ? existing.duration : 0, existing: existing || null });
       stagedFile = null;
       flashStatus('Media replaced on the selected page area.');
     } catch (error) {
       try {
-        const url = await readFileAsDataURL(file);
+        const url = file.size <= MAX_MEDIA_BYTES ? await readFileAsDataURL(file) : URL.createObjectURL(file);
+        const localId = (existing && existing.id) || `media-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
         stagedFile = { type, url, name: file.name, file };
-        applyLocalMediaChange(title, section, area, slot, existing && existing.id, existing ? existing.duration : 0);
+        const savedId = applyLocalMediaChange(title, section, area, slot, existing && existing.id, existing ? existing.duration : 0, localId);
         stagedFile = null;
-        flashStatus('Replaced in this browser. Cloud sync needs attention.', false);
+        if (savedId) queueMediaFor(savedId, file);
+        flashStatus('Replaced in this browser and queued for the live site — it will sync automatically.', false);
       } catch (localError) {
         flashStatus(error.message || 'That file could not be saved.', false);
         stagedFile = null;

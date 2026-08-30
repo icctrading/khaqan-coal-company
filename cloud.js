@@ -171,24 +171,32 @@
         body: JSON.stringify(body)
       });
     };
-    let coreError = null;
-    try { await sendGroup(CORE_COLUMNS); } catch (error) { coreError = error; }
-    /* Rotation timing — the group the Control Room card writes. Best-effort:
-       an older database without these columns keeps the setting local. */
-    try { await sendGroup(ROTATION_COLUMNS); } catch (error) { /* timing stays local */ }
-    /* Leadership texts — best-effort until the migration adds these columns. */
-    try { await sendGroup(BIO_COLUMNS); } catch (error) { /* bios stay local */ }
-    if (coreError) throw coreError;
+    /* Every group is still attempted so one missing column never blocks the
+       others, but ANY failure now throws: the caller keeps the browser copy as
+       the source of truth and the sync queue keeps retrying, instead of the
+       save looking successful while the live site keeps (and re-serves) the
+       old value — which is how changes vanished after a refresh. */
+    const errors = [];
+    try { await sendGroup(CORE_COLUMNS); } catch (error) { errors.push(error); }
+    try { await sendGroup(ROTATION_COLUMNS); } catch (error) { errors.push(error); }
+    try { await sendGroup(BIO_COLUMNS); } catch (error) { errors.push(error); }
+    if (errors.length) {
+      const error = new Error(`Site settings could not reach the cloud: ${errors[0].message || errors[0]}`);
+      error.cause = errors;
+      throw error;
+    }
     return data;
   }
 
   async function createEnquiry(lead) {
+    const allowed = ['New', 'Contacted', 'Won', 'Archived'];
+    const status = allowed.indexOf(lead.status) > -1 ? lead.status : 'New';
     return request('enquiries', {
       method: 'POST',
       headers: { Prefer: 'return=minimal' },
       body: JSON.stringify({
         name: lead.name || '', company: lead.company || '', contact: lead.contact || '',
-        interest: lead.interest || 'General enquiry', message: lead.message || '', status: 'New'
+        interest: lead.interest || 'General enquiry', message: lead.message || '', status
       })
     });
   }
