@@ -105,7 +105,7 @@
      data is read from Supabase. */
   async function syncRemote() {
     const settings = await cloud.getSettings();
-    if (settings && window.KhaqanCMS) window.KhaqanCMS.save(settings);
+    if (settings && window.KhaqanCMS) window.KhaqanCMS.hydrate(settings);
     const leads = await cloud.listEnquiries();
     if (window.KhaqanCMS) window.KhaqanCMS.saveLeads(leads);
     try {

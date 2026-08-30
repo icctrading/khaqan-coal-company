@@ -89,11 +89,30 @@ window.KhaqanCMS = {
   defaults: { ...DEFAULT_CMS_DATA },
   get: getCmsData,
   save: saveCmsData,
+  /* Cloud → browser hydration with these rules:
+     - undefined (a column missing from the DB) never overwrites local;
+     - an EMPTY remote bio/leadership field never blanks the non-empty local
+       (or default) version until the Control Room actually saves the texts
+       to the cloud — right after the SQL migration the DB returns '' and
+       must not wipe the content already on screen. */
+  hydrate: (remote, base) => saveCmsData(mergeCmsSources(base || getCmsData(), remote)),
   readLeads: () => readJSON(LEADS_KEY, []),
   saveLeads: (leads) => {
     try { window.localStorage.setItem(LEADS_KEY, JSON.stringify(leads)); } catch (error) { /* no-op */ }
   }
 };
+
+function mergeCmsSources(base, remote) {
+  const next = { ...(base || {}) };
+  Object.entries(remote || {}).forEach(([key, value]) => {
+    if (value === undefined) return;
+    /* Empty remote leadership text = the cloud row has no bio content yet
+       (fresh column default); keep the local/default version until then. */
+    if (BIO_FIELDS.has(key) && value === '' && next[key]) return;
+    next[key] = value;
+  });
+  return next;
+}
 
 /* Managed media library — images & videos added or removed from the Control Room.
    Each item is tagged to a website part (`section`) so the public pages render
@@ -606,7 +625,7 @@ async function hydrateCloudContent() {
   if (!window.KhaqanCloud?.enabled) return;
   try {
     const remoteData = await window.KhaqanCloud.getSettings();
-    if (remoteData) saveCmsData({ ...getCmsData(), ...remoteData });
+    if (remoteData) window.KhaqanCMS.hydrate(remoteData);
   } catch (error) {
     // Keep the local preview available if Supabase is not yet configured or reachable.
   }
