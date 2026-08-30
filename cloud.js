@@ -49,6 +49,20 @@
   // undefined (rather than '') so callers fall back to the defaults.
   const bioText = (value) => (value === undefined || value === null ? undefined : String(value));
 
+  // Rotation timing (seconds per frame). Same rule: a missing column or an
+  // invalid value stays undefined so the site keeps its local default.
+  const rotationSec = (value) => {
+    const n = Number(value);
+    return Number.isFinite(n) && n > 0 ? String(Math.round(n)) : undefined;
+  };
+
+  // Clamp a rotation setting on the way out: out-of-range or blank values are
+  // written as the 5s default so the public site can rely on the column.
+  const clampRotationSec = (value) => {
+    const n = Number(value);
+    return (Number.isFinite(n) && n >= 3 && n <= 30) ? Math.round(n) : 5;
+  };
+
   const toCms = (row) => row ? ({
     brandName: row.brand_name,
     companyName: row.company_name,
@@ -67,6 +81,8 @@
     phone: row.phone || '',
     whatsapp: row.whatsapp || '',
     email: row.email || '',
+    reelIntervalSec: rotationSec(row.reel_interval_sec),
+    teamHeroIntervalSec: rotationSec(row.team_hero_interval_sec),
     directorBio: bioText(row.director_bio),
     ceoBio: bioText(row.ceo_bio),
     mdBio: bioText(row.md_bio),
@@ -95,6 +111,8 @@
     phone: data.phone || '',
     whatsapp: data.whatsapp || '',
     email: data.email || '',
+    reel_interval_sec: clampRotationSec(data.reelIntervalSec),
+    team_hero_interval_sec: clampRotationSec(data.teamHeroIntervalSec),
     director_bio: data.directorBio || '',
     ceo_bio: data.ceoBio || '',
     md_bio: data.mdBio || '',
@@ -116,11 +134,30 @@
   }
 
   async function saveSettings(data) {
+    const patch = fromCms(data);
+    /* The rotation columns were added after the original schema deploy. They
+       travel in a second, best-effort patch: on a project that has not run
+       the migration yet the whole settings save would otherwise fail and
+       none of the content would reach the cloud. */
+    const rotationPatch = {
+      reel_interval_sec: patch.reel_interval_sec,
+      team_hero_interval_sec: patch.team_hero_interval_sec,
+      updated_at: new Date().toISOString()
+    };
+    delete patch.reel_interval_sec;
+    delete patch.team_hero_interval_sec;
     await request('site_settings?id=eq.default', {
       method: 'PATCH',
       headers: { Prefer: 'return=minimal' },
-      body: JSON.stringify(fromCms(data))
+      body: JSON.stringify(patch)
     });
+    try {
+      await request('site_settings?id=eq.default', {
+        method: 'PATCH',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify(rotationPatch)
+      });
+    } catch (error) { /* older database without the rotation columns — timing stays local */ }
     return data;
   }
 

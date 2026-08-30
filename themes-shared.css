@@ -1846,7 +1846,7 @@ html[data-skin="obsidian"] .page-home .home-reel { border-radius: 8px; }
   transform-origin: left;
   transform: scaleX(0);
 }
-.reel-progress.run i { animation: reelProgress var(--reel-duration, 7600ms) linear forwards; }
+.reel-progress.run i { animation: reelProgress var(--reel-duration, 5000ms) linear forwards; }
 .reel-progress.paused i { animation-play-state: paused; }
 @keyframes reelProgress {
   from { transform: scaleX(0); }
@@ -2920,6 +2920,9 @@ html[data-theme="night"] .page-contact .page-hero { background-image: linear-gra
   isolation: isolate;
 }
 .team-slides { position: absolute; inset: 0; }
+/* Crossfade + gentle drift: opacity/transform are GPU-composited, and the
+   outgoing leader stays visible until its fade-out completes, so the two
+   slides dissolve into each other instead of snapping mid-fade. */
 .team-slide {
   position: absolute;
   inset: 0;
@@ -2929,10 +2932,11 @@ html[data-theme="night"] .page-contact .page-hero { background-image: linear-gra
   opacity: 0;
   visibility: hidden;
   transform: translateX(4%);
-  transition: opacity .7s cubic-bezier(.2, .8, .2, 1), transform .9s cubic-bezier(.2, .8, .2, 1), visibility .7s;
+  transition: opacity .8s cubic-bezier(.45, 0, .25, 1), transform 1.05s cubic-bezier(.45, 0, .25, 1), visibility 0s linear .8s;
   pointer-events: none;
+  will-change: opacity, transform;
 }
-.team-slide.active { opacity: 1; visibility: visible; transform: none; pointer-events: auto; z-index: 2; }
+.team-slide.active { opacity: 1; visibility: visible; transform: none; pointer-events: auto; z-index: 2; transition: opacity .8s cubic-bezier(.45, 0, .25, 1), transform 1.05s cubic-bezier(.45, 0, .25, 1), visibility 0s; }
 
 /* Distinct palettes + textures per leader */
 .team-slide[data-team-accent="emerald"] { --ta: #3ecf97; --tb: #f2c56b; }
@@ -3154,7 +3158,7 @@ html[data-skin="obsidian"] .team-role { border-radius: 6px; }
   background: linear-gradient(90deg, var(--tb), var(--ta));
   transform-origin: left; transform: scaleX(0);
 }
-.team-hero-progress.run i { animation: teamProgress var(--team-duration, 6000ms) linear forwards; }
+.team-hero-progress.run i { animation: teamProgress var(--team-duration, 5000ms) linear forwards; }
 .team-hero-progress.paused i { animation-play-state: paused; }
 @keyframes teamProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
