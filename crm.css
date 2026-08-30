@@ -40,6 +40,10 @@
 .crm-form-grid label { display: grid; gap: 8px; }
 .crm-form-grid label.wide { grid-column: 1 / -1; }
 .crm-form-grid label > span { color: #bccc9a; font-size: .68rem; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+.crm-leader-head { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 11px; padding: 16px 0 2px; border-top: 1px solid rgba(195,218,198,.1); }
+.crm-leader-head:first-child { border-top: 0; padding-top: 0; }
+.crm-leader-head h3 { margin: 0; font-family: Georgia, serif; font-size: 1.08rem; font-weight: 400; letter-spacing: -.01em; color: var(--yellow); }
+.crm-leader-head span { color: #718c75; font-size: .62rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .crm-form-grid input, .crm-form-grid textarea, .crm-lead-actions input { width: 100%; padding: 12px 13px; border: 1px solid rgba(195,218,198,.16); border-radius: 9px; outline: none; color: #edf5e7; background: #08130c; transition: border-color .2s ease, box-shadow .2s ease; }
 .crm-form-grid textarea { min-height: 107px; resize: vertical; line-height: 1.55; }
 .crm-form-grid input::placeholder, .crm-lead-actions input::placeholder { color: #627966; }
