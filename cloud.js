@@ -45,6 +45,10 @@
     return payload;
   }
 
+  // Bio columns may not exist yet on older databases — keep the value
+  // undefined (rather than '') so callers fall back to the defaults.
+  const bioText = (value) => (value === undefined || value === null ? undefined : String(value));
+
   const toCms = (row) => row ? ({
     brandName: row.brand_name,
     companyName: row.company_name,
@@ -62,7 +66,19 @@
     exportMessage: row.export_message,
     phone: row.phone || '',
     whatsapp: row.whatsapp || '',
-    email: row.email || ''
+    email: row.email || '',
+    directorBio: bioText(row.director_bio),
+    ceoBio: bioText(row.ceo_bio),
+    mdBio: bioText(row.md_bio),
+    cfoBio: bioText(row.cfo_bio),
+    directorCard1: bioText(row.director_card1),
+    directorCard2: bioText(row.director_card2),
+    ceoCard1: bioText(row.ceo_card1),
+    ceoCard2: bioText(row.ceo_card2),
+    mdCard1: bioText(row.md_card1),
+    mdCard2: bioText(row.md_card2),
+    cfoCard1: bioText(row.cfo_card1),
+    cfoCard2: bioText(row.cfo_card2)
   }) : null;
 
   const fromCms = (data) => ({
@@ -79,6 +95,18 @@
     phone: data.phone || '',
     whatsapp: data.whatsapp || '',
     email: data.email || '',
+    director_bio: data.directorBio || '',
+    ceo_bio: data.ceoBio || '',
+    md_bio: data.mdBio || '',
+    cfo_bio: data.cfoBio || '',
+    director_card1: data.directorCard1 || '',
+    director_card2: data.directorCard2 || '',
+    ceo_card1: data.ceoCard1 || '',
+    ceo_card2: data.ceoCard2 || '',
+    md_card1: data.mdCard1 || '',
+    md_card2: data.mdCard2 || '',
+    cfo_card1: data.cfoCard1 || '',
+    cfo_card2: data.cfoCard2 || '',
     updated_at: new Date().toISOString()
   });
 

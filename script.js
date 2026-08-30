@@ -15,7 +15,22 @@ const DEFAULT_CMS_DATA = {
   incorporationDate: '03 March 2021',
   totalQuantity: '535,121.35 MT',
   totalTurnover: 'PKR 21,011,459,921',
-  clientCount: '12 leading organizations'
+  clientCount: '12 leading organizations',
+  /* Leadership descriptions — edited from the Control Room. The opening
+     phrase may be wrapped in <strong>…</strong> to keep the bold lead-in;
+     everything else is rendered as plain text. */
+  directorBio: '<strong>The Director who made everything digital</strong> and took Khaqan Coal Company to new heights — a forward-thinking leader who pairs modern systems with old-fashioned values. He brings warmth, honesty and reliability to every supply relationship, and helps Darra Adam Khel keep moving forward with quiet confidence and unmistakable pride.',
+  ceoBio: '<strong>The person behind the vision of the company</strong> and all of its success — a wise and steady presence whose guidance carried Khaqan from a single local mine into a nationwide supplier of choice. His far-sighted judgement, gentle authority and deep-rooted integrity keep the company true to its origins while it grows.',
+  mdBio: '<strong>The man with the courage</strong> — a calm, resourceful problem-solver who keeps the work moving when the ground gets tough and the schedule gets tight. He untangles logistics, protects standards and keeps every promise the company makes, leading with strength, patience and a generous spirit.',
+  cfoBio: '<strong>The finance officer on whom the company relies a great deal</strong> — a meticulous and trustworthy steward who keeps the numbers clear, the books honest and the foundation solid. With an eye on every rupee and a steady hand on the future, he gives Khaqan the confidence to mine deeper, move further and grow with grace.',
+  directorCard1: 'Adnan Khan is the Director who made everything digital and took Khaqan Coal Company to new heights. A forward-thinking and approachable leader, he pairs modern systems with old-fashioned values — bringing warmth, honesty and reliability to every supply relationship while helping Darra Adam Khel continue to move forward.',
+  directorCard2: 'Under his direction, Khaqan Coal Company keeps its values close: honesty in dealing, respect for people, and pride in the place where it all began.',
+  ceoCard1: 'Haji Ilyas Khan is the person behind the vision of the company — and the quiet, wise force behind all of its success. From the earliest days he saw what Khaqan could become: a local name with the discipline, standards and relationships to supply the country\'s leading industries.',
+  ceoCard2: 'His leadership keeps the company grounded in its roots while its ambitions grow — mining with pride in Darra Adam Khel, treating every partner with courtesy, and preparing the next chapter beyond Pakistan\'s borders.',
+  mdCard1: 'Abdur Rauf Khan is the man with the courage — the calm, resourceful problem-solver the company turns to when the ground gets tough and the schedule gets tight. He runs the day-to-day with quiet authority, untangling logistics, protecting standards, and keeping every load moving on time.',
+  mdCard2: 'A straight talker who leads by example and treats everyone with respect, he makes sure that what Khaqan promises is exactly what Khaqan delivers — every single day.',
+  cfoCard1: 'Jibran Khan is the finance officer on whom the company relies a great deal — a meticulous, trustworthy steward of every rupee. He keeps Khaqan\'s numbers clear, disciplined and honest, turning the company\'s growth into a solid financial foundation the whole team can build on.',
+  cfoCard2: 'With an eye on every detail and a steady hand on the books, he gives Khaqan the confidence to mine deeper, move further, and grow without ever losing sight of the bottom line.'
 };
 
 const CMS_KEY = 'khaqanSiteData';
@@ -43,7 +58,13 @@ function getCmsData() {
 }
 
 function saveCmsData(nextData) {
-  const next = { ...DEFAULT_CMS_DATA, ...nextData };
+  // Undefined values (e.g. remote columns that don't exist yet) fall back to
+  // the defaults instead of clobbering them.
+  const merged = { ...DEFAULT_CMS_DATA, ...(nextData || {}) };
+  const next = {};
+  Object.entries(merged).forEach(([key, value]) => {
+    if (value !== undefined) next[key] = value;
+  });
   try { window.localStorage.setItem(CMS_KEY, JSON.stringify(next)); } catch (error) { /* storage can be unavailable in private previews */ }
   applyCmsData();
   return next;
@@ -323,6 +344,27 @@ window.KHAQAN_MEDIA_PLACEMENT = (() => {
   };
 })();
 
+/* Leadership bio fields are edited from the Control Room. They may keep a
+   <strong> lead-in (rendered bold); all other HTML is stripped for safety. */
+const BIO_FIELDS = new Set([
+  'directorBio', 'ceoBio', 'mdBio', 'cfoBio',
+  'directorCard1', 'directorCard2', 'ceoCard1', 'ceoCard2',
+  'mdCard1', 'mdCard2', 'cfoCard1', 'cfoCard2'
+]);
+
+function sanitizeInlineHtml(value) {
+  const holder = document.createElement('div');
+  holder.innerHTML = String(value ?? '');
+  holder.querySelectorAll('*').forEach((el) => {
+    if (!/^(STRONG|B|EM|I|BR)$/.test(el.tagName)) {
+      el.replaceWith(document.createTextNode(el.textContent));
+      return;
+    }
+    for (const attr of Array.from(el.attributes)) el.removeAttribute(attr.name);
+  });
+  return holder.innerHTML;
+}
+
 function applyCmsData() {
   const data = getCmsData();
   document.querySelectorAll('[data-cms]').forEach((node) => {
@@ -332,7 +374,12 @@ function applyCmsData() {
       node.textContent = methods.length ? methods.join(' · ') : 'Send your number or preferred contact method in the form.';
       return;
     }
-    if (Object.prototype.hasOwnProperty.call(data, key)) node.textContent = data[key];
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      if (BIO_FIELDS.has(key)) node.innerHTML = sanitizeInlineHtml(data[key]);
+      else node.textContent = data[key];
+      // If a leadership paragraph is being typed, re-run its writing animation.
+      if (node.matches && node.matches('.team-copy p, .team-card p')) refreshTeamCopyFromCms(node);
+    }
   });
 }
 
@@ -643,9 +690,10 @@ if (canTilt) {
 }
 
 /* Number count-up — the big figures (turnover, quantity, clients, qom
-   facts) count from zero as they scroll into view. Handles comma-grouped
-   numbers, currency prefixes, decimals and trailing units; skips year
-   ranges and labels that only carry an ordinal like "01". */
+   facts) count from zero as they scroll into view, and replay from zero
+   whenever the reader clicks them. Handles comma-grouped numbers, currency
+   prefixes, decimals and trailing units; skips year ranges and labels that
+   only carry an ordinal like "01". */
 const countEls = document.querySelectorAll('.qom-facts strong, .proof-strip strong');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -658,7 +706,12 @@ function isYearRange(value) {
 }
 
 function animateNumber(el) {
-  const original = el.textContent.trim();
+  // Cancel any run already in flight, then restart cleanly from the original.
+  if (el._countRaf) cancelAnimationFrame(el._countRaf);
+  el._countRaf = null;
+  const original = el.dataset.countOriginal || el.textContent.trim();
+  el.dataset.countOriginal = original;
+  el.textContent = original;
   if (isOrdinalLabel(original) || isYearRange(original)) return;
   const match = original.match(/^([^0-9]*?)([\d][\d,]*(?:\.\d+)?)([\s\S]*)$/);
   if (!match) return;
@@ -682,9 +735,15 @@ function animateNumber(el) {
     const p = Math.min(1, (now - start) / duration);
     const eased = 1 - Math.pow(1 - p, 3);
     el.textContent = format(target * eased);
-    if (p < 1) requestAnimationFrame(tick);
+    if (p < 1) {
+      el._countRaf = requestAnimationFrame(tick);
+    } else {
+      el._countRaf = null;
+      el.classList.remove('count-running');
+    }
   };
-  requestAnimationFrame(tick);
+  el.classList.add('count-running');
+  el._countRaf = requestAnimationFrame(tick);
 }
 
 if ('IntersectionObserver' in window && countEls.length && !reducedMotion) {
@@ -697,6 +756,16 @@ if ('IntersectionObserver' in window && countEls.length && !reducedMotion) {
   }, { threshold: 0.4 });
   countEls.forEach((el) => countObserver.observe(el));
 }
+
+// Clicking a key figure replays its moving-number animation on demand.
+countEls.forEach((el) => {
+  el.classList.add('count-replay');
+  el.title = 'Click to replay the count';
+  el.addEventListener('click', () => {
+    if (reducedMotion) return;
+    animateNumber(el);
+  });
+});
 
 window.addEventListener('storage', (event) => {
   if (event.key === CMS_KEY) applyCmsData();
@@ -1306,6 +1375,13 @@ document.querySelectorAll('[data-team-hero]').forEach((hero) => {
       const on = i === index;
       slide.classList.toggle('active', on);
       slide.setAttribute('aria-hidden', String(!on));
+      // The description paragraph "writes itself" word by word when its
+      // slide appears; hidden slides pause mid-write.
+      const para = slide.querySelector('.team-copy p');
+      if (para) {
+        if (on) revealTeamCopy(para, { delay: 340 });
+        else stopTeamCopy(para);
+      }
     });
     if (countEl) countEl.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
     dotsWrap?.querySelectorAll('.team-dot').forEach((dot, i) => dot.classList.toggle('active', i === index));
@@ -1330,6 +1406,152 @@ document.querySelectorAll('[data-team-hero]').forEach((hero) => {
 
   activate(0);
   restart();
+});
+
+/* =====================================================================
+   "Writing" description animation — the leadership paragraphs reveal
+   word by word (with a blinking caret) as if being written, whenever a
+   slide becomes active or a card scrolls into view. Clicking any
+   animated paragraph rewinds and replays the writing from the start.
+   ===================================================================== */
+
+// Split a paragraph into word tokens while remembering which words sit
+// inside <strong> so the bold lead-in survives the rebuild.
+function buildTeamCopyTokens(p) {
+  if (!p.dataset.typeOriginal) p.dataset.typeOriginal = p.innerHTML;
+  const holder = document.createElement('div');
+  holder.innerHTML = p.dataset.typeOriginal;
+  const tokens = [];
+  const collect = (node, strong) => {
+    node.childNodes.forEach((child) => {
+      if (child.nodeType === Node.TEXT_NODE) {
+        child.textContent.split(/(\s+)/).forEach((word) => {
+          if (word) tokens.push({ text: word, strong });
+        });
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        const keepStrong = strong || child.tagName === 'STRONG' || child.tagName === 'B';
+        collect(child, keepStrong);
+      }
+    });
+  };
+  collect(holder, false);
+  return tokens;
+}
+
+function revealTeamCopy(p, { delay = 0, onDone } = {}) {
+  if (reducedMotion) return; // keep the static, fully-readable text
+  if (p._revealTimer) { window.clearInterval(p._revealTimer); p._revealTimer = null; }
+  if (p._revealDelay) { window.clearTimeout(p._revealDelay); p._revealDelay = null; }
+  const tokens = p._revealTokens || (p._revealTokens = buildTeamCopyTokens(p));
+  if (!tokens.length) return;
+  const frag = document.createDocumentFragment();
+  const wordEls = [];
+  let strongEl = null;
+  tokens.forEach((token) => {
+    if (token.strong && !strongEl) { strongEl = document.createElement('strong'); frag.appendChild(strongEl); }
+    if (!token.strong) strongEl = null;
+    const span = document.createElement('span');
+    span.className = 'team-type-word';
+    span.textContent = token.text;
+    (strongEl || frag).appendChild(span);
+    // Whitespace spans stay in the DOM for correct spacing but don't animate.
+    if (/\S/.test(token.text)) wordEls.push(span);
+  });
+  const caret = document.createElement('span');
+  caret.className = 'team-type-caret';
+  caret.setAttribute('aria-hidden', 'true');
+  frag.appendChild(caret);
+  p.innerHTML = '';
+  p.appendChild(frag);
+  p.classList.add('team-typing');
+  let i = 0;
+  const start = () => {
+    p._revealTimer = window.setInterval(() => {
+      if (i >= wordEls.length) {
+        window.clearInterval(p._revealTimer);
+        p._revealTimer = null;
+        caret.classList.add('done');
+        if (onDone) onDone();
+        return;
+      }
+      wordEls[i].classList.add('in');
+      i += 1;
+    }, 42);
+  };
+  if (delay > 0) p._revealDelay = window.setTimeout(start, delay);
+  else start();
+}
+
+function stopTeamCopy(p) {
+  if (p._revealTimer) { window.clearInterval(p._revealTimer); p._revealTimer = null; }
+  if (p._revealDelay) { window.clearTimeout(p._revealDelay); p._revealDelay = null; }
+  const caret = p.querySelector('.team-type-caret');
+  if (caret) caret.classList.add('done');
+}
+
+// Drop all typing state for a paragraph (used when CMS text is refreshed).
+function resetTeamCopyState(p) {
+  if (p._revealTimer) { window.clearInterval(p._revealTimer); p._revealTimer = null; }
+  if (p._revealDelay) { window.clearTimeout(p._revealDelay); p._revealDelay = null; }
+  delete p.dataset.typeOriginal;
+  delete p._revealTokens;
+  p.classList.remove('team-typing');
+}
+
+// Called after the Control Room updates a leadership description: the new
+// text is written out again for the visible hero slide / team card.
+function refreshTeamCopyFromCms(p) {
+  const hadReveal = !!(p._revealTimer || p._revealDelay || p._revealTokens || p.dataset.typeOriginal !== undefined);
+  resetTeamCopyState(p);
+  if (!hadReveal) return;
+  if (p.closest('.team-slide')) {
+    if (p.closest('.team-slide').classList.contains('active')) revealTeamCopy(p, { delay: 240 });
+  } else if (p.closest('.team-card')) {
+    revealTeamCopy(p);
+  }
+}
+
+// Rotating hero: clicking the paragraph replays its writing animation.
+document.querySelectorAll('[data-team-hero] .team-copy p').forEach((para) => {
+  para.classList.add('team-type-target');
+  para.title = 'Click to replay the description';
+  para.addEventListener('click', () => revealTeamCopy(para));
+});
+
+// About page team cards: the description writes itself when the card
+// scrolls into view, then the next paragraph follows — and either
+// paragraph can be clicked to replay.
+document.querySelectorAll('.team-card').forEach((card) => {
+  const paras = Array.from(card.querySelectorAll('p'));
+  if (!paras.length) return;
+  paras.forEach((para) => {
+    para.classList.add('team-type-target');
+    para.title = 'Click to replay the description';
+    para.addEventListener('click', () => revealTeamCopy(para));
+  });
+  if (reducedMotion) return;
+  const revealCard = () => {
+    let pi = 0;
+    const step = () => {
+      if (pi >= paras.length) return;
+      const para = paras[pi];
+      pi += 1;
+      revealTeamCopy(para, { onDone: step });
+    };
+    step();
+  };
+  if ('IntersectionObserver' in window) {
+    const cardObserver = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        obs.unobserve(entry.target);
+        revealCard();
+      });
+    }, { threshold: 0.25 });
+    cardObserver.observe(card);
+  } else {
+    revealCard();
+  }
 });
 
 /* =====================================================================
@@ -1387,45 +1609,52 @@ document.querySelectorAll('[data-team-hero]').forEach((hero) => {
     });
   }
 
+  function teamMediaNode(item) {
+    // Videos fill the portrait frame too — muted, looping and inline so they
+    // play smoothly in place; images lazy-load with async decoding.
+    if (item.type === 'video') {
+      const video = document.createElement('video');
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.autoplay = true;
+      video.setAttribute('preload', 'metadata');
+      video.setAttribute('controls', '');
+      video.src = item.url;
+      return video;
+    }
+    const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.src = item.url;
+    return img;
+  }
+
   function applyTeamPhotos() {
     const media = window.KhaqanMedia ? window.KhaqanMedia.get() : [];
     document.querySelectorAll('[data-member]').forEach((el) => {
       const member = el.dataset.member;
       // The most recently added portrait for a member wins, so re-uploading a
       // portrait from the Control Room swaps it everywhere automatically.
-      const photo = media.find((m) => m.type === 'image' && m.section === `team-${member}`);
-      const portrait = el.querySelector('.team-portrait');
-      const mini = el.querySelector('.team-portrait-mini');
-      if (portrait) {
-        let img = portrait.querySelector('.team-photo');
-        if (photo && photo.url) {
-          if (!img) {
-            img = document.createElement('img');
-            img.className = 'team-photo';
-            img.loading = 'lazy';
-            img.decoding = 'async';
-            portrait.insertBefore(img, portrait.firstChild);
+      // Photos and short videos are both accepted.
+      const item = media.find((m) => m.section === `team-${member}` && (m.type === 'image' || m.type === 'video'));
+      ['.team-portrait', '.team-portrait-mini'].forEach((selector) => {
+        const frame = el.querySelector(selector);
+        if (!frame) return;
+        let node = frame.querySelector('.team-photo');
+        if (item && item.url) {
+          if (!node || node.tagName.toLowerCase() !== item.type) {
+            if (node) node.remove();
+            node = teamMediaNode(item);
+            node.className = 'team-photo';
+            frame.insertBefore(node, frame.firstChild);
           }
-          if (img.src !== photo.url) img.src = photo.url;
-          img.alt = photo.title || `Portrait of ${member}`;
-        } else if (img) {
-          img.remove(); // portrait removed in the CRM → monogram placeholder returns
+          if (node.src !== item.url) node.src = item.url;
+          if (item.type === 'image') node.alt = item.title || `Portrait of ${member}`;
+        } else if (node) {
+          node.remove(); // portrait removed in the CRM → monogram placeholder returns
         }
-      }
-      if (mini) {
-        let img = mini.querySelector('img');
-        if (photo && photo.url) {
-          if (!img) {
-            img = document.createElement('img');
-            img.loading = 'lazy';
-            mini.appendChild(img);
-          }
-          if (img.src !== photo.url) img.src = photo.url;
-          img.alt = photo.title || `Portrait of ${member}`;
-        } else if (img) {
-          img.remove();
-        }
-      }
+      });
     });
   }
 

@@ -3061,6 +3061,66 @@ html[data-theme="night"] .page-contact .page-hero { background-image: linear-gra
 html[data-skin="obsidian"] .team-hero { border-radius: 10px; }
 html[data-skin="obsidian"] .team-role { border-radius: 6px; }
 
+/* ------------------------------------------------------------------
+   Word-by-word "writing" reveal for leadership descriptions. Each word
+   appears as if typed, with a blinking caret; the paragraph replays
+   from the start when clicked. Key figures (proof-strip / qom-facts)
+   share the click-to-replay behaviour for their count-up.
+   ------------------------------------------------------------------ */
+.team-type-target { cursor: pointer; }
+.team-copy p.team-typing, .team-card p.team-typing { margin-bottom: 2px; }
+.team-type-word {
+  opacity: 0;
+  transform: translateY(.32em);
+  transition: opacity .22s ease, transform .22s ease;
+}
+.team-type-word.in { opacity: 1; transform: none; }
+.team-type-caret {
+  display: inline-block;
+  width: 2px;
+  height: .92em;
+  margin-left: 3px;
+  vertical-align: -.06em;
+  border-radius: 2px;
+  background: var(--ta, var(--yellow));
+  animation: teamCaretBlink .85s steps(2, start) infinite;
+  transition: opacity .45s ease;
+}
+.team-type-caret.done { opacity: 0; animation: none; }
+@keyframes teamCaretBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.team-type-target::after {
+  content: "↻ replay";
+  display: inline-block;
+  margin-left: 9px;
+  vertical-align: 2px;
+  opacity: 0;
+  transform: translateX(-5px);
+  color: var(--ta, var(--yellow));
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  transition: opacity .3s ease, transform .3s ease;
+}
+.team-type-target:hover::after { opacity: .85; transform: none; }
+.team-type-target:focus-visible { outline: 2px dashed var(--ta, var(--yellow)); outline-offset: 4px; }
+
+/* Click-to-replay affordance on the moving key numbers. */
+.count-replay {
+  cursor: pointer;
+  border-radius: 6px;
+  transition: text-shadow .3s ease;
+}
+.count-replay:hover {
+  text-shadow: 0 0 18px color-mix(in srgb, var(--yellow) 45%, transparent);
+  text-decoration: underline dotted;
+  text-decoration-color: color-mix(in srgb, var(--yellow) 70%, transparent);
+  text-underline-offset: 5px;
+  text-decoration-thickness: 1px;
+}
+.count-replay:focus-visible { outline: 2px dashed var(--yellow); outline-offset: 4px; }
+.count-running { text-shadow: 0 0 14px color-mix(in srgb, var(--yellow) 30%, transparent); }
+
 /* Slide chrome: dots + progress */
 .team-hero-foot {
   position: absolute;
@@ -3211,6 +3271,27 @@ html[data-theme="day"] .managed-item figcaption b { color: #102d1b; }
 html[data-theme="day"] .managed-item figcaption span { color: #355a3d; }
 @media (max-width: 900px) { .managed-media-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .managed-media-grid { grid-template-columns: 1fr; } }
+
+/* ------------------------------------------------------------------
+   Attached media always fills its frame — pictures and videos alike.
+   Whatever the Control Room attaches to a named slot (or a team
+   member) is cropped to cover the frame edge-to-edge, with a black
+   backing so letterboxed video never shows through. Frames without an
+   intrinsic height (like the About legacy figure) get a 16:9 fallback
+   so they never collapse when a video replaces the original photo.
+   ------------------------------------------------------------------ */
+[data-media-slot].has-media-override img,
+[data-media-slot].has-media-override video,
+.team-portrait-mini .team-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  background: #000;
+}
+.team-portrait-mini .team-photo { object-position: top center; }
+[data-media-slot].has-media-override:where(.about-legacy-media) { aspect-ratio: 16 / 9; }
 
 /* ------------------------------------------------------------------
    D. VISIBLE night-mode backgrounds — stronger aurora glows and

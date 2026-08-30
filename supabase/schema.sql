@@ -23,6 +23,18 @@ create table if not exists public.site_settings (
   phone text not null default '',
   whatsapp text not null default '',
   email text not null default '',
+  director_bio text not null default '',
+  ceo_bio text not null default '',
+  md_bio text not null default '',
+  cfo_bio text not null default '',
+  director_card1 text not null default '',
+  director_card2 text not null default '',
+  ceo_card1 text not null default '',
+  ceo_card2 text not null default '',
+  md_card1 text not null default '',
+  md_card2 text not null default '',
+  cfo_card1 text not null default '',
+  cfo_card2 text not null default '',
   updated_at timestamptz not null default now()
 );
 
@@ -32,6 +44,18 @@ alter table public.site_settings add column if not exists incorporation_date tex
 alter table public.site_settings add column if not exists total_quantity text not null default '535,121.35 MT';
 alter table public.site_settings add column if not exists total_turnover text not null default 'PKR 21,011,459,921';
 alter table public.site_settings add column if not exists client_count text not null default '12 leading organizations';
+alter table public.site_settings add column if not exists director_bio text not null default '';
+alter table public.site_settings add column if not exists ceo_bio text not null default '';
+alter table public.site_settings add column if not exists md_bio text not null default '';
+alter table public.site_settings add column if not exists cfo_bio text not null default '';
+alter table public.site_settings add column if not exists director_card1 text not null default '';
+alter table public.site_settings add column if not exists director_card2 text not null default '';
+alter table public.site_settings add column if not exists ceo_card1 text not null default '';
+alter table public.site_settings add column if not exists ceo_card2 text not null default '';
+alter table public.site_settings add column if not exists md_card1 text not null default '';
+alter table public.site_settings add column if not exists md_card2 text not null default '';
+alter table public.site_settings add column if not exists cfo_card1 text not null default '';
+alter table public.site_settings add column if not exists cfo_card2 text not null default '';
 
 insert into public.site_settings (id) values ('default') on conflict (id) do nothing;
 

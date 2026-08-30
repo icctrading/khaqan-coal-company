@@ -31,7 +31,7 @@
   }
 
   function flashStatus(message, ok = true) {
-    const targets = [saveStatus, query('#media-save-status')].filter(Boolean);
+    const targets = [saveStatus, query('#leadership-save-status'), query('#media-save-status')].filter(Boolean);
     targets.forEach((el) => {
       el.textContent = message;
       el.style.color = ok ? '' : '#ffae80';
@@ -101,6 +101,11 @@
   });
 
   form?.addEventListener('submit', saveSiteForm);
+  query('#leadership-form')?.addEventListener('submit', saveSiteForm);
+
+  // Keep the "Content fields" metric honest as the editable set grows.
+  const metricFields = query('#metric-fields');
+  if (metricFields) metricFields.textContent = String(queryAll('[data-field]').length);
   query('#lead-search')?.addEventListener('input', renderLeads);
   query('#leads-table-body')?.addEventListener('change', (event) => {
     if (event.target.matches('.lead-status')) updateLeadStatus(event.target.dataset.id, event.target.value);
