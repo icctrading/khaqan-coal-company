@@ -176,24 +176,30 @@
 
   function portraitFor(key) {
     const items = window.KhaqanMedia ? window.KhaqanMedia.get() : [];
-    return items.find((m) => m.type === 'image' && m.section === `team-${key}`) || null;
+    return items.find((m) => m.section === `team-${key}` && (m.type === 'image' || m.type === 'video')) || null;
   }
 
   function renderPortraits() {
     if (!portraitGrid) return;
     portraitGrid.innerHTML = PORTRAIT_MEMBERS.map((member) => {
       const photo = portraitFor(member.key);
+      const isVideo = !!(photo && photo.type === 'video');
       const visual = photo
-        ? `<img src="${escapeHtml(photo.url)}" alt="Portrait of ${escapeHtml(member.name)}" loading="lazy">`
+        ? mediaVisual(photo.url, photo.title, photo.type)
         : `<span class="crm-portrait-monogram" aria-hidden="true">${escapeHtml(member.monogram)}</span>`;
       const fileId = `portrait-file-${member.key}`;
+      const durationId = `portrait-duration-${member.key}`;
       return `<article class="crm-portrait-slot${photo ? ' has-photo' : ''}" data-member="${member.key}">
         <div class="crm-portrait-frame">${visual}
-          <span class="crm-portrait-badge">${photo ? 'Photo live on site' : 'No photo yet'}</span>
+          <span class="crm-portrait-badge">${photo ? (isVideo ? 'Video live on site' : 'Photo live on site') : 'No media yet'}</span>
         </div>
-        <div class="crm-portrait-meta"><strong>${escapeHtml(member.name)}</strong><span>${escapeHtml(member.role)} · ${escapeHtml(member.caption)}</span><small>${photo ? escapeHtml(photo.title || 'Portrait') : 'Initials placeholder shown on the site'}</small></div>
+        <div class="crm-portrait-meta"><strong>${escapeHtml(member.name)}</strong><span>${escapeHtml(member.role)} · ${escapeHtml(member.caption)}</span><small>${photo ? escapeHtml(photo.title || (isVideo ? 'Portrait video' : 'Portrait')) : 'Initials placeholder shown on the site'}</small></div>
         <div class="crm-portrait-actions">
-          <label class="file-label" for="${fileId}">${photo ? 'Replace photo' : 'Upload photo'}<input id="${fileId}" type="file" accept="image/*" data-portrait-upload="${member.key}" hidden></label>
+          <label class="file-label" for="${fileId}">${photo ? 'Replace' : 'Add photo / video'}<input id="${fileId}" type="file" accept="image/*,video/*" data-portrait-upload="${member.key}" hidden></label>
+          <label class="crm-portrait-duration-field" title="Set how long the video plays before it stops">
+            <span>Playback time</span>
+            <input id="${durationId}" type="text" inputmode="numeric" placeholder="e.g. 0:15" value="${isVideo ? formatDuration(photo.duration) : ''}" data-portrait-duration="${member.key}" aria-label="Video playback time for ${escapeHtml(member.name)}">
+          </label>
           ${photo ? `<button class="btn btn-quiet crm-danger" type="button" data-portrait-remove="${member.key}">Remove</button>` : ''}
         </div>
       </article>`;
@@ -210,7 +216,7 @@
   }
 
   async function retireStalePortraits(section, keepId, cloud) {
-    const stale = window.KhaqanMedia.get().filter((m) => m.type === 'image' && m.section === section && m.id !== keepId);
+    const stale = window.KhaqanMedia.get().filter((m) => (m.type === 'image' || m.type === 'video') && m.section === section && m.id !== keepId);
     for (const item of stale) {
       try {
         if (cloud) await cloud.deleteMedia(item.id, item.storagePath);
@@ -221,20 +227,32 @@
     }
   }
 
+  function portraitDurationInput(key) {
+    return document.getElementById(`portrait-duration-${key}`);
+  }
+
+  // Playback time for a hero/leadership video — read from the card's field.
+  function readPortraitDuration(key) {
+    const input = portraitDurationInput(key);
+    return input ? parseDuration(input.value) : 0;
+  }
+
   async function handlePortraitUpload(input, key) {
     const file = input.files && input.files[0];
     if (!file || !window.KhaqanMedia) return;
     const member = PORTRAIT_MEMBERS.find((m) => m.key === key);
     const section = `team-${key}`;
     const title = `Portrait — ${member.name}`;
+    const type = fileKind(file);
+    const durationNum = type === 'video' ? readPortraitDuration(key) : 0;
     const cloud = cloudAdmin();
     try {
       if (cloud) {
         const existing = portraitFor(key);
         if (existing && existing.storagePath) {
-          await cloud.updateMedia(existing.id, { file, title, section, type: 'image', storagePath: existing.storagePath });
+          await cloud.updateMedia(existing.id, { file, title, section, type, duration: durationNum, storagePath: existing.storagePath });
         } else {
-          await cloud.uploadMedia({ file, title, section, type: 'image' });
+          await cloud.uploadMedia({ file, title, section, type, duration: durationNum });
           if (existing) {
             try { await cloud.deleteMedia(existing.id, existing.storagePath); } catch (error) { window.KhaqanMedia.remove(existing.id); }
           }
@@ -246,30 +264,30 @@
       } else {
         const url = await readFileAsDataURL(file);
         const stale = window.KhaqanMedia.get()
-          .filter((m) => m.type === 'image' && m.section === section && m.id !== (portraitFor(key) || {}).id)
+          .filter((m) => (m.type === 'image' || m.type === 'video') && m.section === section && m.id !== (portraitFor(key) || {}).id)
           .map((m) => m.id);
         const existing = portraitFor(key);
         if (existing) {
-          window.KhaqanMedia.update(existing.id, { url, title, section, type: 'image' });
+          window.KhaqanMedia.update(existing.id, { url, title, section, type, duration: durationNum });
         } else {
-          window.KhaqanMedia.add({ type: 'image', title, section, url });
+          window.KhaqanMedia.add({ type, title, section, url, duration: durationNum });
         }
         stale.forEach((id) => window.KhaqanMedia.remove(id));
       }
       renderPortraits();
       renderMedia();
       updateMediaMetric();
-      flashStatus(`${member.name}'s portrait is now live in the leadership hero.`);
+      flashStatus(`${member.name}'s ${type === 'video' ? 'video' : 'portrait'} is now live in the leadership hero.`);
     } catch (error) {
       try {
         const url = await readFileAsDataURL(file);
         const existing = portraitFor(key);
-        if (existing) window.KhaqanMedia.update(existing.id, { url, title, section, type: 'image' });
-        else window.KhaqanMedia.add({ type: 'image', title, section, url });
+        if (existing) window.KhaqanMedia.update(existing.id, { url, title, section, type, duration: durationNum });
+        else window.KhaqanMedia.add({ type, title, section, url, duration: durationNum });
         renderPortraits();
         renderMedia();
         updateMediaMetric();
-        flashStatus(`${member.name}'s portrait saved in this browser. Cloud sync needs attention.`, false);
+        flashStatus(`${member.name}'s ${type === 'video' ? 'video' : 'portrait'} saved in this browser. Cloud sync needs attention.`, false);
       } catch (localError) {
         flashStatus(error.message || 'That portrait file could not be saved.', false);
       }
@@ -282,7 +300,7 @@
     const member = PORTRAIT_MEMBERS.find((m) => m.key === key);
     if (!window.KhaqanMedia) return;
     const section = `team-${key}`;
-    const portraits = window.KhaqanMedia.get().filter((m) => m.type === 'image' && m.section === section);
+    const portraits = window.KhaqanMedia.get().filter((m) => (m.type === 'image' || m.type === 'video') && m.section === section);
     if (!portraits.length) return;
     if (!window.confirm(`Remove ${member.name}'s portrait? The initials placeholder will return on the website.`)) return;
     const cloud = cloudAdmin();
@@ -304,6 +322,29 @@
     flashStatus(`${member.name}'s portrait removed.`);
   }
 
+  // Persist a hero/leadership video's playback time to local + cloud storage.
+  async function updateMediaDuration(item, durationNum, key, input) {
+    if (!item || item.type !== 'video') { if (input) input.value = ''; return; }
+    const cloud = cloudAdmin();
+    const patch = { duration: durationNum };
+    try {
+      if (cloud) {
+        await cloud.updateMedia(item.id, { title: item.title, section: item.section, area: item.area || '', slot: item.slot || '', type: item.type, duration: durationNum, storagePath: item.storagePath });
+        await refreshMediaFromCloud();
+      } else {
+        window.KhaqanMedia.update(item.id, patch);
+      }
+    } catch (error) {
+      window.KhaqanMedia.update(item.id, patch);
+    }
+    renderPortraits();
+    renderMedia();
+    updateMediaMetric();
+    const message = durationNum > 0 ? `Playback time set to ${formatDuration(durationNum)}.` : 'Playback time cleared — video loops as normal.';
+    flashStatus(`${key} ${message}`);
+    if (input) input.value = formatDuration(durationNum);
+  }
+
   portraitGrid?.addEventListener('change', (event) => {
     const input = event.target.closest('[data-portrait-upload]');
     if (input) handlePortraitUpload(input, input.dataset.portraitUpload);
@@ -311,6 +352,16 @@
   portraitGrid?.addEventListener('click', (event) => {
     const button = event.target.closest('[data-portrait-remove]');
     if (button) handlePortraitRemove(button.dataset.portraitRemove);
+  });
+  // Saves a portrait video's playback time on blur (or Enter) without re-uploading.
+  portraitGrid?.addEventListener('change', (event) => {
+    const input = event.target.closest('[data-portrait-duration]');
+    if (!input) return;
+    const key = input.dataset.portraitDuration;
+    const item = window.KhaqanMedia ? window.KhaqanMedia.get().find((m) => m.section === `team-${key}` && (m.type === 'image' || m.type === 'video')) : null;
+    if (!item) return;
+    const durationNum = parseDuration(input.value);
+    updateMediaDuration(item, durationNum, key, input);
   });
 
   /* =====================================================================
@@ -328,6 +379,8 @@
   const mediaSlot = query('#media-slot');
   const imageFileInput = query('#media-image-file');
   const videoFileInput = query('#media-video-file');
+  const mediaDurationField = query('#media-duration-field');
+  const videoDurationInput = query('#media-video-duration');
   const mediaSubmit = query('#media-submit');
   const mediaEditCancel = query('#media-edit-cancel');
   const mediaFormEyebrow = query('#media-form-eyebrow');
@@ -353,6 +406,45 @@
     if ((file.type || '').startsWith('video/')) return 'video';
     if (/\.(mp4|webm|mov|m4v|ogv)$/i.test(file.name || '')) return 'video';
     return 'image';
+  }
+
+  /* Duration for a video upload. Accepts plain seconds ("15", "90") or a
+     mm:ss shorthand ("1:30"); anything invalid or empty becomes 0 (no limit). */
+  function parseDuration(value) {
+    const text = String(value || '').trim();
+    if (!text) return 0;
+    const mmss = text.match(/^(\d{1,3}):(\d{1,2})$/);
+    if (mmss) {
+      const mins = Number(mmss[1]);
+      const secs = Number(mmss[2]);
+      if (secs > 59) return 0;
+      return mins * 60 + secs;
+    }
+    const sec = Number(text);
+    return (Number.isFinite(sec) && sec >= 0) ? Math.round(sec) : 0;
+  }
+
+  function formatDuration(seconds) {
+    const s = Number(seconds) || 0;
+    if (s <= 0) return '';
+    const mins = Math.floor(s / 60);
+    const secs = s % 60;
+    return mins > 0 ? `${mins}:${String(secs).padStart(2, '0')}` : String(secs);
+  }
+
+  // Small badge shown on a video card when a playback ceiling is set.
+  function durationBadge(duration) {
+    const label = formatDuration(duration);
+    return label ? `<span class="media-duration-badge" title="Video stops after ${label}">${label}</span>` : '';
+  }
+
+  // Show the duration field only when a video is being added or edited.
+  function refreshDurationField() {
+    if (!mediaDurationField) return;
+    const isVideo = stagedFile
+      ? stagedFile.type === 'video'
+      : !!(editingMediaId && ((window.KhaqanMedia.get().find((m) => m.id === editingMediaId) || {}).type === 'video'));
+    mediaDurationField.hidden = !isVideo;
   }
 
   function isGalleryArea(area) {
@@ -445,7 +537,7 @@
       const ref = placementLabel(m);
       return `<article data-media-id="${escapeHtml(m.id)}" class="has-override">
         ${mediaVisual(m.url, m.title, m.type)}
-        <div><span class="media-kind">${m.type === 'video' ? 'Video' : 'Image'}</span><strong>${escapeHtml(m.title)}</strong>${placeMetaHtml(ref)}</div>
+        <div><span class="media-kind">${m.type === 'video' ? 'Video' : 'Image'}</span>${durationBadge(m.duration)}<strong>${escapeHtml(m.title)}</strong>${placeMetaHtml(ref)}</div>
         ${cardActions({ id: m.id, canEdit: true, canRemove: m.section !== 'general', canDelete: true, replaceLabel: 'Replace' })}
       </article>`;
     }).join('');
@@ -465,7 +557,7 @@
       };
       return `<article class="${override ? 'has-override' : 'is-default'}" ${override ? `data-media-id="${escapeHtml(override.id)}"` : ''} data-slot-key="${escapeHtml(key)}">
         ${mediaVisual(url, slot.label, type)}
-        <div><span class="media-kind">${override ? 'Live on page' : 'Stock on page'}</span><strong>${escapeHtml(override ? (override.title || slot.label) : slot.label)}</strong>${placeMetaHtml(ref)}</div>
+        <div><span class="media-kind">${override ? 'Live on page' : 'Stock on page'}</span>${durationBadge(override && override.duration)}<strong>${escapeHtml(override ? (override.title || slot.label) : slot.label)}</strong>${placeMetaHtml(ref)}</div>
         ${cardActions({
           id: override && override.id,
           replaceKey: key,
@@ -543,6 +635,8 @@
     if (mediaFormTitle) mediaFormTitle.textContent = 'Upload an image or video';
     if (imageFileInput) imageFileInput.closest('.file-label')?.classList.remove('has-file');
     if (videoFileInput) videoFileInput.closest('.file-label')?.classList.remove('has-file');
+    if (videoDurationInput) videoDurationInput.value = '';
+    if (mediaDurationField) mediaDurationField.hidden = true;
   }
 
   function validateFileSize(file) {
@@ -574,6 +668,8 @@
       if (!editingMediaId && mediaTitle && !mediaTitle.value.trim()) {
         mediaTitle.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ');
       }
+      if (type === 'image' && videoDurationInput) videoDurationInput.value = '';
+      refreshDurationField();
     } catch (error) {
       flashStatus('That file could not be read.', false);
     }
@@ -598,28 +694,32 @@
     }
   }
 
-  function applyLocalMediaChange(title, section, area, slot, existingId) {
+  function applyLocalMediaChange(title, section, area, slot, existingId, duration) {
     const id = existingId || editingMediaId;
     const patch = { title, section, area, slot };
+    const durationNum = parseDuration(duration != null ? duration : (videoDurationInput && videoDurationInput.value));
+    if (durationNum > 0) patch.duration = durationNum;
+    else if (id) patch.duration = 0;
     if (stagedFile) { patch.url = stagedFile.url; patch.type = stagedFile.type; }
     if (id) window.KhaqanMedia.update(id, patch);
-    else window.KhaqanMedia.add({ type: stagedFile.type, title, section, area, slot, url: stagedFile.url });
+    else window.KhaqanMedia.add({ type: stagedFile.type, title, section, area, slot, duration: durationNum, url: stagedFile.url });
   }
 
-  async function persistMedia({ title, section, area, slot, file, type, existing }) {
+  async function persistMedia({ title, section, area, slot, file, type, existing, duration }) {
     const cloud = cloudAdmin();
     const id = existing && existing.id;
+    const durationNum = parseDuration(duration != null ? duration : (videoDurationInput && videoDurationInput.value));
     if (cloud) {
       if (id) {
         await cloud.updateMedia(id, {
-          title, section, area, slot,
+          title, section, area, slot, duration: durationNum,
           file: file || undefined,
           type: type || undefined,
           storagePath: existing.storagePath
         });
       } else {
         if (!file) throw new Error('Choose an image or video file first.');
-        await cloud.uploadMedia({ file, title, section, area, slot, type });
+        await cloud.uploadMedia({ file, title, section, area, slot, type, duration: durationNum });
       }
       await refreshMediaFromCloud();
       const keep = (window.KhaqanMedia.get() || []).find((m) => m.section === section && (m.area || 'gallery') === area && (m.slot || '') === (slot || '') && (area === 'gallery' || area === 'library' ? m.title === title : true));
@@ -631,7 +731,7 @@
       return;
     }
     if (id) {
-      const patch = { title, section, area, slot };
+      const patch = { title, section, area, slot, duration: durationNum };
       if (file && stagedFile && stagedFile.url) { patch.url = stagedFile.url; patch.type = stagedFile.type || type; }
       else if (file) {
         const url = await readFileAsDataURL(file);
@@ -642,7 +742,7 @@
     } else {
       const url = (stagedFile && stagedFile.url) || (file ? await readFileAsDataURL(file) : '');
       if (!url) throw new Error('Choose an image or video file first.');
-      window.KhaqanMedia.add({ type: type || (stagedFile && stagedFile.type) || 'image', title, section, area, slot, url });
+      window.KhaqanMedia.add({ type: type || (stagedFile && stagedFile.type) || 'image', title, section, area, slot, duration: durationNum, url });
     }
     const keep = place() && area !== 'gallery' && area !== 'library'
       ? place().occupant(window.KhaqanMedia.get(), section, area, slot || '1')
@@ -660,9 +760,10 @@
       return;
     }
     const existing = editingMediaId ? window.KhaqanMedia.get().find((m) => m.id === editingMediaId) : null;
+    const duration = videoDurationInput ? videoDurationInput.value : '';
     try {
       await persistMedia({
-        title, section, area, slot,
+        title, section, area, slot, duration,
         file: stagedFile && stagedFile.file,
         type: stagedFile ? stagedFile.type : undefined,
         existing
@@ -672,7 +773,7 @@
         : 'Media published to the selected page and page area.');
     } catch (error) {
       if ((stagedFile && stagedFile.url) || (editingMediaId && !stagedFile)) {
-        applyLocalMediaChange(title, section, area, slot);
+        applyLocalMediaChange(title, section, area, slot, null, duration);
         flashStatus('Saved in this browser. Cloud sync needs attention.', false);
       } else {
         flashStatus(error.message || 'That media could not be saved.', false);
@@ -697,6 +798,8 @@
     syncPlacementSelects(pageId, areaId, slotId);
     if (imageFileInput) { imageFileInput.value = ''; imageFileInput.closest('.file-label')?.classList.remove('has-file'); }
     if (videoFileInput) { videoFileInput.value = ''; videoFileInput.closest('.file-label')?.classList.remove('has-file'); }
+    if (videoDurationInput) videoDurationInput.value = item.type === 'video' ? formatDuration(item.duration) : '';
+    refreshDurationField();
     if (mediaSubmit) mediaSubmit.textContent = 'Save changes';
     if (mediaEditCancel) mediaEditCancel.hidden = false;
     if (mediaFormEyebrow) mediaFormEyebrow.textContent = 'Edit media';
@@ -780,14 +883,14 @@
       let url = '';
       if (!remote || file.size <= MAX_MEDIA_BYTES) url = await readFileAsDataURL(file);
       stagedFile = { type, url, name: file.name, file };
-      await persistMedia({ title, section, area, slot, file, type, existing: existing || null });
+      await persistMedia({ title, section, area, slot, file, type, duration: existing ? existing.duration : 0, existing: existing || null });
       stagedFile = null;
       flashStatus('Media replaced on the selected page area.');
     } catch (error) {
       try {
         const url = await readFileAsDataURL(file);
         stagedFile = { type, url, name: file.name, file };
-        applyLocalMediaChange(title, section, area, slot, existing && existing.id);
+        applyLocalMediaChange(title, section, area, slot, existing && existing.id, existing ? existing.duration : 0);
         stagedFile = null;
         flashStatus('Replaced in this browser. Cloud sync needs attention.', false);
       } catch (localError) {

@@ -154,6 +154,7 @@ create table if not exists public.media (
   area text not null default 'gallery',
   slot text not null default '',
   kind text not null default 'image' check (kind in ('image', 'video')),
+  duration integer not null default 0,
   storage_path text not null unique,
   public_url text not null,
   mime_type text not null default '',
@@ -164,6 +165,7 @@ create table if not exists public.media (
 
 alter table public.media add column if not exists area text not null default 'gallery';
 alter table public.media add column if not exists slot text not null default '';
+alter table public.media add column if not exists duration integer not null default 0;
 
 alter table public.media enable row level security;
 
