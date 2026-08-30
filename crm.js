@@ -31,7 +31,7 @@
   }
 
   function flashStatus(message, ok = true) {
-    const targets = [saveStatus, query('#leadership-save-status'), query('#media-save-status')].filter(Boolean);
+    const targets = [saveStatus, query('#leadership-save-status'), query('#rotation-save-status'), query('#media-save-status')].filter(Boolean);
     targets.forEach((el) => {
       el.textContent = message;
       el.style.color = ok ? '' : '#ffae80';
@@ -102,6 +102,7 @@
 
   form?.addEventListener('submit', saveSiteForm);
   query('#leadership-form')?.addEventListener('submit', saveSiteForm);
+  query('#rotation-form')?.addEventListener('submit', saveSiteForm);
 
   // Keep the "Content fields" metric honest as the editable set grows.
   const metricFields = query('#metric-fields');

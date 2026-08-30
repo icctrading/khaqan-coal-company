@@ -16,6 +16,11 @@ const DEFAULT_CMS_DATA = {
   totalQuantity: '535,121.35 MT',
   totalTurnover: 'PKR 21,011,459,921',
   clientCount: '12 leading organizations',
+  /* Rotation timing — seconds a frame stays on screen before the next one
+     fades in. The Control Room's "Rotation timing" card can override both:
+     the home page highlights reel and the leadership hero (Home + About). */
+  reelIntervalSec: 5,
+  teamHeroIntervalSec: 5,
   /* Leadership descriptions — edited from the Control Room. The opening
      phrase may be wrapped in <strong>…</strong> to keep the bold lead-in;
      everything else is rendered as plain text. */
@@ -67,6 +72,9 @@ function saveCmsData(nextData) {
   });
   try { window.localStorage.setItem(CMS_KEY, JSON.stringify(next)); } catch (error) { /* storage can be unavailable in private previews */ }
   applyCmsData();
+  /* Live hooks (rotation timing) listen for this so a save or a cloud
+     hydration re-paces the reels without a page reload. */
+  try { window.dispatchEvent(new CustomEvent('khaqan:cms-change')); } catch (error) { /* no-op */ }
   return next;
 }
 
@@ -786,6 +794,22 @@ window.addEventListener('storage', (event) => {
   }
 });
 
+/* Rotation timing — how long one frame stays on screen before the next fades
+   in. The Control Room's "Rotation timing" card (reelIntervalSec /
+   teamHeroIntervalSec) overrides each deck's data-*-interval attribute; values
+   are clamped to 3–30 seconds so a bad entry can never freeze a deck, and an
+   empty / out-of-range value falls back to the attribute, then the default. */
+const ROTATION_MIN_MS = 3000;
+const ROTATION_MAX_MS = 30000;
+function rotationIntervalMs(cmsSeconds, attributeMs, fallbackMs) {
+  const fromCms = Number(cmsSeconds);
+  const fromAttr = Number(attributeMs);
+  const ms = (Number.isFinite(fromCms) && fromCms > 0)
+    ? fromCms * 1000
+    : (Number.isFinite(fromAttr) && fromAttr > 0 ? fromAttr : fallbackMs);
+  return Math.min(ROTATION_MAX_MS, Math.max(ROTATION_MIN_MS, Math.round(ms)));
+}
+
 // Home-page reel: cycle through compact mining clips without loading all videos at once.
 document.querySelectorAll('[data-reel]').forEach((reel) => {
   const slides = Array.from(reel.querySelectorAll('.reel-slide'));
@@ -796,39 +820,45 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   const band = reel.closest('section') || reel.parentElement;
   const chapterButtons = Array.from((band || document).querySelectorAll('[data-reel-jump]'));
   const tagOut = reel.querySelector('[data-reel-tag-out]');
-  const interval = Number(reel.dataset.reelInterval) || 7200;
+  const DEFAULT_REEL_MS = 5000;
+  const intervalFromSettings = () =>
+    rotationIntervalMs(getCmsData().reelIntervalSec, reel.dataset.reelInterval, DEFAULT_REEL_MS);
+  let interval = intervalFromSettings();
   let index = 0;
   let timer = null;
   let onScreen = true;
+  let running = false;
+  let busy = false;      // a cut is waiting on the next clip's first frame
+  let primeTimer = null;
 
   if (!slides.length) return;
-  reel.style.setProperty('--reel-duration', `${interval}ms`);
+
+  function applyTiming() {
+    interval = intervalFromSettings();
+    reel.style.setProperty('--reel-duration', `${interval}ms`);
+  }
+  applyTiming();
 
   if (dotsWrap) {
     dotsWrap.innerHTML = slides.map((_, i) => `<button class="reel-dot${i === 0 ? ' active' : ''}" data-reel-dot="${i}" type="button" aria-label="Show mining reel item ${i + 1}"></button>`).join('');
     dotsWrap.addEventListener('click', (event) => {
       const dot = event.target.closest('[data-reel-dot]');
       if (!dot) return;
-      activate(Number(dot.dataset.reelDot));
-      restart();
+      goTo(Number(dot.dataset.reelDot));
     });
   }
 
   // Chapter rail: pre-authored buttons beside the stage jump the reel to a slide,
   // and behave as a real tablist (arrow keys move focus and advance the cut).
   chapterButtons.forEach((button, i) => {
-    button.addEventListener('click', () => {
-      activate(Number(button.dataset.reelJump));
-      restart();
-    });
+    button.addEventListener('click', () => goTo(Number(button.dataset.reelJump)));
     button.addEventListener('keydown', (event) => {
       const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
       if (step === undefined && event.key !== 'Home' && event.key !== 'End') return;
       event.preventDefault();
       const target = event.key === 'Home' ? 0 : event.key === 'End' ? chapterButtons.length - 1 : (i + step + chapterButtons.length) % chapterButtons.length;
       chapterButtons[target].focus();
-      activate(Number(chapterButtons[target].dataset.reelJump));
-      restart();
+      goTo(Number(chapterButtons[target].dataset.reelJump));
     });
   });
 
@@ -840,8 +870,8 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
       slide.setAttribute('aria-hidden', String(!active));
       const video = slide.querySelector('video');
       if (video) {
-        if (active && onScreen) {
-          video.currentTime = 0;
+        if (active && running) {
+          try { video.currentTime = 0; } catch (error) { /* not seekable yet — it replays from the top */ }
           delete video.dataset.reelResume;
           video.play().catch(() => {});
         } else {
@@ -866,9 +896,48 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   }
 
   const activeVideo = () => (slides[index] ? slides[index].querySelector('video') : null);
+
+  /* Cut guard: a clip whose first frame has not decoded yet would fade in as
+     a frozen poster — that is what made the reel look stuck. Before cutting to
+     such a slide we nudge the video into loading and hold the current frame
+     until the first real frame is ready (or ~1s passes; the crossfade then
+     hides the cut). Ready clips switch over immediately. */
+  function goTo(nextIndex, { auto = false } = {}) {
+    const target = ((nextIndex % slides.length) + slides.length) % slides.length;
+    if (busy) return;
+    const video = slides[target].querySelector('video');
+    if (target !== index && video && video.readyState < 2 && onScreen) {
+      busy = true;
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        if (primeTimer) { window.clearTimeout(primeTimer); primeTimer = null; }
+        video.removeEventListener('canplay', onReady);
+        video.removeEventListener('error', onFail);
+        busy = false;
+        if (!onScreen) return;
+        activate(target);
+        /* Auto cuts only keep the clock ticking while the deck is unpaused;
+           a deliberate jump (dot / chapter click) always restarts it. */
+        if (running || !auto) restart();
+      };
+      const onReady = () => { if (video.readyState >= 2) finish(); };
+      const onFail = () => finish();
+      video.addEventListener('canplay', onReady);
+      video.addEventListener('error', onFail);
+      primeTimer = window.setTimeout(finish, 1000);
+      video.play().catch(() => {});
+      return;
+    }
+    activate(target);
+    if (running || !auto) restart();
+  }
+
   function stop() {
     if (timer) window.clearInterval(timer);
     timer = null;
+    running = false;
     if (progress) progress.classList.add('paused');
     const video = activeVideo();
     if (video && !video.paused) { video.pause(); video.dataset.reelResume = '1'; }
@@ -876,8 +945,9 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
   function restart() {
     if (!onScreen) return;
     stop();
+    running = true;
     if (progress) progress.classList.remove('paused');
-    timer = window.setInterval(() => activate(index + 1), interval);
+    timer = window.setInterval(() => goTo(index + 1, { auto: true }), interval);
     const video = activeVideo();
     if (video && video.dataset.reelResume === '1') {
       delete video.dataset.reelResume;
@@ -885,7 +955,7 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
     }
   }
 
-  nextButton?.addEventListener('click', () => { activate(index + 1); restart(); });
+  nextButton?.addEventListener('click', () => goTo(index + 1));
   // Hover/focus pauses the whole deck — rail included — so a reader can study a frame.
   const pauseZone = band && band.matches('.reel-deck, .reel-band, section') ? band : reel;
   pauseZone.addEventListener('mouseenter', stop);
@@ -904,6 +974,18 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
       });
     }, { rootMargin: '160px 0px' }).observe(reel);
   }
+
+  /* The Control Room can change the pace while the page is open: a save in
+     another tab arrives as a `storage` event, and cloud hydration or a
+     same-tab save arrives as `khaqan:cms-change`. */
+  const refreshTiming = () => {
+    const next = intervalFromSettings();
+    if (next === interval) return;
+    applyTiming();
+    if (running) restart();
+  };
+  window.addEventListener('khaqan:cms-change', refreshTiming);
+  window.addEventListener('storage', (event) => { if (event.key === CMS_KEY) refreshTiming(); });
 
   activate(0);
   restart();
@@ -1357,11 +1439,19 @@ document.querySelectorAll('[data-team-hero]').forEach((hero) => {
   const dotsWrap = hero.querySelector('[data-team-dots]');
   const countEl = hero.querySelector('[data-team-count]');
   const progress = hero.querySelector('.team-hero-progress');
-  const interval = Number(hero.dataset.teamInterval) || 6000;
+  const DEFAULT_TEAM_MS = 5000;
+  const intervalFromSettings = () =>
+    rotationIntervalMs(getCmsData().teamHeroIntervalSec, hero.dataset.teamInterval, DEFAULT_TEAM_MS);
+  let interval = intervalFromSettings();
   let index = 0;
   let timer = null;
   if (!slides.length) return;
-  hero.style.setProperty('--team-duration', `${interval}ms`);
+
+  function applyTiming() {
+    interval = intervalFromSettings();
+    hero.style.setProperty('--team-duration', `${interval}ms`);
+  }
+  applyTiming();
 
   if (dotsWrap) {
     dotsWrap.innerHTML = slides.map((_, i) => `<button class="team-dot${i === 0 ? ' active' : ''}" type="button" data-team-dot="${i}" aria-label="Show team member ${i + 1}"></button>`).join('');
@@ -1407,6 +1497,16 @@ document.querySelectorAll('[data-team-hero]').forEach((hero) => {
   hero.addEventListener('focusin', stop);
   hero.addEventListener('focusout', (event) => { if (!hero.contains(event.relatedTarget)) restart(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else restart(); });
+
+  /* Control Room "Rotation timing" — same live refresh wiring as the reel. */
+  const refreshTiming = () => {
+    const next = intervalFromSettings();
+    if (next === interval) return;
+    applyTiming();
+    if (timer) restart();
+  };
+  window.addEventListener('khaqan:cms-change', refreshTiming);
+  window.addEventListener('storage', (event) => { if (event.key === CMS_KEY) refreshTiming(); });
 
   activate(0);
   restart();

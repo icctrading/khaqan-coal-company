@@ -281,7 +281,7 @@
   /* ---- Mirror local CRM actions to Supabase once an admin session exists.
      Delegated on `document` because the workspace mounts after login. ----- */
   document.addEventListener('submit', (event) => {
-    if (!event.target || (event.target.id !== 'site-form' && event.target.id !== 'leadership-form')) return;
+    if (!event.target || (event.target.id !== 'site-form' && event.target.id !== 'leadership-form' && event.target.id !== 'rotation-form')) return;
     if (!cloud.session()) return;
     window.setTimeout(async () => {
       const data = {};

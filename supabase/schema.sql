@@ -35,6 +35,8 @@ create table if not exists public.site_settings (
   md_card2 text not null default '',
   cfo_card1 text not null default '',
   cfo_card2 text not null default '',
+  reel_interval_sec integer not null default 5,
+  team_hero_interval_sec integer not null default 5,
   updated_at timestamptz not null default now()
 );
 
@@ -56,6 +58,9 @@ alter table public.site_settings add column if not exists md_card1 text not null
 alter table public.site_settings add column if not exists md_card2 text not null default '';
 alter table public.site_settings add column if not exists cfo_card1 text not null default '';
 alter table public.site_settings add column if not exists cfo_card2 text not null default '';
+-- Rotation timing (seconds per frame) for the home reel and the leadership hero.
+alter table public.site_settings add column if not exists reel_interval_sec integer not null default 5;
+alter table public.site_settings add column if not exists team_hero_interval_sec integer not null default 5;
 
 insert into public.site_settings (id) values ('default') on conflict (id) do nothing;
 
