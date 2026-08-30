@@ -163,6 +163,7 @@
     section: row.section || 'general',
     area: row.area || 'gallery',
     slot: row.slot || '',
+    duration: Number(row.duration) || 0,
     url: row.public_url || '',
     storagePath: row.storage_path || '',
     mimeType: row.mime_type || '',
@@ -225,7 +226,7 @@
     return (rows || []).map(normalizeMedia);
   }
 
-  async function uploadMedia({ file, title, section, type, area, slot } = {}) {
+  async function uploadMedia({ file, title, section, type, area, slot, duration } = {}) {
     if (!file) throw new Error('Choose a file first.');
     const uploaded = await uploadObject(file, section);
     const rows = await request('media', {
@@ -237,6 +238,7 @@
         area: area || 'gallery',
         slot: slot || '',
         kind: type === 'video' ? 'video' : 'image',
+        duration: Number(duration) || 0,
         storage_path: uploaded.storagePath,
         public_url: uploaded.publicUrl,
         mime_type: file.type || '',
@@ -253,6 +255,7 @@
     if (patch.section != null) next.section = patch.section;
     if (patch.area != null) next.area = patch.area;
     if (patch.slot != null) next.slot = patch.slot;
+    if (patch.duration != null) next.duration = Number(patch.duration) || 0;
     if (patch.type) next.kind = patch.type === 'video' ? 'video' : 'image';
     if (patch.file) {
       const uploaded = await uploadObject(patch.file, patch.section || 'general');

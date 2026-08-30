@@ -102,6 +102,10 @@ const normalizeMediaItem = (item, i = 0) => {
        in that page's "Fresh from the field" gallery. */
     area: (item && item.area) || (isTeam ? 'portrait' : 'gallery'),
     slot: (item && item.slot) || '',
+    /* Playback ceiling in seconds for uploaded videos shown in the hero and
+       leadership portrait frames — the clip stops after this many seconds.
+       0 means "let it loop as it always has". */
+    duration: Number((item && item.duration) || 0) || 0,
     url: (item && item.url) || '',
     storagePath: (item && item.storagePath) || '',
     addedAt: (item && item.addedAt) || new Date().toISOString()
@@ -1561,6 +1565,26 @@ document.querySelectorAll('.team-card').forEach((card) => {
 (function () {
   const escapeMediaHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 
+  /* If an admin set a playback ceiling on an uploaded video (hero / leadership
+     portrait frames), stop the clip after that many seconds. Leaving it empty
+     keeps the video looping as it always has. The clip is reset to the top on
+     stop so a replay starts cleanly. */
+  function applyAutoplayCeiling(video, seconds) {
+    if (!video || typeof seconds !== 'number' || !(seconds > 0)) return;
+    let timer = null;
+    const clear = () => { if (timer) { window.clearTimeout(timer); timer = null; } };
+    const onPlay = () => {
+      clear();
+      timer = window.setTimeout(() => {
+        timer = null;
+        try { video.pause(); video.currentTime = 0; } catch (error) { try { video.pause(); } catch (ignored) { /* already stopped */ } }
+      }, seconds * 1000);
+    };
+    video.addEventListener('play', onPlay);
+    video.addEventListener('pause', clear);
+    video.addEventListener('ended', clear);
+  }
+
   function videoMarkup(m) {
     // Uploads may be .webm/.mov/.mp4 — let the browser pick; also pass the
     // data-URL directly to <video src> as a fallback for data URLs with
@@ -1621,6 +1645,7 @@ document.querySelectorAll('.team-card').forEach((card) => {
       video.setAttribute('preload', 'metadata');
       video.setAttribute('controls', '');
       video.src = item.url;
+      applyAutoplayCeiling(video, item.duration);
       return video;
     }
     const img = document.createElement('img');
@@ -1701,6 +1726,7 @@ document.querySelectorAll('.team-card').forEach((card) => {
       source.src = item.url;
       node.appendChild(source);
       try { node.src = item.url; } catch (error) { /* source tag is enough */ }
+      applyAutoplayCeiling(node, item.duration);
     } else {
       node = document.createElement('img');
       node.src = item.url;
