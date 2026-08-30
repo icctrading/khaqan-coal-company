@@ -1691,12 +1691,18 @@ document.querySelectorAll('.team-card').forEach((card) => {
 (function () {
   const escapeMediaHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 
+  /* Playback ceiling floor — matches the Control Room minimum (2s). A stored
+     value below it (legacy data, a direct write) is raised so a clip can never
+     be cut off in under 2 seconds. */
+  const PLAYBACK_MIN_SECONDS = 2;
+
   /* If an admin set a playback ceiling on an uploaded video (hero / leadership
      portrait frames), stop the clip after that many seconds. Leaving it empty
      keeps the video looping as it always has. The clip is reset to the top on
      stop so a replay starts cleanly. */
   function applyAutoplayCeiling(video, seconds) {
     if (!video || typeof seconds !== 'number' || !(seconds > 0)) return;
+    const ceiling = Math.max(PLAYBACK_MIN_SECONDS, Math.round(seconds));
     let timer = null;
     const clear = () => { if (timer) { window.clearTimeout(timer); timer = null; } };
     const onPlay = () => {
@@ -1704,7 +1710,7 @@ document.querySelectorAll('.team-card').forEach((card) => {
       timer = window.setTimeout(() => {
         timer = null;
         try { video.pause(); video.currentTime = 0; } catch (error) { try { video.pause(); } catch (ignored) { /* already stopped */ } }
-      }, seconds * 1000);
+      }, ceiling * 1000);
     };
     video.addEventListener('play', onPlay);
     video.addEventListener('pause', clear);

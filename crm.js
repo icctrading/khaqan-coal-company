@@ -197,7 +197,7 @@
         <div class="crm-portrait-meta"><strong>${escapeHtml(member.name)}</strong><span>${escapeHtml(member.role)} · ${escapeHtml(member.caption)}</span><small>${photo ? escapeHtml(photo.title || (isVideo ? 'Portrait video' : 'Portrait')) : 'Initials placeholder shown on the site'}</small></div>
         <div class="crm-portrait-actions">
           <label class="file-label" for="${fileId}">${photo ? 'Replace' : 'Add photo / video'}<input id="${fileId}" type="file" accept="image/*,video/*" data-portrait-upload="${member.key}" hidden></label>
-          <label class="crm-portrait-duration-field" title="Set how long the video plays before it stops">
+          <label class="crm-portrait-duration-field" title="Set how long the video plays before it stops (2 s minimum)">
             <span>Playback time</span>
             <input id="${durationId}" type="text" inputmode="numeric" placeholder="e.g. 0:15" value="${isVideo ? formatDuration(photo.duration) : ''}" data-portrait-duration="${member.key}" aria-label="Video playback time for ${escapeHtml(member.name)}">
           </label>
@@ -414,20 +414,31 @@
     return 'image';
   }
 
+  /* Playback ceiling floor: 2 seconds is the fastest a clip can be set to
+     stop. Any positive value typed below it ("1", "0:01") is raised to 2 so
+     the setting always lands on a working pace — 0 still means "no limit,
+     loop as normal", and blank still clears the ceiling. */
+  const MIN_PLAYBACK_SECONDS = 2;
+
   /* Duration for a video upload. Accepts plain seconds ("15", "90") or a
-     mm:ss shorthand ("1:30"); anything invalid or empty becomes 0 (no limit). */
+     mm:ss shorthand ("1:30"); anything invalid or empty becomes 0 (no limit),
+     and any positive value below MIN_PLAYBACK_SECONDS is raised to it. */
   function parseDuration(value) {
     const text = String(value || '').trim();
     if (!text) return 0;
+    let seconds;
     const mmss = text.match(/^(\d{1,3}):(\d{1,2})$/);
     if (mmss) {
       const mins = Number(mmss[1]);
       const secs = Number(mmss[2]);
       if (secs > 59) return 0;
-      return mins * 60 + secs;
+      seconds = mins * 60 + secs;
+    } else {
+      const sec = Number(text);
+      seconds = (Number.isFinite(sec) && sec >= 0) ? Math.round(sec) : 0;
     }
-    const sec = Number(text);
-    return (Number.isFinite(sec) && sec >= 0) ? Math.round(sec) : 0;
+    if (seconds > 0 && seconds < MIN_PLAYBACK_SECONDS) seconds = MIN_PLAYBACK_SECONDS;
+    return seconds;
   }
 
   function formatDuration(seconds) {
@@ -448,7 +459,7 @@
      as the leadership portraits: seconds ("15") or mm:ss ("1:30"), blank
      clears the ceiling so the clip loops as normal. */
   function playbackTimeField(id, duration) {
-    return `<label class="crm-media-duration-tile" title="Set how long the video plays before it stops">
+    return `<label class="crm-media-duration-tile" title="Set how long the video plays before it stops (2 s minimum)">
       <span>Playback time</span>
       <input type="text" inputmode="numeric" placeholder="e.g. 0:15" value="${escapeHtml(formatDuration(duration))}" data-media-duration="${escapeHtml(id)}" aria-label="Video playback time">
     </label>`;
