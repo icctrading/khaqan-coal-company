@@ -40,6 +40,10 @@ create table if not exists public.site_settings (
   -- Page copy overrides edited in the Control Room (headings, frame captions,
   -- reel tile labels), keyed 'home:reel' / 'home:reel:4'. See script.js.
   slot_copy jsonb not null default '{}'::jsonb,
+  -- Leadership team + reel rotation order: `{ members: [...], reelSequence: [...] }`.
+  -- The array order is the presentation/rotation order; members can be added,
+  -- removed and re-ordered from the Control Room. See script.js.
+  team_config jsonb not null default '{}'::jsonb,
   updated_at timestamptz not null default now()
 );
 
@@ -66,6 +70,8 @@ alter table public.site_settings add column if not exists reel_interval_sec inte
 alter table public.site_settings add column if not exists team_hero_interval_sec integer not null default 5;
 -- Page copy overrides (headings · captions · tile labels) as one jsonb map.
 alter table public.site_settings add column if not exists slot_copy jsonb not null default '{}'::jsonb;
+-- Leadership team + reel rotation order as one jsonb map.
+alter table public.site_settings add column if not exists team_config jsonb not null default '{}'::jsonb;
 
 insert into public.site_settings (id) values ('default') on conflict (id) do nothing;
 

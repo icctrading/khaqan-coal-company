@@ -41,7 +41,34 @@ const DEFAULT_CMS_DATA = {
   mdCard1: 'Abdur Rauf Khan is the man with the courage — the calm, resourceful problem-solver the company turns to when the ground gets tough and the schedule gets tight. He runs the day-to-day with quiet authority, untangling logistics, protecting standards, and keeping every load moving on time.',
   mdCard2: 'A straight talker who leads by example and treats everyone with respect, he makes sure that what Khaqan promises is exactly what Khaqan delivers — every single day.',
   cfoCard1: 'Jibran Khan is the finance officer on whom the company relies a great deal — a meticulous, trustworthy steward of every rupee. He keeps Khaqan\'s numbers clear, disciplined and honest, turning the company\'s growth into a solid financial foundation the whole team can build on.',
-  cfoCard2: 'With an eye on every detail and a steady hand on the books, he gives Khaqan the confidence to mine deeper, move further, and grow without ever losing sight of the bottom line.'
+  cfoCard2: 'With an eye on every detail and a steady hand on the books, he gives Khaqan the confidence to mine deeper, move further, and grow without ever losing sight of the bottom line.',
+  /* Leadership team — the rotating hero (Home + About) and the About team
+     cards are built from this list, so members can be added or removed and
+     re-ordered from the Control Room without touching a line of HTML. The
+     array order IS the rotation / presentation order (member 1 first, member 2
+     second, and so on). */
+  teamMembers: [
+    { key: 'director', role: 'Director', name: 'Adnan Khan', monogram: 'AK', kicker: 'The digital pioneer', accent: 'emerald',
+      bio: '<strong>The Director who made everything digital</strong> and took Khaqan Coal Company to new heights — a forward-thinking leader who pairs modern systems with old-fashioned values. He brings warmth, honesty and reliability to every supply relationship, and helps Darra Adam Khel keep moving forward with quiet confidence and unmistakable pride.',
+      card1: 'Adnan Khan is the Director who made everything digital and took Khaqan Coal Company to new heights. A forward-thinking and approachable leader, he pairs modern systems with old-fashioned values — bringing warmth, honesty and reliability to every supply relationship while helping Darra Adam Khel continue to move forward.',
+      card2: 'Under his direction, Khaqan Coal Company keeps its values close: honesty in dealing, respect for people, and pride in the place where it all began.' },
+    { key: 'ceo', role: 'Chief Executive Officer', name: 'Haji Ilyas Khan', monogram: 'IK', kicker: 'The vision', accent: 'gold',
+      bio: '<strong>The person behind the vision of the company</strong> and all of its success — a wise and steady presence whose guidance carried Khaqan from a single local mine into a nationwide supplier of choice. His far-sighted judgement, gentle authority and deep-rooted integrity keep the company true to its origins while it grows.',
+      card1: 'Haji Ilyas Khan is the person behind the vision of the company — and the quiet, wise force behind all of its success. From the earliest days he saw what Khaqan could become: a local name with the discipline, standards and relationships to supply the country\'s leading industries.',
+      card2: 'His leadership keeps the company grounded in its roots while its ambitions grow — mining with pride in Darra Adam Khel, treating every partner with courtesy, and preparing the next chapter beyond Pakistan\'s borders.' },
+    { key: 'md', role: 'Managing Director', name: 'Abdur Rauf Khan', monogram: 'AR', kicker: 'The problem-solver', accent: 'ember',
+      bio: '<strong>The man with the courage</strong> — a calm, resourceful problem-solver who keeps the work moving when the ground gets tough and the schedule gets tight. He untangles logistics, protects standards and keeps every promise the company makes, leading with strength, patience and a generous spirit.',
+      card1: 'Abdur Rauf Khan is the man with the courage — the calm, resourceful problem-solver the company turns to when the ground gets tough and the schedule gets tight. He runs the day-to-day with quiet authority, untangling logistics, protecting standards, and keeping every load moving on time.',
+      card2: 'A straight talker who leads by example and treats everyone with respect, he makes sure that what Khaqan promises is exactly what Khaqan delivers — every single day.' },
+    { key: 'cfo', role: 'Chief Financial Officer', name: 'Jibran Khan', monogram: 'JK', kicker: 'The steady hand', accent: 'steel',
+      bio: '<strong>The finance officer on whom the company relies a great deal</strong> — a meticulous and trustworthy steward who keeps the numbers clear, the books honest and the foundation solid. With an eye on every rupee and a steady hand on the future, he gives Khaqan the confidence to mine deeper, move further and grow with grace.',
+      card1: 'Jibran Khan is the finance officer on whom the company relies a great deal — a meticulous, trustworthy steward of every rupee. He keeps Khaqan\'s numbers clear, disciplined and honest, turning the company\'s growth into a solid financial foundation the whole team can build on.',
+      card2: 'With an eye on every detail and a steady hand on the books, he gives Khaqan the confidence to mine deeper, move further, and grow without ever losing sight of the bottom line.' }
+  ],
+  /* Home-page highlights reel rotation order — the order the frames appear in
+     the reel stage (and the chapter rail beside it). Each entry is the frame's
+     `data-media-slot` reference; leave the default to keep the shipping order. */
+  reelSequence: ['home:reel:1', 'home:reel:2', 'home:reel:3', 'home:reel:4', 'home:reel:5', 'home:reel:6', 'home:reel:7', 'home:reel:8', 'home:reel:9']
 };
 
 const CMS_KEY = 'khaqanSiteData';
@@ -716,7 +743,15 @@ window.KHAQAN_MEDIA_SECTIONS = [
 ];
 window.KHAQAN_MEDIA_SECTION_LABEL = (value) => {
   const match = window.KHAQAN_MEDIA_SECTIONS.find((s) => s.value === value);
-  return match ? match.label : value;
+  if (match) return match.label;
+  /* Added leadership members get a section like `team-<key>`; label it with the
+     member's name so the media list reads "Team — <name>" instead of a raw key. */
+  if (/^team-/.test(String(value || '')) && window.KhaqanCMS) {
+    const key = String(value || '').replace(/^team-/, '');
+    const member = (window.KhaqanCMS.get().teamMembers || []).find((m) => m.key === key);
+    if (member) return `Team — ${member.name || key}`;
+  }
+  return value;
 };
 
 /* Page + page-area map. Every public visual slot the Control Room can
@@ -980,8 +1015,141 @@ function sanitizeInlineHtml(value) {
   return holder.innerHTML;
 }
 
+/* =====================================================================
+   Leadership team + reel sequence rendering
+   ---------------------------------------------------------------------
+   The rotating team hero (Home + About) and the About team cards are built
+   from the `teamMembers` list in the site settings, so the Control Room can
+   add, edit, re-order and remove members with no HTML changes. The home
+   highlights reel is re-ordered from `reelSequence`. Both run once, early
+   (before the rotation timers and writing-animation blocks below capture
+   their node lists), so a freshly-built DOM is wired like the shipped one.
+   ===================================================================== */
+let teamSequenceRendered = false;
+
+function escapeAttr(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+}
+
+function normalizeTeamMembers(list) {
+  const members = Array.isArray(list) ? list : [];
+  return members.filter((m) => m && typeof m === 'object' && (m.key || m.name)).map((m) => ({
+    key: String(m.key || (m.name || '').toLowerCase().replace(/[^a-z0-9]+/gi, '-')),
+    role: m.role || 'Leader',
+    name: m.name || String(m.key || 'Member'),
+    monogram: m.monogram || '',
+    kicker: m.kicker || '',
+    accent: m.accent || 'emerald',
+    bio: m.bio == null ? '' : String(m.bio),
+    card1: m.card1 == null ? '' : String(m.card1),
+    card2: m.card2 == null ? '' : String(m.card2)
+  }));
+}
+
+function teamMemberMonogram(member) {
+  if (member.monogram) return String(member.monogram).toUpperCase().slice(0, 3);
+  const parts = String(member.name || '').trim().split(/\s+/);
+  return ((parts[0] ? parts[0][0] : '') + (parts[parts.length - 1] ? parts[parts.length - 1][0] : '')).toUpperCase();
+}
+
+function splitName(name) {
+  const parts = String(name || '').trim().split(/\s+/);
+  return { first: parts[0] || '', last: parts.slice(1).join(' ') };
+}
+
+function teamHeroSlideHtml(member, index) {
+  const { first, last } = splitName(member.name);
+  const role = member.key === 'director' ? `${member.role || 'Director'} · Khaqan Coal Company` : (member.role || 'Leader');
+  return `<article class="team-slide${index === 0 ? ' active' : ''}" data-team-accent="${escapeAttr(member.accent || 'emerald')}" data-member="${escapeAttr(member.key)}">
+    <div class="team-portrait" role="img" aria-label="Portrait of ${escapeAttr(member.name)}" data-monogram="${escapeAttr(teamMemberMonogram(member))}"><div class="team-halo"></div></div>
+    <div class="team-copy"><span class="team-kicker">${escapeAttr(member.kicker || '')}</span><span class="team-role">${escapeAttr(role)}</span><h2>${escapeAttr(first)} <span>${escapeAttr(last)}</span></h2><p>${sanitizeInlineHtml(member.bio)}</p></div>
+  </article>`;
+}
+
+function teamCardHtml(member) {
+  const role = member.key === 'director' ? `${member.role || 'Director'} · Khaqan Coal Company` : (member.role || '');
+  return `<article class="team-card" data-team-accent="${escapeAttr(member.accent || 'emerald')}" data-member="${escapeAttr(member.key)}"><span class="team-role">${escapeAttr(role)}</span><div class="team-portrait-mini" role="img" aria-label="Portrait of ${escapeAttr(member.name)}"></div><h3>${escapeAttr(member.name)}</h3><p>${sanitizeInlineHtml(member.card1 || '')}</p><p>${sanitizeInlineHtml(member.card2 || '')}</p></article>`;
+}
+
+function renderTeamHeroes() {
+  const members = normalizeTeamMembers(getCmsData().teamMembers);
+  if (!members.length) return;
+  document.querySelectorAll('[data-team-hero]').forEach((hero) => {
+    const wrap = hero.querySelector('.team-slides');
+    if (!wrap) return;
+    wrap.innerHTML = members.map((member, i) => teamHeroSlideHtml(member, i)).join('');
+    const count = hero.querySelector('[data-team-count]');
+    if (count) count.textContent = `${String(1).padStart(2, '0')} / ${String(members.length).padStart(2, '0')}`;
+  });
+}
+
+function renderTeamCards() {
+  const members = normalizeTeamMembers(getCmsData().teamMembers);
+  if (!members.length) return;
+  document.querySelectorAll('.team-grid').forEach((grid) => {
+    grid.innerHTML = members.map((member) => teamCardHtml(member)).join('');
+  });
+}
+
+function applyReelSequence() {
+  const seq = getCmsData().reelSequence;
+  if (!Array.isArray(seq) || !seq.length) return;
+  document.querySelectorAll('[data-reel]').forEach((reel) => {
+    if (reel.dataset.khaqanSequenceApplied) return;
+    const band = reel.closest('section') || reel.parentElement;
+    if (!band) return;
+    const slides = Array.from(reel.querySelectorAll('.reel-slide'));
+    const tiles = Array.from(band.querySelectorAll('[data-reel-jump]'));
+    if (!slides.length) return;
+    const bySlot = new Map();
+    slides.forEach((slide) => { if (slide.dataset.mediaSlot) bySlot.set(slide.dataset.mediaSlot, slide); });
+    const ordered = [];
+    seq.forEach((slotKey) => {
+      const slide = bySlot.get(slotKey);
+      if (slide && ordered.indexOf(slide) === -1) ordered.push(slide);
+    });
+    slides.forEach((slide) => { if (ordered.indexOf(slide) === -1) ordered.push(slide); });
+    const slidesWrap = reel.querySelector('.reel-slides') || reel;
+    ordered.forEach((slide) => slidesWrap.appendChild(slide));
+    /* The chapter rail matches the stage position: re-order the buttons to the
+       same sequence and renumber their `data-reel-jump` so a click still jumps
+       to the slide beside the same slot. */
+    const tagToTile = new Map();
+    tiles.forEach((tile) => {
+      const span = tile.querySelector('span');
+      const label = span ? span.textContent.trim() : (tile.textContent || '').trim();
+      if (label) tagToTile.set(label, tile);
+    });
+    const rail = tiles[0] ? tiles[0].parentElement : null;
+    if (rail) {
+      ordered.forEach((slide, i) => {
+        const tag = slide.dataset.reelTag || '';
+        const tile = tagToTile.get(tag);
+        if (tile) {
+          tile.dataset.reelJump = String(i);
+          tile.setAttribute('aria-selected', 'false');
+          rail.appendChild(tile);
+        }
+      });
+    }
+    reel.dataset.khaqanSequenceApplied = '1';
+  });
+}
+
+/* Build the leadership hero/cards and re-order the reel once, before the
+   rotation and writing-animation blocks capture their node lists. A later
+   re-order of an already-open page takes effect on the next load. */
+function ensureTeamAndSequenceRendered() {
+  if (teamSequenceRendered) return;
+  teamSequenceRendered = true;
+  renderTeamHeroes();
+  renderTeamCards();
+  applyReelSequence();
+}
+
 function applyCmsData() {
   const data = getCmsData();
+  ensureTeamAndSequenceRendered();
   document.querySelectorAll('[data-cms]').forEach((node) => {
     const key = node.dataset.cms;
     if (key === 'phoneDisplay') {

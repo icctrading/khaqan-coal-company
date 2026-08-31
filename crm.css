@@ -520,3 +520,41 @@ html[data-theme="day"] .am-table .am-title b { color: #173420; }
 @media (max-width: 640px) {
   .am-table th:last-child, .am-table td:last-child { width: auto; text-align: left; }
 }
+
+/* =====================================================================
+   Leadership team editor + reel sequence re-order (rotation order).
+   The team rows and the reel-sequence list live in the content view.
+   ===================================================================== */
+.crm-team-list { display: grid; gap: 14px; margin-bottom: 8px; }
+.crm-team-row { border: 1px solid rgba(195,218,198,.16); border-radius: 14px; padding: 14px 15px 16px; background: rgba(18,38,28,.42); }
+.crm-team-row-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.crm-team-row-head strong { color: #edf5e7; font-size: .95rem; }
+.crm-team-pos { min-width: 34px; text-align: center; font-family: Georgia, serif; color: var(--yellow); font-size: .9rem; letter-spacing: .04em; }
+.crm-team-row-actions { margin-left: auto; display: inline-flex; gap: 6px; }
+.crm-team-row-actions button { background: rgba(195,218,198,.1); border: 1px solid rgba(195,218,198,.18); color: #d4e6d1; border-radius: 8px; padding: 5px 10px; font-size: .78rem; line-height: 1; cursor: pointer; }
+.crm-team-row-actions button:hover:not(:disabled) { background: rgba(195,218,198,.2); }
+.crm-team-row-actions button:disabled { opacity: .35; cursor: default; }
+.crm-team-row-actions .crm-team-remove { color: #ffae80; border-color: rgba(255,174,128,.32); }
+.crm-team-row-actions .crm-team-remove:hover { background: rgba(255,174,128,.14); }
+.crm-team-fields { display: grid; grid-template-columns: repeat(2, 1fr); }
+html[data-theme="day"] .crm-team-row { background: rgba(240,247,235,.55); border-color: rgba(30,81,52,.16); }
+html[data-theme="day"] .crm-team-row-head strong { color: #173420; }
+html[data-theme="day"] .crm-team-row-actions button { background: rgba(30,81,52,.06); border-color: rgba(30,81,52,.18); color: #2f6b40; }
+html[data-theme="day"] .crm-team-row-actions .crm-team-remove { color: #a4532d; }
+
+.crm-order-block { display: grid; gap: 10px; margin-top: 8px; }
+.crm-order-head { display: flex; align-items: baseline; gap: 10px; }
+.crm-order-head span { font-weight: 750; color: #edf5e7; font-size: .86rem; }
+.crm-order-head small { color: #718a76; font-size: .7rem; }
+html[data-theme="day"] .crm-order-head span { color: #173420; }
+.crm-order-list { display: grid; gap: 7px; }
+.crm-order-row { display: flex; align-items: center; gap: 9px; padding: 8px 11px; border: 1px solid rgba(195,218,198,.15); border-radius: 10px; background: rgba(18,38,28,.42); }
+.crm-order-label { color: #edf5e7; font-size: .8rem; }
+.crm-order-key { color: #718a76; font-size: .68rem; margin-left: auto; }
+html[data-theme="day"] .crm-order-row { background: rgba(240,247,235,.55); border-color: rgba(30,81,52,.16); }
+html[data-theme="day"] .crm-order-label { color: #173420; }
+html[data-theme="day"] .crm-order-key { color: #4a6b52; }
+@media (max-width: 720px) {
+  .crm-team-fields { grid-template-columns: 1fr; }
+  .crm-order-key { display: none; }
+}

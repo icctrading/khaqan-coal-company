@@ -25,9 +25,9 @@ const SHELL = [
   './community.html', './contact.html', './crm.html',
   './profile.html',  // redirect stub: cached so an offline /portfolio still lands on the cached page
   './styles.css?v=4', './themes.css?v=18', './themes-marble.css?v=1',
-  './themes-obsidian.css?v=1', './themes-shared.css?v=8', './script.js?v=30',
-  './supabase-config.js?v=1', './cloud.js?v=11',
-  './crm.css?v=12', './crm.js?v=12', './crm-cloud.js?v=11',
+  './themes-obsidian.css?v=1', './themes-shared.css?v=8', './script.js?v=31',
+  './supabase-config.js?v=1', './cloud.js?v=12',
+  './crm.css?v=13', './crm.js?v=13', './crm-cloud.js?v=11',
   './media/logo-mark-128.webp?v=1', './media/logo-mark-light-128.webp?v=1',
   './media/coal-texture-bg.webp'
 ];
