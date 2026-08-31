@@ -77,6 +77,23 @@
     return (Number.isFinite(n) && n >= 2 && n <= 30) ? Math.round(n) : 5;
   };
 
+  /* Leadership team + reel sequence (`team_config`) arrive as a jsonb map:
+     `{ members: [...], reelSequence: [...] }`. A project that has not run the
+     latest schema has no column at all, and an empty/absent map means "keep the
+     defaults" — both must stay `undefined` so hydration never blanks the
+     members the site ships with. */
+  const teamConfigMap = (value) => {
+    let map = value;
+    if (typeof map === 'string') {
+      try { map = JSON.parse(map); } catch (error) { return undefined; }
+    }
+    if (!map || typeof map !== 'object' || Array.isArray(map)) return undefined;
+    const out = {};
+    if (Array.isArray(map.members) && map.members.length) out.teamMembers = map.members;
+    if (Array.isArray(map.reelSequence) && map.reelSequence.length) out.reelSequence = map.reelSequence;
+    return Object.keys(out).length ? out : undefined;
+  };
+
   const toCms = (row) => row ? ({
     brandName: row.brand_name,
     companyName: row.company_name,
@@ -98,6 +115,7 @@
     reelIntervalSec: rotationSec(row.reel_interval_sec),
     teamHeroIntervalSec: rotationSec(row.team_hero_interval_sec),
     slotCopy: slotCopyMap(row.slot_copy),
+    ...(teamConfigMap(row.team_config) || {}),
     directorBio: bioText(row.director_bio),
     ceoBio: bioText(row.ceo_bio),
     mdBio: bioText(row.md_bio),
@@ -134,6 +152,10 @@
     reel_interval_sec: clampRotationSec(data.reelIntervalSec),
     team_hero_interval_sec: clampRotationSec(data.teamHeroIntervalSec),
     slot_copy: data.slotCopy && typeof data.slotCopy === 'object' ? data.slotCopy : {},
+    team_config: {
+      members: Array.isArray(data.teamMembers) ? data.teamMembers : [],
+      reelSequence: Array.isArray(data.reelSequence) ? data.reelSequence : []
+    },
     director_bio: data.directorBio || '',
     ceo_bio: data.ceoBio || '',
     md_bio: data.mdBio || '',
@@ -169,6 +191,7 @@
   ];
   const ROTATION_COLUMNS = ['reel_interval_sec', 'team_hero_interval_sec'];
   const COPY_COLUMNS = ['slot_copy'];
+  const TEAM_CONFIG_COLUMNS = ['team_config'];
 
   /* PostgREST rejects a PATCH naming a column the project has not created yet
      ("Could not find the 'x' column…"). For the newest group that is expected
@@ -209,6 +232,11 @@
       await sendGroup(COPY_COLUMNS);
     } catch (error) {
       if (!isMissingColumnError(error, 'slot_copy')) errors.push(error);
+    }
+    try {
+      await sendGroup(TEAM_CONFIG_COLUMNS);
+    } catch (error) {
+      if (!isMissingColumnError(error, 'team_config')) errors.push(error);
     }
     if (errors.length) {
       const error = new Error(`Site settings could not reach the cloud: ${errors[0].message || errors[0]}`);

@@ -197,8 +197,8 @@
   });
 
   form?.addEventListener('submit', saveSiteForm);
-  query('#leadership-form')?.addEventListener('submit', saveSiteForm);
-  query('#rotation-form')?.addEventListener('submit', saveSiteForm);
+  query('#leadership-form')?.addEventListener('submit', saveLeadershipForm);
+  query('#rotation-form')?.addEventListener('submit', saveRotationForm);
 
   // Keep the "Content fields" metric honest as the editable set grows.
   const metricFields = query('#metric-fields');
@@ -246,6 +246,7 @@
         if (Array.isArray(bundle.leads)) cms.saveLeads(bundle.leads);
         if (Array.isArray(bundle.media) && window.KhaqanMedia) window.KhaqanMedia.setAll(bundle.media);
         loadSiteForm();
+        loadTeamAndSequence();
         renderLeads();
         renderPortraits();
         renderMedia();
@@ -273,6 +274,7 @@
     if (!ok) return;
     cms.save(cms.defaults);
     loadSiteForm();
+    loadTeamAndSequence();
     renderCopyForm();
     flashStatus('Defaults restored.');
     /* Push the reset to the shared store too — otherwise the live site keeps
@@ -284,12 +286,23 @@
      Leadership portraits — the rotating hero (Home) and team cards
      (About) show these photographs for Director, CEO, MD and CFO.
      ===================================================================== */
-  const PORTRAIT_MEMBERS = [
-    { key: 'director', role: 'Director', name: 'Adnan Khan', monogram: 'AK', caption: 'The digital pioneer' },
-    { key: 'ceo', role: 'Chief Executive Officer', name: 'Haji Ilyas Khan', monogram: 'IK', caption: 'The vision' },
-    { key: 'md', role: 'Managing Director', name: 'Abdur Rauf Khan', monogram: 'AR', caption: 'The problem-solver' },
-    { key: 'cfo', role: 'Chief Financial Officer', name: 'Jibran Khan', monogram: 'JK', caption: 'The steady hand' }
-  ];
+  /* Leadership members come from the site settings `teamMembers` list, so a
+     member added in the "Leadership team" card gets a portrait slot here too.
+     `caption` maps to the member's `kicker` (the short line on the hero). */
+  const portraitMembers = () => {
+    const data = cms.get() || {};
+    const members = (Array.isArray(data.teamMembers) ? data.teamMembers : [])
+      .filter((m) => m && (m.key || m.name))
+      .map((m) => {
+        const parts = String(m.name || m.key || '').trim().split(/\s+/);
+        const monogram = m.monogram || (((parts[0] || '')[0] || '') + ((parts[parts.length - 1] || '')[0] || '')).toUpperCase();
+        return { key: String(m.key), role: m.role || 'Leader', name: m.name || m.key, monogram, caption: m.kicker || '' };
+      });
+    return members.length ? members : [
+      { key: 'director', role: 'Director', name: 'Adnan Khan', monogram: 'AK', caption: 'The digital pioneer' },
+      { key: 'ceo', role: 'Chief Executive Officer', name: 'Haji Ilyas Khan', monogram: 'IK', caption: 'The vision' }
+    ];
+  };
   const portraitGrid = query('#leadership-portrait-grid');
 
   function portraitFor(key) {
@@ -299,7 +312,7 @@
 
   function renderPortraits() {
     if (!portraitGrid) return;
-    portraitGrid.innerHTML = PORTRAIT_MEMBERS.map((member) => {
+    portraitGrid.innerHTML = portraitMembers().map((member) => {
       const photo = portraitFor(member.key);
       const isVideo = !!(photo && photo.type === 'video');
       const visual = photo
@@ -359,7 +372,7 @@
   async function handlePortraitUpload(input, key) {
     const file = input.files && input.files[0];
     if (!file || !window.KhaqanMedia) return;
-    const member = PORTRAIT_MEMBERS.find((m) => m.key === key);
+    const member = portraitMembers().find((m) => m.key === key);
     const section = `team-${key}`;
     const title = `Portrait — ${member.name}`;
     const type = fileKind(file);
@@ -418,7 +431,7 @@
   }
 
   async function handlePortraitRemove(key) {
-    const member = PORTRAIT_MEMBERS.find((m) => m.key === key);
+    const member = portraitMembers().find((m) => m.key === key);
     if (!window.KhaqanMedia) return;
     const section = `team-${key}`;
     const portraits = window.KhaqanMedia.get().filter((m) => (m.type === 'image' || m.type === 'video') && m.section === section);
@@ -491,9 +504,208 @@
     const key = input.dataset.portraitDuration;
     const item = window.KhaqanMedia ? window.KhaqanMedia.get().find((m) => m.section === `team-${key}` && (m.type === 'image' || m.type === 'video')) : null;
     if (!item) return;
-    const member = PORTRAIT_MEMBERS.find((m) => m.key === key);
+    const member = portraitMembers().find((m) => m.key === key);
     const durationNum = parseDuration(input.value);
     updateMediaDuration(item, durationNum, member && member.name, input);
+  });
+
+  /* =====================================================================
+     Leadership team editor + reel sequence (rotation order)
+     ---------------------------------------------------------------------
+     The rotating team hero (Home + About) and the About team cards are built
+     from the `teamMembers` list; the home reel follows `reelSequence`. Both
+     can be re-ordered (member/frame 1 first), and members can be added or
+     removed — all without touching HTML. Saved into the site settings.
+     ===================================================================== */
+  const leadershipList = query('#leadership-team-list');
+  const leadershipCount = query('#leadership-count');
+  const leadershipAdd = query('#leadership-add');
+  const reelSequenceList = query('#reel-sequence-list');
+  const ACCENT_OPTIONS = ['emerald', 'gold', 'ember', 'steel', 'violet'];
+  const DEFAULT_REEL_SEQUENCE = ['home:reel:1', 'home:reel:2', 'home:reel:3', 'home:reel:4', 'home:reel:5', 'home:reel:6', 'home:reel:7', 'home:reel:8', 'home:reel:9'];
+  let teamDraft = [];
+  let sequenceDraft = [];
+
+  function normalizeTeamMember(m) {
+    return {
+      key: m.key || `member-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
+      role: m.role || 'Leader',
+      name: m.name || '',
+      monogram: m.monogram || '',
+      kicker: m.kicker || '',
+      accent: ACCENT_OPTIONS.indexOf(m.accent) > -1 ? m.accent : 'emerald',
+      bio: m.bio || '',
+      card1: m.card1 || '',
+      card2: m.card2 || ''
+    };
+  }
+
+  function teamRowHtml(member, index, total) {
+    const accentOpts = ACCENT_OPTIONS.map((accent) => `<option value="${accent}"${member.accent === accent ? ' selected' : ''}>${accent}</option>`).join('');
+    return `<article class="crm-team-row" data-team-index="${index}">
+      <div class="crm-team-row-head">
+        <span class="crm-team-pos">${String(index + 1).padStart(2, '0')}</span>
+        <strong>${escapeHtml(member.name || 'New member')}</strong>
+        <span class="crm-team-row-actions">
+          <button type="button" data-team-move="-1" ${index === 0 ? 'disabled' : ''} aria-label="Move ${escapeHtml(member.name || 'member')} up">↑</button>
+          <button type="button" data-team-move="1" ${index === total - 1 ? 'disabled' : ''} aria-label="Move ${escapeHtml(member.name || 'member')} down">↓</button>
+          <button type="button" class="crm-danger crm-team-remove" data-team-remove aria-label="Remove member">Remove</button>
+        </span>
+      </div>
+      <div class="crm-form-grid crm-team-fields">
+        <label><span>Key (portrait section = team-&lt;key&gt;)</span><input type="text" data-team-field="key" value="${escapeHtml(member.key)}"></label>
+        <label><span>Name</span><input type="text" data-team-field="name" value="${escapeHtml(member.name)}"></label>
+        <label><span>Role</span><input type="text" data-team-field="role" value="${escapeHtml(member.role)}"></label>
+        <label><span>Monogram / initials</span><input type="text" data-team-field="monogram" value="${escapeHtml(member.monogram)}" placeholder="AK"></label>
+        <label><span>Kicker (line over the hero)</span><input type="text" data-team-field="kicker" value="${escapeHtml(member.kicker)}"></label>
+        <label><span>Accent</span><select data-team-field="accent">${accentOpts}</select></label>
+        <label class="wide"><span>Hero description</span><textarea data-team-field="bio" rows="3">${escapeHtml(member.bio)}</textarea></label>
+        <label class="wide"><span>About team card — paragraph 1</span><textarea data-team-field="card1" rows="3">${escapeHtml(member.card1)}</textarea></label>
+        <label class="wide"><span>About team card — paragraph 2</span><textarea data-team-field="card2" rows="2">${escapeHtml(member.card2)}</textarea></label>
+      </div>
+    </article>`;
+  }
+
+  function readTeamDraftFromDom() {
+    if (!leadershipList) return;
+    const rows = Array.from(leadershipList.querySelectorAll('.crm-team-row'));
+    if (!rows.length) return;
+    teamDraft = rows.map((row, i) => {
+      const base = teamDraft[i] || {};
+      const get = (field) => row.querySelector(`[data-team-field="${field}"]`);
+      return normalizeTeamMember({
+        key: (get('key') && get('key').value.trim()) || base.key || `member-${Date.now()}-${i}`,
+        name: get('name') ? get('name').value.trim() : (base.name || ''),
+        role: get('role') ? get('role').value : (base.role || 'Leader'),
+        monogram: get('monogram') ? get('monogram').value.trim() : (base.monogram || ''),
+        kicker: get('kicker') ? get('kicker').value.trim() : (base.kicker || ''),
+        accent: get('accent') ? get('accent').value : (base.accent || 'emerald'),
+        bio: get('bio') ? get('bio').value : (base.bio || ''),
+        card1: get('card1') ? get('card1').value : (base.card1 || ''),
+        card2: get('card2') ? get('card2').value : (base.card2 || '')
+      });
+    });
+  }
+
+  function renderLeadershipTeam() {
+    if (!leadershipList) return;
+    leadershipList.innerHTML = teamDraft.map((member, i) => teamRowHtml(member, i, teamDraft.length)).join('');
+    if (leadershipCount) leadershipCount.textContent = `${teamDraft.length} member${teamDraft.length === 1 ? '' : 's'} · rotating hero & team cards`;
+  }
+
+  function saveLeadershipForm(event) {
+    event.preventDefault();
+    readTeamDraftFromDom();
+    const clean = teamDraft.filter((m) => m.name && m.key).map(normalizeTeamMember);
+    cms.save({ ...cms.get(), teamMembers: clean });
+    teamDraft = clean;
+    renderLeadershipTeam();
+    renderPortraits();
+    renderAllMedia();
+    flashStatus('Leadership team saved — the Home hero and About cards update on the next load.');
+    queueSettingsForCloud();
+  }
+
+  function addTeamMember() {
+    readTeamDraftFromDom();
+    teamDraft.push(normalizeTeamMember({ key: `member-${Date.now()}`, role: 'Leader' }));
+    renderLeadershipTeam();
+  }
+
+  function moveTeamMember(index, dir) {
+    readTeamDraftFromDom();
+    const target = index + dir;
+    if (target < 0 || target >= teamDraft.length) return;
+    const [moved] = teamDraft.splice(index, 1);
+    teamDraft.splice(target, 0, moved);
+    renderLeadershipTeam();
+  }
+
+  async function removeTeamMember(index) {
+    readTeamDraftFromDom();
+    const member = teamDraft[index];
+    if (teamDraft.length <= 1) {
+      flashStatus('Keep at least one leader — the rotating hero needs a first member.', false);
+      return;
+    }
+    const ok = await askConfirm({
+      title: `Remove ${member.name || 'this member'} from the team?`,
+      body: 'The member disappears from the Home hero and the About team cards.\nTheir portrait (if any) stays in the media library until you remove it there.',
+      confirm: 'Remove member'
+    });
+    if (!ok) return;
+    teamDraft.splice(index, 1);
+    renderLeadershipTeam();
+  }
+
+  function reelSlotLabel(slotKey) {
+    const parts = String(slotKey || '').split(':');
+    const areas = (window.KHAQAN_PAGE_AREAS && window.KHAQAN_PAGE_AREAS[parts[0]]) || [];
+    const area = areas.find((a) => a.id === parts[1]);
+    if (area && Array.isArray(area.slots)) {
+      const slot = area.slots.find((s) => s.id === (parts[2] || ''));
+      if (slot) return slot.label;
+    }
+    return slotKey || 'Frame';
+  }
+
+  function renderReelSequence() {
+    if (!reelSequenceList) return;
+    reelSequenceList.innerHTML = sequenceDraft.map((slotKey, i) => `
+      <div class="crm-order-row" data-seq-index="${i}">
+        <span class="crm-team-pos">${String(i + 1).padStart(2, '0')}</span>
+        <span class="crm-order-label">${escapeHtml(reelSlotLabel(slotKey))}</span>
+        <span class="crm-order-key">${escapeHtml(slotKey)}</span>
+        <span class="crm-team-row-actions">
+          <button type="button" data-seq-move="-1" ${i === 0 ? 'disabled' : ''} aria-label="Move frame up">↑</button>
+          <button type="button" data-seq-move="1" ${i === sequenceDraft.length - 1 ? 'disabled' : ''} aria-label="Move frame down">↓</button>
+        </span>
+      </div>`).join('');
+  }
+
+  function moveSequence(index, dir) {
+    const target = index + dir;
+    if (target < 0 || target >= sequenceDraft.length) return;
+    const [moved] = sequenceDraft.splice(index, 1);
+    sequenceDraft.splice(target, 0, moved);
+    renderReelSequence();
+  }
+
+  function saveRotationForm(event) {
+    event.preventDefault();
+    const data = { ...cms.get() };
+    queryAll('#rotation-form [data-field]').forEach((field) => {
+      data[field.dataset.field] = field.value.trim();
+    });
+    data.reelSequence = sequenceDraft.slice();
+    cms.save(data);
+    flashStatus('Rotation timing and order saved — the reel and hero re-pace on the next load.');
+    queueSettingsForCloud();
+  }
+
+  function loadTeamAndSequence() {
+    const data = cms.get() || {};
+    teamDraft = (Array.isArray(data.teamMembers) ? data.teamMembers : []).map(normalizeTeamMember);
+    sequenceDraft = (Array.isArray(data.reelSequence) && data.reelSequence.length ? data.reelSequence : DEFAULT_REEL_SEQUENCE).slice();
+    renderLeadershipTeam();
+    renderReelSequence();
+  }
+
+  leadershipList?.addEventListener('click', (event) => {
+    const row = event.target.closest('.crm-team-row');
+    if (!row) return;
+    const index = Number(row.dataset.teamIndex);
+    const moveButton = event.target.closest('[data-team-move]');
+    if (moveButton) { moveTeamMember(index, Number(moveButton.dataset.teamMove)); return; }
+    if (event.target.closest('[data-team-remove]')) removeTeamMember(index);
+  });
+  leadershipAdd?.addEventListener('click', addTeamMember);
+  reelSequenceList?.addEventListener('click', (event) => {
+    const row = event.target.closest('.crm-order-row');
+    if (!row) return;
+    const index = Number(row.dataset.seqIndex);
+    const button = event.target.closest('[data-seq-move]');
+    if (button) moveSequence(index, Number(button.dataset.seqMove));
   });
 
   /* =====================================================================
@@ -1740,6 +1952,7 @@
   window.addEventListener('khaqan:cms-change', renderCopyForm);
 
   loadSiteForm();
+  loadTeamAndSequence();
   renderLeads();
   renderPortraits();
   resetMediaForm();
