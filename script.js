@@ -772,12 +772,12 @@ window.KHAQAN_PAGE_AREAS = {
   home: [
     { id: 'gallery', label: 'Fresh from the field', kind: 'gallery' },
     { id: 'reel', label: 'Highlights reel', kind: 'slots', slots: [
-      MEDIA_SLOT('1', '01 · Open pit', 'media/coal-mining-poster.webp'),
+      MEDIA_SLOT('1', '01 · Mountain mine', 'media/generated/green-mountain-coal-mine.webp'),
       MEDIA_SLOT('2', '02 · Cutting face', 'media/cine/reel-bucketwheel.webp'),
       MEDIA_SLOT('3', '03 · Terraces', 'media/cine/reel-aerial.webp'),
-      MEDIA_SLOT('4', '04 · Coal on the move', 'media/excavator-poster.webp'),
+      MEDIA_SLOT('4', '04 · Coal on the move', 'media/generated/mining-excavator.webp'),
       MEDIA_SLOT('5', '05 · Longwall', 'media/cine/reel-underground.webp'),
-      MEDIA_SLOT('6', '06 · Hauler', 'media/hauler-poster.webp'),
+      MEDIA_SLOT('6', '06 · Hauler', 'media/generated/mining-haulage.webp'),
       MEDIA_SLOT('7', '07 · Haul road', 'media/cine/reel-haulroad.webp'),
       MEDIA_SLOT('8', '08 · Our valley', 'media/darra-photo-2.webp'),
       MEDIA_SLOT('9', '09 · Railhead', 'media/cine/reel-rail.webp')
@@ -790,7 +790,7 @@ window.KHAQAN_PAGE_AREAS = {
     { id: 'field-notes', label: 'Field notes', kind: 'slots', slots: [
       MEDIA_SLOT('1', '01 · Field reference', 'media/mine-3d-terraces.webp'),
       MEDIA_SLOT('2', '02 · Heavy equipment', 'media/mine-3d-underground.webp'),
-      MEDIA_SLOT('3', '03 · Motion study', 'media/excavator-poster.webp')
+      MEDIA_SLOT('3', '03 · Excavation', 'media/generated/mining-excavator.webp')
     ] },
     { id: 'distribution', label: 'Mine · move · market', kind: 'slots', slots: [
       MEDIA_SLOT('1', '01 · Mine to road', 'media/coal-haul-truck.webp'),
@@ -807,19 +807,19 @@ window.KHAQAN_PAGE_AREAS = {
       MEDIA_SLOT('1', 'Mining context', 'media/mine-3d-terraces.webp'),
       MEDIA_SLOT('2', 'Distribution', 'media/coal-haul-truck.webp'),
       MEDIA_SLOT('3', 'Home ground', 'media/darra-photo-4.webp'),
-      MEDIA_SLOT('4', 'Field footage', 'media/coal-mining-poster.webp')
+      MEDIA_SLOT('4', 'Mountain mine', 'media/generated/green-mountain-coal-mine.webp')
     ] }
   ],
   operations: [
     { id: 'gallery', label: 'Fresh from the field', kind: 'gallery' },
     { id: 'machinery', label: 'Heavy machinery', kind: 'slots', slots: [
       MEDIA_SLOT('1', 'Conveyor system', 'media/mining-conveyor.webp'),
-      MEDIA_SLOT('2', 'Bucket-wheel excavation', 'media/welzow-bucket-poster.webp')
+      MEDIA_SLOT('2', 'Mining machinery', 'media/generated/mining-excavator.webp')
     ] },
-    { id: 'field', label: 'Real field references', kind: 'slots', slots: [
+    { id: 'field', label: 'Mining imagery', kind: 'slots', slots: [
       MEDIA_SLOT('1', 'Aerial view', 'media/mining-site.webp'),
       MEDIA_SLOT('2', 'Conveyor system', 'media/mining-conveyor.webp'),
-      MEDIA_SLOT('3', 'Open footage', 'media/hauler-poster.webp'),
+      MEDIA_SLOT('3', 'Coal haulage', 'media/generated/mining-haulage.webp'),
       MEDIA_SLOT('4', 'Coal transport', 'media/coal-haul-truck.webp'),
       MEDIA_SLOT('5', 'Mine layout', 'media/mining-aerial.webp'),
       MEDIA_SLOT('6', 'Haul road', 'media/coal-mine-transport.webp')
@@ -845,10 +845,10 @@ window.KHAQAN_PAGE_AREAS = {
       MEDIA_SLOT('7', '07 · Haul road', 'media/mine-3d-trucks.webp'),
       MEDIA_SLOT('8', '08 · The full pit', 'media/cine/hero-05.webp')
     ] },
-    { id: 'film', label: 'Motion from the field', kind: 'slots', slots: [
-      MEDIA_SLOT('1', 'Excavation', 'media/excavator-poster.webp'),
-      MEDIA_SLOT('2', 'Surface mining', 'media/welzow-bucket-poster.webp'),
-      MEDIA_SLOT('3', 'Haul road', 'media/hauler-poster.webp'),
+    { id: 'film', label: 'Mining imagery', kind: 'slots', slots: [
+      MEDIA_SLOT('1', 'Excavation', 'media/generated/mining-excavator.webp'),
+      MEDIA_SLOT('2', 'Mountain mine', 'media/generated/green-mountain-coal-mine.webp'),
+      MEDIA_SLOT('3', 'Haul road', 'media/generated/mining-haulage.webp'),
       MEDIA_SLOT('4', 'Rail movement', 'media/cine/reel-rail.webp')
     ] },
     { id: 'hometown', label: 'Darra Adam Khel · our home', kind: 'slots', slots: [

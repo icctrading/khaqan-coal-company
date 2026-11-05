@@ -195,9 +195,7 @@ Two rules to keep:
   the mark at 78px, whose 2x box (156px) sits between two tiers — narrow that slot's
   `srcset` to the tiers that satisfy it instead of widening `sizes`, so a 1x visitor is
   not made to pay for a retina file either.
-- `<video poster>` always points at a `.webp`. The JPEG posters cost 2-5x the same
-  picture (142KB vs 89KB on `excavator-poster`) and are painted on every load, poster or
-  no poster.
+- Default public-page motion clips have been replaced with optimized WebP images. If a future Control Room upload adds a video, test its first-frame poster, mobile data use, and reduced-motion behavior before publishing.
 - CSS background textures point at a `.webp` too. Five older `.coal-page-bg` rules were
   still naming `media/coal-texture-bg.jpg` (208KB vs 132KB for the same 1376x768 image,
   mean channel difference 2.2/255); they lost the cascade everywhere except day mode on the

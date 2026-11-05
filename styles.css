@@ -802,7 +802,7 @@ html[data-theme="day"] .footer p, html[data-theme="day"] .footer-links a, html[d
 html[data-theme="day"] .footer h4 { color: #3c6a45; }
 html[data-theme="day"] .text-link { color: #29633c; }
 
-/* Real media rails. Images use lazy loading in markup; video uses compact local WebM files. */
+/* Image-led media rails. Still assets use responsive WebP and lazy loading in markup. */
 .media-rail { display: grid; grid-template-columns: 1.28fr .86fr .86fr; gap: 16px; }
 .media-tile, .media-card, .media-wall figure { position: relative; margin: 0; overflow: hidden; border: 1px solid rgba(195,218,198,.17); border-radius: var(--radius-sm); background: #0b1710; }
 .media-tile { min-height: 282px; }
@@ -813,7 +813,6 @@ html[data-theme="day"] .text-link { color: #29633c; }
 .media-tile figcaption, .media-card figcaption, .media-wall figcaption { position: absolute; z-index: 2; right: 18px; bottom: 17px; left: 18px; display: grid; gap: 4px; }
 .media-tile figcaption span, .media-card figcaption span { color: var(--ember-2); font-size: .64rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .media-tile figcaption strong, .media-card figcaption strong { color: #f0f4e8; font-family: Georgia, serif; font-size: 1.24rem; font-weight: 400; letter-spacing: -.03em; }
-.media-video-tile video, .media-card-video video { background: #101a12; }
 .media-credit { margin-top: 15px; color: #84978a; font-size: .68rem; letter-spacing: .02em; }
 .media-credit a { color: var(--sand-2); text-decoration: underline; text-underline-offset: 3px; }
 .media-section { overflow: hidden; }
@@ -1625,7 +1624,7 @@ html[data-theme="day"] .reel-stage .reel-slide video, html[data-theme="day"] .re
 
 .film-wall { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .film-card { margin: 0; position: relative; border-radius: 16px; overflow: hidden; border: 1px solid rgba(195,218,198,.14); background: #0a120d; aspect-ratio: 16 / 10; }
-.film-card video { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.85) contrast(1.06) brightness(.92); }
+.film-card img, .film-card video { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.85) contrast(1.06) brightness(.92); }
 .film-card figcaption { position: absolute; right: 0; bottom: 0; left: 0; padding: 30px 14px 12px; background: linear-gradient(transparent, rgba(4,10,6,.9)); display: grid; gap: 3px; pointer-events: none; }
 .film-card figcaption span { color: var(--ember-2); font-size: .56rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
 .film-card figcaption strong { color: #f2f4e6; font-size: .8rem; font-weight: 700; }
