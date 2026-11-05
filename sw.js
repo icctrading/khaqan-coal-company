@@ -12,7 +12,7 @@
  * the oldest half once the entry count passes MAX_ENTRIES, so a long visit can't
  * grow the origin's quota without bound.
  */
-const VERSION = 'khaqan-coal-v32';
+const VERSION = 'khaqan-coal-v33';
 const ASSETS = VERSION + ':assets';
 const PAGES = VERSION + ':pages';
 const LIST = VERSION + ':list';
@@ -25,7 +25,7 @@ const SHELL = [
   './community.html', './contact.html', './crm.html',
   './profile.html',  // redirect stub: cached so an offline /portfolio still lands on the cached page
   './styles.css?v=5', './themes.css?v=18', './themes-marble.css?v=1',
-  './themes-obsidian.css?v=1', './themes-shared.css?v=9', './script.js?v=32',
+  './themes-obsidian.css?v=1', './themes-shared.css?v=9', './script.js?v=33',
   './supabase-config.js?v=1', './cloud.js?v=12',
   './crm.css?v=13', './crm.js?v=13', './crm-cloud.js?v=11',
   './media/logo-mark-128.webp?v=1', './media/logo-mark-light-128.webp?v=1',
