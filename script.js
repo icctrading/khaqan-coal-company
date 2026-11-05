@@ -1464,7 +1464,7 @@ if (contactForm && formStatus) {
       });
     }
     const name = payload.name?.trim() || 'there';
-    formStatus.textContent = `Thank you, ${name}. Your enquiry is ready for the Khaqan team.`;
+    formStatus.textContent = `Thank you, ${name}. Your enquiry was saved in this browser${window.KhaqanCloud?.enabled ? ' and will sync to the CRM when available' : ''}. It does not send an email or notify the team.`;
     contactForm.reset();
   });
 }
