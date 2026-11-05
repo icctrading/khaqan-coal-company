@@ -15,12 +15,6 @@ The website uses the following reference media until the company’s own Darra A
 - `coal-mine-transport.jpg` — “Premier coal mine, Collie, April 2022 16.jpg”, by Calistemon, licensed CC BY-SA 4.0: https://commons.wikimedia.org/wiki/File:Premier_coal_mine,_Collie,_April_2022_16.jpg
 - `coal-haul-truck.png` — original high-resolution source for the optimized JPG above.
 
-## Videos and posters
-
-- `coal-mining-360.webm` / `coal-mining-poster.jpg` — “Garzweiler excavatrice godets.ogv”, bucket-wheel excavator at the Garzweiler coal mine in Germany, by Milhouse fr, licensed CC BY-SA 3.0: https://commons.wikimedia.org/wiki/File:Garzweiler_excavatrice_godets.ogv
-- `welzow-bucket-360.webm` / `welzow-bucket-poster.jpg` — “Schaufelradbagger und f60 im Tagebau Welzow Süd.webm”, bucket-wheel mining equipment in the Welzow Süd lignite surface mine, by Onkel Holz, licensed CC0: https://commons.wikimedia.org/wiki/File:Schaufelradbagger_und_f60_im_Tagebau_Welzow_S%C3%BCd.webm
-- `excavator-360.webm` / `excavator-poster.jpg` — “Rh40b.webm”, O&K RH40-B excavator in action at the open-pit mining site Lhoist in Menden, Germany, by R a mueller, licensed CC BY-SA 4.0: https://commons.wikimedia.org/wiki/File:Rh40b.webm
-
 ## Darra Adam Khel reference links
 
 - `darra-coal-mines-max.jpg` — thumbnail for “Coal Mines of Dara Adam Khel”: https://www.youtube.com/watch?v=szSbXgzsNFU
@@ -28,10 +22,8 @@ The website uses the following reference media until the company’s own Darra A
 - `darra-mountain-poster.jpg` — optional thumbnail for “Inside Darra Adam Khel’s Hidden Coal Mine Mountains”: https://www.youtube.com/watch?v=o2Fpz2uO45s
 
 The Darra references remain linked to their original YouTube uploads rather than copied locally. Please confirm the uploader’s permission before using them in a commercial launch.
-- `hauler-360.webm` / `hauler-poster.jpg` — “Articulated hauler dump truck.webm”, by Wikideas1, dedicated under CC0: https://commons.wikimedia.org/wiki/File:Articulated_hauler_dump_truck.webm
-- `coal-train-240.webm` / `coal-train-poster.jpg` (CRM media library only) — “Eerste kolentrein uit Duitsland over de Maas bij Roermond-519002.ogv”, historical coal-train transport footage from the Netherlands Institute for Sound and Vision, licensed CC BY-SA 3.0 NL: https://commons.wikimedia.org/wiki/File:Eerste_kolentrein_uit_Duitsland_over_de_Maas_bij_Roermond-519002.ogv
 
-Please review each license and attribution requirement before deploying the site commercially. For the strongest brand result, replace these reference assets with original photographs and videos from Khaqan Coal Company’s own operation.
+Please review each license and attribution requirement before deploying the site commercially. The new AI-generated images are illustrative visualizations, not documentary photographs of Khaqan Coal Company operations.
 
 ---
 
@@ -51,9 +43,17 @@ Please review each license and attribution requirement before deploying the site
 - `media/cine/valley-dawn.jpg` (+ `.webp`) — original cinematic 3D render of a hillside coal mine in a KPK valley at dawn; used on the About page legacy section.
 - `media/cine/gallery-conveyor.jpg`, `media/cine/gallery-stockpile.jpg` (+ `.webp`) — original 3D renders for the Gallery.
 
+## AI-generated mining illustrations (approved 2026-11)
+
+- `media/generated/mining-excavator.webp` — illustrative excavator working at an open-pit coal face.
+- `media/generated/mining-haulage.webp` — illustrative coal haul truck on a mine road.
+- `media/generated/green-mountain-coal-mine.webp` — illustrative coal mine entrance in green mountains.
+
+Generated specifically for the site after owner review. These are not documentary images of Khaqan Coal Company operations; the page captions and alternative text identify them as illustrations.
+
 ## WebP optimisation (added 2026-08)
 
-All page imagery now ships as WebP through `<picture>` (with the original JPG as fallback) or as a WebP CSS background. Originals are retained on disk. The landing-page background video (`coal-mining-360.webm` as a fixed full-page loop) was removed; it remains available for the home reel and CRM library.
+All website mining visuals now ship as optimized WebP still images; the decorative cinematic backdrop continues to crossfade between WebP frames. The stock video files and their posters have been removed from the website repository. The Control Room media library remains available for company-managed uploads.
 
 ## Reel and backdrop renders (added 2026-08-27)
 
@@ -80,8 +80,7 @@ https://www.vecteezy.com/free-photos/mining-3d (no stock asset was downloaded or
   `hero-01…hero-05` plus three reel frames, and each inner page cycles its own five-frame set drawn from
   `media/cine/*`, `media/mine-3d-*`, `media/darra-photo-*` and the transport photos. See `script.js`
   ("Cinematic 3D backdrop").
-- The archival clip `coal-train-240.webm` is no longer embedded on the Supply page; it was replaced by the
-  `reel-rail` render. The file and its attribution above are kept for the CRM media library.
+- The former stock video files were removed; gallery and page-area slots now use still imagery by default.
 
 ## Rendered sizes (`-768.webp`)
 
@@ -115,8 +114,7 @@ The brand mark ships in three renditions - `logo-mark-128.webp` (128 px),
 are cut from the master at `quality=90, method=6, exact=True` on an RGBA image, so the
 transparent surround survives. The `-128` pair is what the service worker precaches.
 
-Video posters are `.webp` only. The three `*-poster.jpg` masters are kept because the CRM
-media library lists them as source files, but no page markup references them.
+Default stock media is image-only; the CRM media inventory still supports company uploads.
 
 ## App icons (`media/icons/`)
 
@@ -169,6 +167,6 @@ photo above — no page uses it), the `logo-official.png` / `logo-official-light
 `logo-official-black.jpg` production and display lockups (the true masters stay in
 `media/brand/`), the earlier `logo-official.webp` / `logo-official-light.webp` variants,
 the unused tunnel render `mine-3d-tunnel.jpg` / `mine-3d-tunnel.webp`, the unused
-`garzweiler-stacker-360.webm` and its `.jpg` / `.webp` posters, the unused
+all shipped stock `.webm` clips and their poster images, the unused
 `darra-coal-poster.jpg` / `.webp`, and `coal-texture-bg.jpg` (superseded in every rule by
 `coal-texture-bg.webp`).

@@ -3469,21 +3469,21 @@ html[data-theme="day"] .cine-veil {
 .cine-scene-caption span { color: #f2c56b; font-size: .56rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
 .cine-scene-caption strong { color: #f6f2e8; font-family: "Playfair Display", Georgia, serif; font-size: .95rem; font-weight: 400; letter-spacing: .01em; }
 
-/* Video scene (operations) — real footage, cinematic grade */
-.cine-video { position: relative; overflow: hidden; border-radius: 16px; border: 1px solid rgba(242, 197, 107, .38); background: #050a07; box-shadow: 0 26px 60px rgba(0, 0, 0, .4); }
-.cine-video video {
+/* Operations media scene — image-first frame; CRM overrides may still supply video. */
+.cine-image { position: relative; overflow: hidden; border-radius: 16px; border: 1px solid rgba(242, 197, 107, .38); background: #050a07; box-shadow: 0 26px 60px rgba(0, 0, 0, .4); }
+.cine-image img, .cine-image video {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
   filter: saturate(.82) contrast(1.1) brightness(.78);
 }
-html[data-theme="day"] .cine-video video { filter: saturate(.9) contrast(1.05) brightness(1.02); }
+html[data-theme="day"] .cine-image img, html[data-theme="day"] .cine-image video { filter: saturate(.9) contrast(1.05) brightness(1.02); }
 
-/* Operations: the old flat illustration becomes a real video scene */
-.mine-animation.cine-video { height: 440px; background: #050a07; }
-.mine-animation.cine-video::before { display: none; } /* drop the star field */
-.mine-animation.cine-video::after { display: none; }  /* drop the old sweep */
-.mine-animation.cine-video video { filter: saturate(.84) contrast(1.12) brightness(.8); }
+/* Operations illustration frame */
+.mine-animation.cine-image { height: 440px; background: #050a07; }
+.mine-animation.cine-image::before { display: none; } /* drop the star field */
+.mine-animation.cine-image::after { display: none; }  /* drop the old sweep */
+.mine-animation.cine-image img, .mine-animation.cine-image video { filter: saturate(.84) contrast(1.12) brightness(.8); }
 
 /* Supply board: realistic railhead behind the route nodes */
 .supply-scene { z-index: 0; }

@@ -32,7 +32,7 @@ The project is Vercel-ready. See `deploy.md` for the GitHub → Supabase → Ver
 
 ## Media
 
-Reference mining photos and open-licensed short videos are in `/media`. Attribution and license notes are in `/media/credits.md`. Replace them with original Khaqan Coal Company photographs and footage before public commercial launch.
+Mining photos, company-supplied local images, and explicitly marked AI-generated illustrations are in `/media`. Attribution and generation notes are in `/media/credits.md`; the static website ships with still images rather than stock video.
 
 ## Brand themes
 
