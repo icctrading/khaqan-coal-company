@@ -773,10 +773,10 @@ window.KHAQAN_PAGE_AREAS = {
     { id: 'gallery', label: 'Fresh from the field', kind: 'gallery' },
     { id: 'reel', label: 'Highlights reel', kind: 'slots', slots: [
       MEDIA_SLOT('1', '01 · Mountain mine', 'media/generated/green-mountain-coal-mine.webp'),
-      MEDIA_SLOT('2', '02 · Cutting face', 'media/cine/reel-bucketwheel.webp'),
-      MEDIA_SLOT('3', '03 · Terraces', 'media/cine/reel-aerial.webp'),
+      MEDIA_SLOT('2', '02 · Mountain portal', 'media/cine/mountain-mine-portal.webp'),
+      MEDIA_SLOT('3', '03 · Mountain road', 'media/cine/mountain-mine-haul-road.webp'),
       MEDIA_SLOT('4', '04 · Coal on the move', 'media/generated/mining-excavator.webp'),
-      MEDIA_SLOT('5', '05 · Longwall', 'media/cine/reel-underground.webp'),
+      MEDIA_SLOT('5', '05 · Miners at work', 'media/cine/mountain-coal-tunnel-work.webp'),
       MEDIA_SLOT('6', '06 · Hauler', 'media/generated/mining-haulage.webp'),
       MEDIA_SLOT('7', '07 · Haul road', 'media/cine/reel-haulroad.webp'),
       MEDIA_SLOT('8', '08 · Our valley', 'media/darra-photo-2.webp'),
