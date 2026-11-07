@@ -55,11 +55,13 @@ Generated specifically for the site after owner review. These are not documentar
 
 All website mining visuals now ship as optimized WebP still images; the decorative cinematic backdrop continues to crossfade between WebP frames. The stock video files and their posters have been removed from the website repository. The Control Room media library remains available for company-managed uploads.
 
-## Reel and backdrop renders (added 2026-08-27)
+## Illustrative mountain mining reel scenes (refreshed 2026-11-07)
 
-- `media/cine/reel-bucketwheel.jpg/.webp` — bucket-wheel excavator cutting a highwall bench at sunrise.
-- `media/cine/reel-underground.jpg/.webp` — lit underground development heading with roof bolts and a shuttle car.
-- `media/cine/reel-aerial.jpg/.webp` — aerial view of a terraced mountain open-pit with haul ramps.
+- `media/cine/mountain-mine-portal.jpg/.webp` — AI-generated illustration of a modest loader near a mountain mine entrance.
+- `media/cine/mountain-coal-tunnel-work.jpg/.webp` — AI-generated illustration of miners at work in a supported coal tunnel.
+- `media/cine/mountain-mine-haul-road.jpg/.webp` — AI-generated illustration of a small vehicle on a rugged mountain mine road.
+
+These scenes are illustrative, not photographs documenting Khaqan Coal Company operations.
 - `media/cine/reel-rail.jpg/.webp` — wagon-loading gantry at a mountain railhead at dusk.
 - `media/cine/reel-stockpile.jpg/.webp` — reclaimed stockpile domes with stacker/reclaimer at blue hour.
 - `media/cine/reel-haulroad.jpg/.webp` — loaded haul trucks on a switchback mountain haul road.
