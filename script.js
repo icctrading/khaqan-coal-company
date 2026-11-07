@@ -1855,10 +1855,10 @@ document.querySelectorAll('[data-reel]').forEach((reel) => {
       const image = new Image();
       image.decoding = 'async';
       image.dataset.cineIndex = String(i);
-      /* Only the opening frame is urgent — the rest of the sequence is
-         fetched once the page itself has settled, so the reel, the hero
-         and the copy all win the first race. */
-      if (i < 2) { image.fetchPriority = 'high'; image.src = src; }
+      /* This backdrop is decorative; keep its first image below the real
+         hero and content in the network priority queue. Later frames wait
+         until idle, so the LCP image and render-critical resources win. */
+      if (i === 0) { image.fetchPriority = 'low'; image.src = src; }
       return image;
     });
     const rest = images.filter((image) => !image.getAttribute('src'));
